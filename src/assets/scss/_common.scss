@@ -1,0 +1,47 @@
+button + button {
+  margin-left: 5px;
+}
+.actionBtnBottom {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: #ffffff;
+  border-top: 1px solid rgba(206, 190, 190, 0.356);
+  z-index: 10;
+}
+.actionCollumn {
+  display: flex;
+  justify-content: center;
+  // text-align: center;
+  align-items: center;
+}
+.customAlert {
+  color: #ff4d4f;
+  display: block;
+  height: 0;
+  margin-top: -34px;
+  margin-bottom: 34px;
+}
+.customFieldAlert {
+  .ant-input-affix-wrapper {
+    border-color: #ff4d4f;
+  }
+}
+.hiddenColumn {
+  max-width: 0px !important;
+  width: 0px !important;
+  overflow: hidden;
+  padding: 0px !important;
+  margin: 0px !important;
+  overflow-wrap: normal !important;
+  border-width: 0px !important;
+}
+main {
+  position: relative;
+  background-color: #f7f7f785;
+  padding: 10px;
+}

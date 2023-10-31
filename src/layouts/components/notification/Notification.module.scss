@@ -1,0 +1,35 @@
+.notiDropdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 2.75rem;
+  min-width: 20rem !important;
+  :global {
+    .dropdown-item-text {
+      margin-left: 8px;
+    }
+  }
+}
+.notiheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 40px;
+  .title {
+    font-weight: 600;
+  }
+  .markRead {
+    color: #1677ff;
+    cursor: pointer;
+  }
+}
+.notiOverlay {
+  :global {
+    .ant-dropdown-menu {
+      max-height: 70vh;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+  }
+}

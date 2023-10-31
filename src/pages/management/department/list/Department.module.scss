@@ -1,0 +1,11 @@
+.department {
+  padding: 0 10px;
+}
+
+.drawer {
+  :global {
+    .ant-drawer-body {
+      padding-top: 0;
+    }
+  }
+}

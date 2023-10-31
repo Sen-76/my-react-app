@@ -1,0 +1,37 @@
+.navItem {
+  width: 8.125rem;
+  white-space: normal;
+  line-height: 1.1;
+  word-break: break-word;
+}
+.leftNav {
+  height: calc(100% - 64px);
+  background-color: #ffffff;
+  color: #222222;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 10px;
+  :global {
+    li,
+    .ant-menu-submenu-title {
+      min-height: 50px;
+      span {
+        .anticon {
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+        .ant-menu-title-content {
+          font-size: 16px;
+          overflow: hidden;
+        }
+      }
+    }
+    .ant-menu-sub {
+      li {
+        padding-right: 24px;
+      }
+    }
+  }
+}

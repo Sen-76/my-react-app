@@ -1,0 +1,17 @@
+.breadcrumb {
+  font-weight: 500;
+  color: #7c7f90 ;
+  :global {
+    .ant-breadcrumb-link {
+      color: #7c7f90 ;
+    }
+  }
+  .breadcrumbIcon {
+    svg {
+      font-size: 16px;
+    }
+  }
+  .canClickBreadcrumb {
+    cursor: pointer;
+  }
+}

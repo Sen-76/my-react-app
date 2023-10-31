@@ -1,0 +1,53 @@
+.Card {
+  :global {
+    .card-header {
+      height: 40px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #e7ecef;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      .card-left {
+        display: flex;
+        align-items: center;
+        .cardTitle {
+          position: relative;
+          font-size: 16px;
+          font-weight: 600;
+          line-height: 40px;
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #3762ea;
+          }
+        }
+      }
+      .card-right {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        .upIcon {
+          margin-left: 24px;
+          color: #4b5566;
+        }
+      }
+      &:hover {
+        .card-left {
+          .cardTitle {
+            color: #0c7d8f;
+          }
+        }
+      }
+      &:active {
+        background-color: #0000000f;
+      }
+    }
+    .card-con {
+      padding: 16px 0px;
+    }
+  }
+}

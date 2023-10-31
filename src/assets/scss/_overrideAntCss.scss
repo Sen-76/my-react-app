@@ -1,0 +1,127 @@
+.ant-table-content {
+  border: 1px solid #d3b6c154;
+  border-radius: 5px;
+  border-bottom: none;
+}
+td {
+  vertical-align: middle !important;
+}
+.ant-table-thead {
+  border-radius: 5px;
+  border: 1px solid transparent;
+  .ant-table-cell {
+    background: #f3f3f3 !important;
+    border: 1px solid transparent;
+    &::before {
+      display: none;
+    }
+  }
+}
+.ant-picker {
+  width: 100%;
+}
+.ant-table-title {
+  background-color: #f7f7f785;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0 !important;
+}
+.ant-input-group-wrapper {
+  height: 100%;
+  vertical-align: middle;
+}
+.ant-checkbox-group {
+  width: 100%;
+}
+.ant-typography {
+  margin-bottom: 2px !important;
+}
+.ant-collapse-header {
+  border-radius: 0 !important;
+  border-bottom: 1px solid rgba(97, 84, 99, 0.404);
+  padding-inline-start: 0 !important;
+  padding: 10px 5px !important;
+}
+.ant-collapse-content-box {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  .ant-form-item {
+    margin: 0;
+  }
+}
+.ant-form-item-label {
+  label {
+    font-size: 14px !important;
+    font-weight: 500;
+  }
+}
+.ant-drawer-body {
+  form {
+    margin-bottom: 50px;
+  }
+}
+.ant-btn-primary {
+  background-color: #3762ea;
+}
+.ant-input-number {
+  width: 100%;
+}
+.ant-select-multiple {
+  .ant-select-selector {
+    padding: 2.5px 0;
+    .ant-select-selection-item {
+      min-height: 35px !important;
+      margin: 2.5px 0;
+      margin-left: 5px;
+    }
+    .ant-select-selection-item-content {
+      display: flex;
+      align-items: center;
+      margin-right: 10px;
+    }
+  }
+}
+.ant-upload {
+  position: relative;
+}
+
+.ant-col {
+  margin-bottom: 10px;
+}
+.ant-tooltip-inner {
+  color: #222222 !important;
+  font-size: 14px;
+  line-height: 18px;
+  padding: 9px 8px !important;
+  background-color: #fff !important;
+}
+
+.ant-menu-item-selected {
+  background-color: #3762ea26 !important;
+  .ant-menu-title-content,
+  .ant-menu-submenu-arrow,
+  .ant-menu-item-icon {
+    color: #3762ea !important;
+  }
+}
+.ant-menu-title-content,
+.ant-menu-submenu-arrow,
+.ant-menu-item-icon {
+  color: #7c7f90 !important;
+}
+.ant-menu-item,
+.ant-menu-submenu-title {
+  border-radius: 4px !important;
+  &:hover {
+    background-color: #3762ea26 !important;
+  }
+  &:active {
+    background-color: #3762ea26 !important;
+  }
+}
+
+.ant-tooltip-arrow {
+  &::before {
+    background-color: #fbfbfb !important;
+  }
+}

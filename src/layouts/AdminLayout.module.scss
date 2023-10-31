@@ -1,0 +1,110 @@
+.siteLayout {
+  display: flex;
+  flex-direction: row;
+
+  .lefNav {
+    background: transparent;
+    height: 100vh;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-x: auto;
+    transition: all 0.5s;
+    border-right: 0.8px solid #9092a062;
+    background: #fff;
+    overflow-x: hidden;
+    opacity: 1;
+    z-index: 10;
+    &.expandLeftNav {
+      width: 80px;
+    }
+  }
+  .siteLayout {
+    width: calc(100vw - 250px);
+  }
+  :global {
+    .ant-layout {
+      transition: all 0.5s;
+      background-color: #ffffff;
+      height: 100vh;
+      width: 100%;
+    }
+    .ant-menu-item {
+      display: flex;
+    }
+    .ant-menu-submenu-title {
+      display: flex;
+    }
+  }
+  .barIcon,
+  .barMobileIcon {
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    margin-right: 20px;
+    display: block;
+  }
+  .barMobileIcon {
+    display: none;
+  }
+  .rightHeader {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+
+    :global {
+      .anticon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 25%;
+        border: 1px solid rgb(233, 223, 210);
+        cursor: pointer;
+      }
+    }
+    svg {
+      font-size: 20px;
+    }
+  }
+  @media only screen and (max-width: 800px) {
+    .rightHeader {
+      display: none;
+      width: 250px !important;
+    }
+    .barIcon {
+      display: none;
+    }
+    .barMobileIcon {
+      display: block;
+    }
+    .lefNav {
+      width: 0 !important;
+    }
+    :global {
+      .ant-layout {
+        width: 100vw !important;
+        padding: 0 !important;
+      }
+    }
+  }
+}
+
+.logoWrap {
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobileLeftNav {
+  :global {
+    .ant-drawer-wrapper-body {
+      .ant-drawer-body {
+        padding: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+.goals {
+  padding: 0 10px;
+}
+.goalList {
+  :global {
+    .ant-tree {
+    }
+    .ant-tree-draggable-icon {
+      display: none;
+    }
+    .ant-tree-treenode {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      .ant-tree-switcher {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        width: 30px;
+        &:hover {
+          background-color: #cae0df;
+        }
+      }
+      .ant-tree-node-content-wrapper {
+        width: 100%;
+        .ant-row {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          padding-right: 20px;
+          .ant-col {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+          }
+        }
+      }
+    }
+  }
+}

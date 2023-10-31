@@ -1,0 +1,15 @@
+.smtpConfig {
+  padding: 20px;
+  position: absolute;
+  height: calc(100% - 10px);
+  width: calc(100% - 20px);
+  form {
+    margin-bottom: 50px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .smtpConfig {
+    width: 100%;
+  }
+}

@@ -1,0 +1,52 @@
+.member {
+  label {
+    width: 100%;
+    div {
+      width: 100%;
+    }
+    &::after {
+      display: none;
+    }
+  }
+}
+.drawer {
+  :global {
+    .ant-drawer-body {
+      padding-top: 0;
+    }
+  }
+}
+
+.detailPanel {
+  :global {
+    .ant-drawer-body {
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  }
+  .title {
+    font-weight: 600;
+    margin: 10px 0 5px 0;
+  }
+  .detailRow {
+    height: 40px;
+    border: 1px solid #b6b6b6;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    line-height: 40px;
+    padding: 0 10px;
+    color: #646464;
+  }
+  .keyCol {
+    border-right: 1px solid #b6b6b6;
+    padding-right: 10px;
+    width: 110px;
+  }
+  .valueCol {
+    padding-left: 10px;
+  }
+}

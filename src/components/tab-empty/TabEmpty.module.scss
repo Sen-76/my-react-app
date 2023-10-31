@@ -1,0 +1,10 @@
+.tableEmpty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  :global {
+    .table-empty-text {
+      margin-left: 8px;
+    }
+  }
+}

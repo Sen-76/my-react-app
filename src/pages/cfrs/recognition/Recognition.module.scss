@@ -1,0 +1,121 @@
+.recognitions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  height: 100%;
+  :global {
+    .ant-col {
+      margin-bottom: 0px;
+    }
+    .ant-card {
+      border: 1px solid #c0a7a79d;
+    }
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 16px;
+    width: 100%;
+    min-height: 50px !important;
+    padding: 0 20px;
+    border-bottom: 1px solid #e6e6e6;
+    z-index: 1;
+    a {
+      font-size: 14px;
+      font-weight: normal;
+    }
+    .editIcon {
+      cursor: pointer;
+      font-size: 17px;
+      &:hover {
+        color: blue;
+      }
+    }
+  }
+  .draft {
+    width: 100%;
+  }
+  .tabs {
+    padding: 10px;
+  }
+  .giveStar {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    :global {
+      .ant-picker {
+        width: 100%;
+      }
+    }
+    .keyCol {
+      width: 110px;
+    }
+    .row {
+      padding: 5px;
+      :global {
+        .ant-col {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+      }
+      button + button {
+        margin-left: 5px;
+        min-width: 70px;
+      }
+    }
+  }
+  .body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: calc(100% - 50px);
+    :global {
+      .ant-table-wrapper {
+        width: 100%;
+      }
+    }
+    form {
+      width: 100%;
+      margin-bottom: 50px;
+    }
+  }
+  .giveAndReceive {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .record {
+    display: flex;
+    align-content: stretch;
+    align-items: flex-start;
+    justify-content: space-around;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e6e6e6;
+  }
+  .contentRecord {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px;
+  }
+  .contentLibary {
+    height: 100%;
+  }
+  .overFollow {
+    height: 100%;
+    overflow: auto;
+  }
+  .spacePicker {
+    gap: 8px;
+    display: flex;
+    padding-bottom: 10px;
+    flex-direction: row-reverse;
+  }
+}
