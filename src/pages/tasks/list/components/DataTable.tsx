@@ -17,6 +17,7 @@ import Search from 'antd/es/input/Search';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { OrderBy } from '../Task.model';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface IProps {
   data: A[];
@@ -25,7 +26,6 @@ interface IProps {
   onSearch: (value: string) => void;
   openPanel: (data?: A) => void;
   openFilterPanel: (data?: A) => void;
-  openDetailPanel: (data?: A) => void;
   onOrder: (value: string, des: boolean) => void;
 }
 function DataTable(props: IProps) {
@@ -87,10 +87,17 @@ function DataTable(props: IProps) {
         return (
           <div>
             <Tooltip placement="bottom" title={t('Common_ViewDetail')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={() => props.openDetailPanel(record)} icon={<SolutionOutlined />} />
+              <Link to={`/tasks/task-detail/${record.key}/${record.id}`}>
+                <Button type="text" icon={<SolutionOutlined />} />
+              </Link>
             </Tooltip>
             <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={() => props.openPanel(record)} icon={<EditOutlined />} />
+              <Button
+                type="text"
+                disabled={record.status?.title === 'Done'}
+                onClick={() => props.openPanel(record)}
+                icon={<EditOutlined />}
+              />
             </Tooltip>
           </div>
         );

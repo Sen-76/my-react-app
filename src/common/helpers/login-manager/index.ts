@@ -25,7 +25,8 @@ export const useLoginManager = () => {
         user: {
           id: result.user.id,
           fullName: result.user.fullName,
-          userRole: result.user.userRole2.title
+          userRole: result.user.userRole2.title,
+          userEmail: result.user.userEmail
         }
       };
       if (userLogin.remember) {

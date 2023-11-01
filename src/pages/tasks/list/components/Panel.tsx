@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
   CloseOutlined,
   EllipsisOutlined,
@@ -33,6 +34,8 @@ import 'react-quill/dist/quill.snow.css';
 import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { util } from '@/common/helpers/util';
+import { useLoginManager } from '@/common/helpers/login-manager';
+import { RcFile } from 'antd/es/upload';
 
 interface IProps {
   refreshList: () => void;
@@ -44,16 +47,19 @@ function Panel(props: IProps, ref: A) {
   const { showLoading, closeLoading } = useLoading();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [projectList, setProjectList] = useState<Project.IProjectModel[]>();
-  const [statusList, setStatusList] = useState<Project.IProjectModel[]>();
+  const [projectList, setProjectList] = useState<A[]>();
+  const [statusList, setStatusList] = useState<A[]>();
+  const [typeList, setTypeList] = useState<A[]>();
   const [selectLoading, setSelectLoading] = useState<boolean>();
-  const [userMemberList, setUserMemberList] = useState<Account.IAccountModel[]>([]);
-  const [mileStoneList, setMilestoneList] = useState<Account.IAccountModel[]>([]);
-  const [priotyList, setPriotyList] = useState<Account.IAccountModel[]>([]);
-  const [taskList, setTaskList] = useState<Account.IAccountModel[]>([]);
-  const [editData, setEditDate] = useState<A[]>([]);
+  const [userMemberList, setUserMemberList] = useState<A[]>([]);
+  const [mileStoneList, setMilestoneList] = useState<A[]>([]);
+  const [priotyList, setPriotyList] = useState<A[]>([]);
+  const [taskList, setTaskList] = useState<A[]>([]);
+  const [editData, setEditData] = useState<A>();
+  const [selectedProject, setSelectedProject] = useState<string>('');
   const [searchAssigneeValue, setSearchAssigneeValue] = useState<string>('');
   const userDebouncedAssignee = useDebounce(searchAssigneeValue, 300);
+  const { getLoginUser } = useLoginManager();
 
   useEffect(() => {
     getUsers();
@@ -81,7 +87,14 @@ function Panel(props: IProps, ref: A) {
       showLoading();
       setOpen(true);
       setIsEdit(false);
-      const promises = [getProjectList(), getTaskList(), getStatusList(), getMilestoneList(), getPriotyList()];
+      const promises = [
+        getProjectList(),
+        getTaskList(),
+        getStatusList(),
+        getMilestoneList(),
+        getPriotyList(),
+        getTypeList()
+      ];
       await Promise.all(promises);
       if (data) {
         setIsEdit(true);
@@ -99,7 +112,7 @@ function Panel(props: IProps, ref: A) {
       const { data } = await service.taskService.getDetail(id);
       data.dueDate = dayjs(data.dueDate);
       form.setFieldsValue(data);
-      setEditDate(data);
+      setEditData(data);
     } catch (e) {
       console.log(e);
     }
@@ -110,7 +123,9 @@ function Panel(props: IProps, ref: A) {
       const draftParam = { ...initDataGrid };
       draftParam.searchInfor!.searchValue = userDebouncedAssignee ?? '';
       const result = await service.accountService.getAccount(draftParam);
-      const optionsValue = result.data?.map((x: A) => ({
+      const loginUser = JSON.parse(sessionStorage.getItem('userDetail') ?? '');
+      const data = [...result.data, loginUser];
+      const optionsValue = data?.map((x: A) => ({
         label: (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Avatar size={25} src={x?.photoUrl} style={{ marginRight: 10, backgroundColor: util.randomColor() }}>
@@ -151,6 +166,21 @@ function Panel(props: IProps, ref: A) {
         }
       });
       setProjectList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getTypeList = async () => {
+    try {
+      const result = await service.taskTypeService.get({
+        pageInfor: {
+          pageSize: 100,
+          pageNumber: 1,
+          totalItems: 0
+        }
+      });
+      setTypeList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -223,34 +253,35 @@ function Panel(props: IProps, ref: A) {
 
   const onFinish = async (val: A) => {
     try {
+      showLoading();
       if (isEdit) {
+        await handleUpload();
         await service.taskService.update({
           ...editData,
           ...val,
-          assignee: val.assignee.value,
-          reportTo: val.reportTo.value,
-          taskType: null,
+          assignee: val.assignee ? val.assignee.value : '',
+          reportTo: val.reportTo.value ?? '',
           dueDate: dayjs(val.dueDate).format('YYYY-MM-DD')
         });
         notification.open({
           message: t('Common_UpdateSuccess'),
           type: 'success'
         });
+      } else {
+        await handleUpload();
+        await service.taskService.create({
+          ...val,
+          assignee: val.assignee ? val.assignee.value : '',
+          reportTo: val.reportTo.value ?? '',
+          dueDate: dayjs(val.dueDate).format('YYYY-MM-DD')
+        });
+        notification.open({
+          message: t('Common_CreateSuccess'),
+          type: 'success'
+        });
       }
-      await service.taskService.create({
-        ...val,
-        assignee: val.assignee.value,
-        reportTo: val.reportTo.value,
-        taskType: null,
-        dueDate: dayjs(val.dueDate).format('YYYY-MM-DD'),
-        statusId: `c24ddc20-68b5-4556-b34f-93b3b70a4e88`
-      });
-      notification.open({
-        message: t('Common_CreateSuccess'),
-        type: 'success'
-      });
-      // props.refreshList();
-      // closeDrawer();
+      props.refreshList();
+      closeDrawer();
     } catch (e) {
       console.log(e);
     } finally {
@@ -286,10 +317,25 @@ function Panel(props: IProps, ref: A) {
     fileList
   };
 
+  const handleUpload = async () => {
+    const formData = new FormData();
+    formData.append('outletId', 'la cai d gi');
+    formData.append('comment', 'comment làm cái đúng gì');
+    // formData.append('id', editData?.id.toString() ?? '');
+    for (const file of fileList) {
+      if (file instanceof Blob) {
+        formData.append('file', file, file.name);
+      } else if ('originFileObj' in file && file.originFileObj instanceof Blob) {
+        formData.append('file', file.originFileObj, file.name);
+      }
+      await service.taskService.uploadAttach(formData);
+    }
+  };
+
   return (
     <>
       <Drawer
-        title={isEdit ? t('Configuration_File_Edit') : t('Configuration_File_Create')}
+        title={isEdit ? t('Task_Update') : t('Task_Create')}
         placement="right"
         open={open}
         extra={
@@ -308,7 +354,10 @@ function Panel(props: IProps, ref: A) {
       >
         <Form form={form} onFinish={onFinish} layout="vertical" className={styles.panelform}>
           <Form.Item name="projectId" label={t('Task_Project')} rules={formRule.project}>
-            <Select options={projectList} />
+            <Select options={projectList} onSelect={(val) => setSelectedProject(val)} />
+          </Form.Item>
+          <Form.Item name="taskType" label={t('Task_Type')} rules={formRule.project}>
+            <Select options={typeList} />
           </Form.Item>
           {isEdit && (
             <Form.Item name="statusId" label={t('Common_Status')} rules={formRule.status}>
@@ -324,7 +373,6 @@ function Panel(props: IProps, ref: A) {
           <Form.Item name="description" label={t('Common_Description')} rules={formRule.description}>
             <ReactQuill theme="snow" />
           </Form.Item>
-          {/* <Row> */}
           <Form.Item name="assignee" label={t('Task_Assignee')}>
             <Select
               labelInValue
@@ -363,10 +411,42 @@ function Panel(props: IProps, ref: A) {
               suffixIcon={<SearchOutlined />}
             />
           </Form.Item>
-          {/* <Button style={{ padding: 0 }} type="link">
-              {t('Task_Assign_To_Me')}
-            </Button>
-          </Row> */}
+          <Button
+            className={styles.customAlert}
+            type="link"
+            onClick={() =>
+              form.setFieldValue('assignee', {
+                label: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Avatar
+                      size={25}
+                      src={localStorage.getItem('avatar')}
+                      style={{ marginRight: 10, backgroundColor: util.randomColor() }}
+                    >
+                      {getLoginUser().user.fullName?.charAt(0)}
+                    </Avatar>
+                    <div>
+                      <Paragraph
+                        ellipsis={{ rows: 1, expandable: false }}
+                        style={{ maxWidth: 350, minWidth: 30, fontWeight: 600, fontSize: 16, lineHeight: '20px' }}
+                      >
+                        {getLoginUser().user.fullName}
+                      </Paragraph>
+                      <Paragraph
+                        ellipsis={{ rows: 1, expandable: false }}
+                        style={{ maxWidth: 350, minWidth: 30, lineHeight: '16px', fontSize: 12 }}
+                      >
+                        {getLoginUser().user.userEmail}
+                      </Paragraph>
+                    </div>
+                  </div>
+                ),
+                value: getLoginUser().user.id
+              })
+            }
+          >
+            {t('Task_Assign_To_Me')}
+          </Button>
           <Form.Item name="milestoneId" label={t('Task_Milestone')}>
             <Select options={mileStoneList} />
           </Form.Item>
@@ -411,6 +491,42 @@ function Panel(props: IProps, ref: A) {
               suffixIcon={<SearchOutlined />}
             />
           </Form.Item>
+          <Button
+            className={styles.customAlert}
+            type="link"
+            onClick={() =>
+              form.setFieldValue('reportTo', {
+                label: (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Avatar
+                      size={25}
+                      src={localStorage.getItem('avatar')}
+                      style={{ marginRight: 10, backgroundColor: util.randomColor() }}
+                    >
+                      {getLoginUser().user.fullName?.charAt(0)}
+                    </Avatar>
+                    <div>
+                      <Paragraph
+                        ellipsis={{ rows: 1, expandable: false }}
+                        style={{ maxWidth: 350, minWidth: 30, fontWeight: 600, fontSize: 16, lineHeight: '20px' }}
+                      >
+                        {getLoginUser().user.fullName}
+                      </Paragraph>
+                      <Paragraph
+                        ellipsis={{ rows: 1, expandable: false }}
+                        style={{ maxWidth: 350, minWidth: 30, lineHeight: '16px', fontSize: 12 }}
+                      >
+                        {getLoginUser().user.userEmail}
+                      </Paragraph>
+                    </div>
+                  </div>
+                ),
+                value: getLoginUser().user.id
+              })
+            }
+          >
+            {t('Task_Assign_To_Me')}
+          </Button>
           <Form.Item name="attachment" label={t('Task_Attachment')}>
             <Upload {...fileProps} listType="picture" multiple>
               <Button icon={<UploadOutlined />}>Upload</Button>

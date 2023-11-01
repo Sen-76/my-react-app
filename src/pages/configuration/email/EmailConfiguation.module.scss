@@ -1,3 +1,55 @@
 .emailConfiguration {
   padding: 0 10px;
+  height: 100%;
+  :global {
+    .ant-segmented-group {
+      flex-direction: column;
+    }
+    .ql-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 0;
+    }
+    .ql-editor {
+      min-height: 500px;
+    }
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+  }
+}
+
+.leftNav {
+  background-color: #e4d7d794;
+  color: #222222;
+  font-size: 16px;
+  font-weight: 500;
+  :global {
+    li,
+    .ant-menu-submenu-title {
+      min-height: 50px;
+      span {
+        .anticon {
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+        .ant-menu-title-content {
+          font-size: 16px;
+          overflow: hidden;
+        }
+      }
+    }
+    .ant-menu-sub {
+      li {
+        padding-right: 24px;
+      }
+    }
+  }
+}
+.quill {
+  width: calc(100% - 270px);
 }

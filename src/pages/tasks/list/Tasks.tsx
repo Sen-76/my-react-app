@@ -211,12 +211,11 @@ function Tasks() {
             loading={false}
             onSearch={onSearch}
             openFilterPanel={openFilterPanel}
-            openDetailPanel={() => console.log('cc')}
             onOrder={onOrder}
             param={param}
           />
         )}
-        {tabStatus === 'kanban' && <Kanban />}
+        {tabStatus === 'kanban' && <Kanban taskList={taskList} />}
         <Panel refreshList={() => console.log('cc')} ref={panelRef} />
         <FilterPanel ref={filterPanelRef} onFilter={onFilter} />
       </div>

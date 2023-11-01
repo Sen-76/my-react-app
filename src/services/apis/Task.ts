@@ -3,16 +3,25 @@ import axiosInstance from '../axios-instance/index';
 export const taskService = {
   async get(param: Common.IDataGrid): Promise<Response.IDefaultResponse> {
     try {
-      const response = await axiosInstance.post('/task/get', param);
+      const response = await axiosInstance.post('/task/getAllTask', param);
       return response.data;
     } catch (error) {
       console.error('An error occurred while get:', error);
       throw error;
     }
   },
-  async restoretask(ids: string[]): Promise<Response.IDefaultResponse> {
+  async getMyTask(param: Common.IDataGrid): Promise<Response.IDefaultResponse> {
     try {
-      const response = await axiosInstance.post('/task/restore', ids);
+      const response = await axiosInstance.post('/task/getMyTask', param);
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while get:', error);
+      throw error;
+    }
+  },
+  async updateStatus(ids: A): Promise<Response.IDefaultResponse> {
+    try {
+      const response = await axiosInstance.post('/task/updateStatusTask', ids);
       return response.data;
     } catch (error) {
       console.error('An error occurred while restore task:', error);
@@ -39,7 +48,7 @@ export const taskService = {
   },
   async update(param: Department.IDepartmentUpdateModel): Promise<Response.IDefaultResponse> {
     try {
-      const response = await axiosInstance.post('/task/update', param);
+      const response = await axiosInstance.post('/task/updateTask', param);
       return response.data;
     } catch (error) {
       console.error('An error occurred while update:', error);
@@ -52,6 +61,15 @@ export const taskService = {
       return response.data;
     } catch (error) {
       console.error('An error occurred while delete:', error);
+      throw error;
+    }
+  },
+  async uploadAttach(userData: A): Promise<A> {
+    try {
+      const response = await axiosInstance.post('/task/uploadAttach', userData);
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while import files:', error);
       throw error;
     }
   }
