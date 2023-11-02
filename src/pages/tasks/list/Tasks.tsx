@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useBreadcrumb } from '@/components/breadcrum/Breadcrum';
-import { SnippetsOutlined } from '@ant-design/icons';
-import { Select, Tabs } from 'antd';
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  FilterOutlined,
+  OrderedListOutlined,
+  SnippetsOutlined
+} from '@ant-design/icons';
+import { Button, Dropdown, Menu, Tabs, Tooltip } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import styles from './Task.module.scss';
 import DataTable from './components/DataTable';
@@ -11,6 +17,9 @@ import Kanban from './components/Kanban';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import FilterPanel from './components/FilterPanel';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Search from 'antd/es/input/Search';
+import { OrderBy } from './Task.model';
 
 function Tasks() {
   const { setBreadcrumb } = useBreadcrumb();
@@ -31,9 +40,10 @@ function Tasks() {
     // }
   };
   const [tabStatus, setTabStatus] = useState<string>('table');
-  const [projectList, setProjectList] = useState<Project.IProjectModel[]>();
   const [taskList, setTaskList] = useState<A[]>([]);
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
+  const [des, setDes] = useState<boolean>(true);
+  const [activeFilterKey, setActiveFilterKey] = useState<string>('updateDate');
   const { showLoading, closeLoading } = useLoading();
   const { t } = useTranslation();
   const panelRef = useRef();
@@ -48,25 +58,6 @@ function Tasks() {
       key: 'kanban'
     }
   ];
-
-  const getProjectList = async () => {
-    try {
-      showLoading();
-      const result = await service.projectService.get({
-        pageInfor: {
-          pageSize: 100,
-          pageNumber: 1,
-          totalItems: 0
-        }
-      });
-      setProjectList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
-    } catch (e) {
-      console.log(e);
-    } finally {
-      closeLoading();
-    }
-  };
-
   const getTaskList = async (drafParam?: Common.IDataGrid) => {
     try {
       showLoading();
@@ -78,19 +69,46 @@ function Tasks() {
       closeLoading();
     }
   };
-
-  const onChangeProject = (val: string) => {
-    const draftParam = { ...param };
-    if (draftParam.filter) {
-      const projectId = draftParam.filter.findIndex((x) => x.key === 'projectId');
-      projectId !== -1 && draftParam.filter.splice(projectId, 1);
-      draftParam.filter.push({
-        key: 'projectId',
-        value: [val]
-      });
+  const selectFilter = (val: string) => {
+    setActiveFilterKey(val);
+    if (val === activeFilterKey) {
+      onOrder(val, !des);
+      setDes(!des);
+    } else {
+      setDes(true);
+      onOrder(val, true);
     }
-    setParam(draftParam);
-    getTaskList(draftParam);
+  };
+
+  const TableHeader = () => {
+    const menu = () => (
+      <Menu>
+        {OrderBy.map((item) => (
+          <Menu.Item
+            key={item.key}
+            className={`${styles.menuItem} ${item.key === activeFilterKey ? styles.active : ''}`}
+            onClick={() => selectFilter(item.key)}
+          >
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{item.value}</Paragraph>
+            {item.key === activeFilterKey ? des ? <ArrowDownOutlined /> : <ArrowUpOutlined /> : ''}
+          </Menu.Item>
+        ))}
+      </Menu>
+    );
+
+    return (
+      <>
+        <Dropdown dropdownRender={menu} placement="bottomRight" trigger={['click']}>
+          <Tooltip placement="top" title={t('Common_Order')} color="#ffffff" arrow={true}>
+            <Button type="text" icon={<OrderedListOutlined />} />
+          </Tooltip>
+        </Dropdown>
+        <Tooltip placement="bottom" title={t('Common_Filter')} color="#ffffff" arrow={true}>
+          <Button type="text" onClick={() => openFilterPanel()} icon={<FilterOutlined />} />
+        </Tooltip>
+        <Search placeholder={t('Common_SearchByTitle')} allowClear onSearch={onSearch} style={{ width: 250 }} />
+      </>
+    );
   };
 
   const onTabChanged = (e: A) => {
@@ -103,7 +121,6 @@ function Tasks() {
 
   useEffect(() => {
     const fetchApi = async () => {
-      await getProjectList();
       await getTaskList();
     };
     fetchApi();
@@ -195,7 +212,7 @@ function Tasks() {
           size="large"
           onChange={onTabChanged}
           tabBarExtraContent={
-            <></>
+            TableHeader()
             // <Select
             //   className={styles.select}
             //   placeholder={t('Task_Select_Project')}
@@ -205,18 +222,10 @@ function Tasks() {
           }
         />
         {tabStatus === 'table' && (
-          <DataTable
-            data={taskList}
-            openPanel={openPanel}
-            loading={false}
-            onSearch={onSearch}
-            openFilterPanel={openFilterPanel}
-            onOrder={onOrder}
-            param={param}
-          />
+          <DataTable data={taskList} openPanel={openPanel} loading={false} onOrder={onOrder} param={param} />
         )}
         {tabStatus === 'kanban' && <Kanban taskList={taskList} />}
-        <Panel refreshList={() => console.log('cc')} ref={panelRef} />
+        <Panel refreshList={getTaskList} ref={panelRef} />
         <FilterPanel ref={filterPanelRef} onFilter={onFilter} />
       </div>
     </div>

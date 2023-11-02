@@ -1,38 +1,21 @@
-import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
-  EditOutlined,
-  ExportOutlined,
-  FilterOutlined,
-  OrderedListOutlined,
-  PlusOutlined,
-  SmileOutlined,
-  SolutionOutlined
-} from '@ant-design/icons';
-import { Button, Dropdown, Menu, Table, Tag, Tooltip, notification } from 'antd';
+import { EditOutlined, ExportOutlined, PlusOutlined, SmileOutlined, SolutionOutlined } from '@ant-design/icons';
+import { Button, Table, Tag, Tooltip, notification } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import styles from '../Task.module.scss';
-import Search from 'antd/es/input/Search';
 import Paragraph from 'antd/es/typography/Paragraph';
-import { OrderBy } from '../Task.model';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface IProps {
   data: A[];
   loading: boolean;
   param: Common.IDataGrid;
-  onSearch: (value: string) => void;
   openPanel: (data?: A) => void;
-  openFilterPanel: (data?: A) => void;
   onOrder: (value: string, des: boolean) => void;
 }
 function DataTable(props: IProps) {
-  const { loading, param, data } = props;
+  const { loading, data } = props;
   const { t } = useTranslation();
-  const [des, setDes] = useState<boolean>(true);
-  const [activeFilterKey, setActiveFilterKey] = useState<string>('updateDate');
   const columns: ColumnsType<A> = [
     {
       title: t('Common_Title'),
@@ -40,7 +23,7 @@ function DataTable(props: IProps) {
       key: 'title',
       render: (_, record) => {
         return (
-          <Tooltip placement="bottom" title={record.title} color="#ffffff" arrow={true}>
+          <Tooltip placement="bottom" title={record?.title} color="#ffffff" arrow={true}>
             <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.summary}</Paragraph>
           </Tooltip>
         );
@@ -51,7 +34,11 @@ function DataTable(props: IProps) {
       dataIndex: 'description',
       key: 'description',
       render: (_, record) => {
-        return <Tag>{record.taskPrioty.pname}</Tag>;
+        return (
+          <Tag>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.taskPrioty?.pname}</Paragraph>
+          </Tag>
+        );
       }
     },
     {
@@ -59,21 +46,29 @@ function DataTable(props: IProps) {
       dataIndex: 'modifiedOn',
       key: 'modifiedOn',
       render: (_, record) => {
-        return record.assignee2.fullName;
+        return <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.assignee2?.fullName}</Paragraph>;
       }
     },
     {
       title: t('Task_ReportTo'),
       dataIndex: 'modifiedBy',
       key: 'modifiedBy',
-      render: (_, record) => record.reportToRelation.fullName
+      render: (_, record) => (
+        <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.reportToRelation?.fullName}</Paragraph>
+      )
     },
     {
       title: t('Task_Status'),
       dataIndex: 'description',
       key: 'description',
       render: (_, record) => {
-        return <Tag color={record.status.color}>{record.status.title}</Tag>;
+        return (
+          <Tag color={record.status?.color}>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ color: 'white' }}>
+              {record.status?.title}
+            </Paragraph>
+          </Tag>
+        );
       }
     },
     {
@@ -105,37 +100,7 @@ function DataTable(props: IProps) {
     }
   ];
 
-  const onSearch = (val: A) => {
-    props.onSearch(val);
-  };
-
-  const selectFilter = (val: string) => {
-    setActiveFilterKey(val);
-    if (val === activeFilterKey) {
-      props.onOrder(val, !des);
-      setDes(!des);
-    } else {
-      setDes(true);
-      props.onOrder(val, true);
-    }
-  };
-
   const TableHeader = () => {
-    const menu = () => (
-      <Menu>
-        {OrderBy.map((item) => (
-          <Menu.Item
-            key={item.key}
-            className={`${styles.menuItem} ${item.key === activeFilterKey ? styles.active : ''}`}
-            onClick={() => selectFilter(item.key)}
-          >
-            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{item.value}</Paragraph>
-            {item.key === activeFilterKey ? des ? <ArrowDownOutlined /> : <ArrowUpOutlined /> : ''}
-          </Menu.Item>
-        ))}
-      </Menu>
-    );
-
     return (
       <>
         <div className={styles.tableHeaderLeft}>
@@ -146,17 +111,7 @@ function DataTable(props: IProps) {
             {t('Common_ExportExcel')}
           </Button>
         </div>
-        <div className={styles.tableHeaderRight}>
-          <Dropdown dropdownRender={menu} placement="bottomRight" trigger={['click']}>
-            <Tooltip placement="top" title={t('Common_Order')} color="#ffffff" arrow={true}>
-              <Button type="text" icon={<OrderedListOutlined />} />
-            </Tooltip>
-          </Dropdown>
-          <Tooltip placement="bottom" title={t('Common_Filter')} color="#ffffff" arrow={true}>
-            <Button type="text" onClick={() => props.openFilterPanel(param.filter)} icon={<FilterOutlined />} />
-          </Tooltip>
-          <Search placeholder={t('Common_SearchByTitle')} allowClear onSearch={onSearch} style={{ width: 250 }} />
-        </div>
+        <div className={styles.tableHeaderRight}></div>
       </>
     );
   };

@@ -4,6 +4,7 @@ import { Image, Tag } from 'antd';
 import styles from '../Task.module.scss';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
+import { Link } from 'react-router-dom';
 
 interface IProps {
   taskList: A[];
@@ -41,25 +42,43 @@ function Kanban(props: IProps) {
       }
     };
     fetchData();
-  }, []);
+  }, [taskList]);
 
   const mapTaskList = (taskList: A[], statusList: A[]) => {
     const track = statusList?.map((x) => ({ ...x, tasks: taskList.filter((y) => x.id === y.statusId) }));
-    console.log(track);
     setKanbanTaskList(track);
   };
 
   const sortList = (newState: A, sortable: A) => {
     if (sortable) {
       const groupId: A = sortable.el.closest('[data-group]')?.getAttribute('data-group') || 0;
-      console.log(groupId);
-      const newList = kanBanTaskList.map((task: A) => {
-        if (task.id === groupId) {
-          task.tasks = newState;
+      const newList = kanBanTaskList.map((taskGroup: A) => {
+        if (taskGroup.id === groupId) {
+          const oldState = taskGroup.tasks;
+          taskGroup.tasks = newState;
+          const sortedItem = newState.find((item: A, index: A) => item.id !== oldState[index]?.id);
+          if (sortedItem) {
+            console.log('Sorted item:', { ...sortedItem, status: groupId });
+            onChangeStatus(sortedItem.id, groupId);
+          }
         }
-        return task;
+        return taskGroup;
       });
       setKanbanTaskList(newList);
+    }
+  };
+
+  const onChangeStatus = async (id: string, val: string) => {
+    try {
+      showLoading();
+      await service.taskService.updateStatus({
+        id: id,
+        status: val
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      closeLoading();
     }
   };
 
@@ -68,7 +87,7 @@ function Kanban(props: IProps) {
       {kanBanTaskList?.map((project: A) => {
         return (
           <div key={project.id} data-group={project.id}>
-            <div className={styles.title}>{project.title}</div>
+            <div className={styles.title}>{project?.title}</div>
             <ReactSortable
               list={project.tasks}
               setList={(newState: A, sortable: A) => sortList(newState, sortable)}
@@ -81,16 +100,18 @@ function Kanban(props: IProps) {
               {project.tasks?.map((task: A) => {
                 return (
                   <div className={styles.task} key={project.id + '' + task.id}>
-                    <div>
-                      <Image src="https://d1hjkbq40fs2x4.cloudfront.net/2017-08-21/files/landscape-photography_1645.jpg" />
-                      <div>{task.summary}</div>
-                      <div dangerouslySetInnerHTML={{ __html: task?.description }} />
-                      <Tag color={task.status.color}>{task.status.title}</Tag>
-                      <Tag>{task.taskPrioty.pname}</Tag>
+                    <Link to={`/tasks/task-detail/${task.key}/${task.id}`}>
                       <div>
-                        <span>{task.date}</span>
+                        <Image src="https://d1hjkbq40fs2x4.cloudfront.net/2017-08-21/files/landscape-photography_1645.jpg" />
+                        <div>{task.summary}</div>
+                        <div dangerouslySetInnerHTML={{ __html: task?.description }} />
+                        <Tag color={task.status?.color}>{task.status?.title}</Tag>
+                        <Tag>{task.taskPrioty?.pname}</Tag>
+                        <div>
+                          <span>{task.date}</span>
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                 );
               })}

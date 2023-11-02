@@ -54,14 +54,14 @@ function FilterPanel(props: IProps, ref: A) {
         label: (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Avatar size={25} src={x?.photoUrl} style={{ marginRight: 10, backgroundColor: util.randomColor() }}>
-              {x.fullName?.charAt(0)}
+              {x?.fullName?.charAt(0)}
             </Avatar>
             <div>
               <Paragraph
                 ellipsis={{ rows: 1, expandable: false }}
                 style={{ maxWidth: 350, minWidth: 30, fontWeight: 600, fontSize: 16, lineHeight: '20px' }}
               >
-                {x.fullName}
+                {x?.fullName}
               </Paragraph>
               <Paragraph
                 ellipsis={{ rows: 1, expandable: false }}
@@ -90,7 +90,7 @@ function FilterPanel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setProjectList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setProjectList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -105,7 +105,7 @@ function FilterPanel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setStatusList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setStatusList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -120,7 +120,7 @@ function FilterPanel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setMilestoneList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setMilestoneList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -135,7 +135,7 @@ function FilterPanel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setPriotyList(result.data.map((x: A) => ({ label: x.pname, value: x.id })));
+      setPriotyList(result.data.map((x: A) => ({ label: x?.pname, value: x.id })));
     } catch (e) {
       console.log(e);
     }

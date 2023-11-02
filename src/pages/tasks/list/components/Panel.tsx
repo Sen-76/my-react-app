@@ -35,7 +35,6 @@ import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { util } from '@/common/helpers/util';
 import { useLoginManager } from '@/common/helpers/login-manager';
-import { RcFile } from 'antd/es/upload';
 
 interface IProps {
   refreshList: () => void;
@@ -53,10 +52,10 @@ function Panel(props: IProps, ref: A) {
   const [selectLoading, setSelectLoading] = useState<boolean>();
   const [userMemberList, setUserMemberList] = useState<A[]>([]);
   const [mileStoneList, setMilestoneList] = useState<A[]>([]);
+  const [projectId, setProjectId] = useState<string>('');
   const [priotyList, setPriotyList] = useState<A[]>([]);
   const [taskList, setTaskList] = useState<A[]>([]);
   const [editData, setEditData] = useState<A>();
-  const [selectedProject, setSelectedProject] = useState<string>('');
   const [searchAssigneeValue, setSearchAssigneeValue] = useState<string>('');
   const userDebouncedAssignee = useDebounce(searchAssigneeValue, 300);
   const { getLoginUser } = useLoginManager();
@@ -69,32 +68,12 @@ function Panel(props: IProps, ref: A) {
     openDrawer
   }));
 
-  const initDataGrid: Common.IDataGrid = {
-    pageInfor: {
-      pageSize: 10,
-      pageNumber: 1,
-      totalItems: 0
-    },
-    searchInfor: {
-      searchValue: '',
-      searchColumn: ['FullName', 'UserEmail']
-    },
-    filter: []
-  };
-
   const openDrawer = async (data?: A) => {
     try {
       showLoading();
       setOpen(true);
       setIsEdit(false);
-      const promises = [
-        getProjectList(),
-        getTaskList(),
-        getStatusList(),
-        getMilestoneList(),
-        getPriotyList(),
-        getTypeList()
-      ];
+      const promises = [getProjectList(), getStatusList(), getMilestoneList(), getPriotyList(), getTypeList()];
       await Promise.all(promises);
       if (data) {
         setIsEdit(true);
@@ -120,6 +99,18 @@ function Panel(props: IProps, ref: A) {
 
   const getUsers = async () => {
     try {
+      const initDataGrid: Common.IDataGrid = {
+        pageInfor: {
+          pageSize: 10,
+          pageNumber: 1,
+          totalItems: 0
+        },
+        searchInfor: {
+          searchValue: '',
+          searchColumn: ['FullName', 'UserEmail']
+        },
+        filter: []
+      };
       const draftParam = { ...initDataGrid };
       draftParam.searchInfor!.searchValue = userDebouncedAssignee ?? '';
       const result = await service.accountService.getAccount(draftParam);
@@ -129,20 +120,20 @@ function Panel(props: IProps, ref: A) {
         label: (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Avatar size={25} src={x?.photoUrl} style={{ marginRight: 10, backgroundColor: util.randomColor() }}>
-              {x.fullName?.charAt(0)}
+              {x?.fullName?.charAt(0)}
             </Avatar>
             <div>
               <Paragraph
                 ellipsis={{ rows: 1, expandable: false }}
                 style={{ maxWidth: 350, minWidth: 30, fontWeight: 600, fontSize: 16, lineHeight: '20px' }}
               >
-                {x.fullName}
+                {x?.fullName}
               </Paragraph>
               <Paragraph
                 ellipsis={{ rows: 1, expandable: false }}
                 style={{ maxWidth: 350, minWidth: 30, lineHeight: '16px', fontSize: 12 }}
               >
-                {x.userEmail}
+                {x?.userEmail}
               </Paragraph>
             </div>
           </div>
@@ -165,7 +156,7 @@ function Panel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setProjectList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setProjectList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -180,7 +171,7 @@ function Panel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setTypeList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setTypeList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -195,7 +186,7 @@ function Panel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setStatusList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setStatusList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -210,7 +201,7 @@ function Panel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setMilestoneList(result.data.map((x: A) => ({ label: x.title, value: x.id })));
+      setMilestoneList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -231,14 +222,15 @@ function Panel(props: IProps, ref: A) {
     }
   };
 
-  const getTaskList = async () => {
+  const getTaskList = async (projectId?: string) => {
     try {
       const result = await service.taskService.get({
         pageInfor: {
           pageSize: 100,
           pageNumber: 1,
           totalItems: 0
-        }
+        },
+        filter: [{ key: 'projectId', value: [projectId] }]
       });
       setTaskList(result.data.map((x: A) => ({ label: x.summary, value: x.id })));
     } catch (e) {
@@ -254,26 +246,29 @@ function Panel(props: IProps, ref: A) {
   const onFinish = async (val: A) => {
     try {
       showLoading();
+      let attachmentList = [];
+      fileList.length > 0 && (attachmentList = await handleUpload());
       if (isEdit) {
-        await handleUpload();
+        console.log(val);
         await service.taskService.update({
           ...editData,
           ...val,
-          assignee: val.assignee ? val.assignee.value : '',
-          reportTo: val.reportTo.value ?? '',
-          dueDate: dayjs(val.dueDate).format('YYYY-MM-DD')
+          assignee: typeof val.assignee === 'string' ? val.assignee : val.assignee.value,
+          reportTo: typeof val.reportTo === 'string' ? val.reportTo : val.reportTo.value,
+          dueDate: dayjs(val.dueDate).format('YYYY-MM-DD'),
+          attachment: attachmentList
         });
         notification.open({
           message: t('Common_UpdateSuccess'),
           type: 'success'
         });
       } else {
-        await handleUpload();
         await service.taskService.create({
           ...val,
           assignee: val.assignee ? val.assignee.value : '',
           reportTo: val.reportTo.value ?? '',
-          dueDate: dayjs(val.dueDate).format('YYYY-MM-DD')
+          dueDate: dayjs(val.dueDate).format('YYYY-MM-DD'),
+          attachment: attachmentList
         });
         notification.open({
           message: t('Common_CreateSuccess'),
@@ -321,15 +316,19 @@ function Panel(props: IProps, ref: A) {
     const formData = new FormData();
     formData.append('outletId', 'la cai d gi');
     formData.append('comment', 'comment làm cái đúng gì');
-    // formData.append('id', editData?.id.toString() ?? '');
-    for (const file of fileList) {
-      if (file instanceof Blob) {
-        formData.append('file', file, file.name);
-      } else if ('originFileObj' in file && file.originFileObj instanceof Blob) {
-        formData.append('file', file.originFileObj, file.name);
-      }
-      await service.taskService.uploadAttach(formData);
-    }
+    formData.append('id', editData?.id.toString() ?? 'dm');
+    fileList.forEach((file: A) => {
+      formData.append('files', file);
+    });
+    const result = await service.taskService.uploadAttach(formData);
+    return result.data;
+  };
+
+  const onProjectSelect = (val: string) => {
+    showLoading();
+    getTaskList(val);
+    setProjectId(val);
+    closeLoading();
   };
 
   return (
@@ -354,7 +353,7 @@ function Panel(props: IProps, ref: A) {
       >
         <Form form={form} onFinish={onFinish} layout="vertical" className={styles.panelform}>
           <Form.Item name="projectId" label={t('Task_Project')} rules={formRule.project}>
-            <Select options={projectList} onSelect={(val) => setSelectedProject(val)} />
+            <Select options={projectList} onSelect={onProjectSelect} />
           </Form.Item>
           <Form.Item name="taskType" label={t('Task_Type')} rules={formRule.project}>
             <Select options={typeList} />
@@ -373,7 +372,7 @@ function Panel(props: IProps, ref: A) {
           <Form.Item name="description" label={t('Common_Description')} rules={formRule.description}>
             <ReactQuill theme="snow" />
           </Form.Item>
-          <Form.Item name="assignee" label={t('Task_Assignee')}>
+          <Form.Item name="assignee" label={t('Task_Assignee')} rules={formRule.summary}>
             <Select
               labelInValue
               showSearch
@@ -423,20 +422,20 @@ function Panel(props: IProps, ref: A) {
                       src={localStorage.getItem('avatar')}
                       style={{ marginRight: 10, backgroundColor: util.randomColor() }}
                     >
-                      {getLoginUser().user.fullName?.charAt(0)}
+                      {getLoginUser().user?.fullName?.charAt(0)}
                     </Avatar>
                     <div>
                       <Paragraph
                         ellipsis={{ rows: 1, expandable: false }}
                         style={{ maxWidth: 350, minWidth: 30, fontWeight: 600, fontSize: 16, lineHeight: '20px' }}
                       >
-                        {getLoginUser().user.fullName}
+                        {getLoginUser().user?.fullName}
                       </Paragraph>
                       <Paragraph
                         ellipsis={{ rows: 1, expandable: false }}
                         style={{ maxWidth: 350, minWidth: 30, lineHeight: '16px', fontSize: 12 }}
                       >
-                        {getLoginUser().user.userEmail}
+                        {getLoginUser().user?.userEmail}
                       </Paragraph>
                     </div>
                   </div>
@@ -447,10 +446,10 @@ function Panel(props: IProps, ref: A) {
           >
             {t('Task_Assign_To_Me')}
           </Button>
-          <Form.Item name="milestoneId" label={t('Task_Milestone')}>
+          <Form.Item name="milestoneId" label={t('Task_Milestone')} rules={formRule.summary}>
             <Select options={mileStoneList} />
           </Form.Item>
-          <Form.Item name="taskPriotyId" label={t('Task_Prioty')}>
+          <Form.Item name="taskPriotyId" label={t('Task_Prioty')} rules={formRule.summary}>
             <Select options={priotyList} />
           </Form.Item>
           <Form.Item name="reportTo" label={t('Task_ReportTo')} rules={formRule.reportTo}>
@@ -503,14 +502,14 @@ function Panel(props: IProps, ref: A) {
                       src={localStorage.getItem('avatar')}
                       style={{ marginRight: 10, backgroundColor: util.randomColor() }}
                     >
-                      {getLoginUser().user.fullName?.charAt(0)}
+                      {getLoginUser().user?.fullName?.charAt(0)}
                     </Avatar>
                     <div>
                       <Paragraph
                         ellipsis={{ rows: 1, expandable: false }}
                         style={{ maxWidth: 350, minWidth: 30, fontWeight: 600, fontSize: 16, lineHeight: '20px' }}
                       >
-                        {getLoginUser().user.fullName}
+                        {getLoginUser().user?.fullName}
                       </Paragraph>
                       <Paragraph
                         ellipsis={{ rows: 1, expandable: false }}
