@@ -3,9 +3,24 @@
   padding: 20px;
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   border-radius: 4px;
+  :global {
+    .ant-form-item {
+      width: calc(100% - 110px);
+    }
+    .ant-form-item-control {
+      margin: 0;
+    }
+    .ant-collapse-header {
+      align-items: center !important;
+    }
+    .ant-col {
+      margin: 0;
+    }
+  }
   .title {
     padding: 20px;
     font-weight: 600;
+    font-size: 24px;
   }
 }
 .col {
@@ -15,6 +30,7 @@
 }
 .detailRow {
   height: 40px;
+  width: 100%;
   border-radius: 4px;
   display: flex;
   align-items: center;

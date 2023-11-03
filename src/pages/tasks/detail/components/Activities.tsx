@@ -9,14 +9,7 @@ function Activities() {
   const items = [{ key: 'Activities', label: t('Common_Activities'), children: onRenderNothing() }];
   return (
     <>
-      <Collapse
-        items={items}
-        bordered={false}
-        defaultActiveKey={['Activities']}
-        ghost
-        size="large"
-        expandIconPosition="end"
-      />
+      <Collapse items={items} bordered={false} defaultActiveKey={['Activities']} ghost size="large" />
     </>
   );
 }

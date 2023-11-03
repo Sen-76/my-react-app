@@ -89,6 +89,7 @@ function Panel(props: IProps, ref: A) {
   const getDetail = async (id: string) => {
     try {
       const { data } = await service.taskService.getDetail(id);
+      getTaskList(data.projectId);
       data.dueDate = dayjs(data.dueDate);
       form.setFieldsValue(data);
       setEditData(data);
@@ -232,7 +233,7 @@ function Panel(props: IProps, ref: A) {
         },
         filter: [{ key: 'projectId', value: [projectId] }]
       });
-      setTaskList(result.data.map((x: A) => ({ label: x.summary, value: x.id })));
+      setTaskList(result.data.map((x: A) => ({ label: `[` + x.key + `] ` + x.summary, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -249,7 +250,6 @@ function Panel(props: IProps, ref: A) {
       let attachmentList = [];
       fileList.length > 0 && (attachmentList = await handleUpload());
       if (isEdit) {
-        console.log(val);
         await service.taskService.update({
           ...editData,
           ...val,
@@ -287,6 +287,7 @@ function Panel(props: IProps, ref: A) {
   const formRule = {
     project: [{ required: true, message: t('Common_Require_Field') }],
     status: [{ required: true, message: t('Common_Require_Field') }],
+    key: [{ required: true, message: t('Common_Require_Field') }],
     summary: [{ required: true, message: t('Common_Require_Field') }],
     dueDate: [{ required: true, message: t('Common_Require_Field') }],
     description: [{ required: true, message: t('Common_Require_Field') }],

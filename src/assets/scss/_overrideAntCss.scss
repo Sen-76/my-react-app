@@ -11,6 +11,8 @@ td {
   border: 1px solid transparent;
   .ant-table-cell {
     background: #f3f3f3 !important;
+    font-size: 16px;
+    font-weight: 600 !important;
     border: 1px solid transparent;
     &::before {
       display: none;
@@ -101,13 +103,13 @@ td {
   .ant-menu-title-content,
   .ant-menu-submenu-arrow,
   .ant-menu-item-icon {
-    color: #3762ea !important;
+    color: #373941 !important;
   }
 }
 .ant-menu-title-content,
 .ant-menu-submenu-arrow,
 .ant-menu-item-icon {
-  color: #7c7f90 !important;
+  color: #40414b !important;
 }
 .ant-menu-item,
 .ant-menu-submenu-title {

@@ -115,7 +115,6 @@ function Projects() {
     }
     getProjectList(draftGrid);
   };
-
   const tabItems = [
     {
       label: t('Project_Active'),
@@ -123,7 +122,7 @@ function Projects() {
     },
     {
       label: t('Project_Mine'),
-      key: '99'
+      key: 'mine'
     },
     {
       label: t('Project_Inactive'),
@@ -136,7 +135,14 @@ function Projects() {
     if (draftGrid.filter) {
       const statusIndex = draftGrid.filter.findIndex((x) => x.key === 'Status');
       statusIndex !== -1 && draftGrid.filter.splice(statusIndex, 1);
-      if (Number(e) === EStatus.Active)
+      const teamIndex = draftGrid.filter.findIndex((x) => x.key === 'teamId');
+      teamIndex !== -1 && draftGrid.filter.splice(teamIndex, 1);
+      if (e === 'mine' && draftGrid.filter) {
+        draftGrid.filter?.push({
+          key: 'teamId',
+          value: [JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId ?? '']
+        });
+      } else if (Number(e) === EStatus.Active)
         draftGrid.filter?.push({ key: 'Status', value: [Number(EStatus.Inactive)], operators: 'not in' });
       else draftGrid.filter?.push({ key: 'Status', value: [Number(EStatus.Inactive)] });
     }

@@ -10,7 +10,7 @@ function Teams() {
   const detailPanelRef = useRef();
   const [loading, setLoading] = useState<boolean>(false);
   const [teamList, setTeamList] = useState<Account.IAccountModel[]>([]);
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId;
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId ?? '';
   const initDataGrid: Common.IDataGrid = {
     pageInfor: {
       pageSize: 10,

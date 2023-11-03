@@ -18,6 +18,18 @@ function DataTable(props: IProps) {
   const { t } = useTranslation();
   const columns: ColumnsType<A> = [
     {
+      title: t('Task_Key'),
+      dataIndex: 'title',
+      key: 'title',
+      render: (_, record) => {
+        return (
+          <Tooltip placement="bottom" title={record?.key} color="#ffffff" arrow={true}>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.key}</Paragraph>
+          </Tooltip>
+        );
+      }
+    },
+    {
       title: t('Common_Title'),
       dataIndex: 'title',
       key: 'title',
@@ -89,7 +101,7 @@ function DataTable(props: IProps) {
             <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
               <Button
                 type="text"
-                disabled={record.status?.title === 'Done'}
+                disabled={record.status?.title !== 'Open'}
                 onClick={() => props.openPanel(record)}
                 icon={<EditOutlined />}
               />

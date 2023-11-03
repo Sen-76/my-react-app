@@ -182,7 +182,7 @@ function Panel(props: IProps, ref: A) {
             name="title"
             label={t('Common_Title')}
             rules={formRule.title}
-            className={customAlert?.userEmail && 'customFieldAlert'}
+            className={customAlert?.title && 'customFieldAlert'}
           >
             <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, title: '' })} />
           </Form.Item>

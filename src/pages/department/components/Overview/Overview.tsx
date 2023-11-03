@@ -10,7 +10,7 @@ function Overview() {
   const { showLoading, closeLoading } = useLoading();
   const [editData, setEditData] = useState<A>();
   const { t } = useTranslation();
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId;
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId ?? '';
 
   useEffect(() => {
     getDepartmentDetail();

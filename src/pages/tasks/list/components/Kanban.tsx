@@ -1,6 +1,6 @@
 import { ReactSortable } from 'react-sortablejs';
 import { useState, useEffect } from 'react';
-import { Image, Tag } from 'antd';
+import { Image, Modal, Tag } from 'antd';
 import styles from '../Task.module.scss';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
@@ -42,7 +42,7 @@ function Kanban(props: IProps) {
       }
     };
     fetchData();
-  }, [taskList]);
+  }, []);
 
   const mapTaskList = (taskList: A[], statusList: A[]) => {
     const track = statusList?.map((x) => ({ ...x, tasks: taskList.filter((y) => x.id === y.statusId) }));
@@ -75,8 +75,12 @@ function Kanban(props: IProps) {
         id: id,
         status: val
       });
-    } catch (e) {
+    } catch (e: A) {
       console.log(e);
+      Modal.error({
+        title: 'This is an error message',
+        content: e.message()
+      });
     } finally {
       closeLoading();
     }
@@ -84,29 +88,32 @@ function Kanban(props: IProps) {
 
   return (
     <div className={styles.kanban}>
-      {kanBanTaskList?.map((project: A) => {
+      {kanBanTaskList?.map((status: A) => {
         return (
-          <div key={project.id} data-group={project.id}>
-            <div className={styles.title}>{project?.title}</div>
+          <div key={status.id} data-group={status.id}>
+            <div className={styles.title}>{status?.title}</div>
             <ReactSortable
-              list={project.tasks}
+              list={status.tasks}
               setList={(newState: A, sortable: A) => sortList(newState, sortable)}
               animation={200}
-              group={{ name: 'shared', pull: true, put: true }}
+              group={{ name: 'shared', pull: status.title !== 'Done' ? true : false, put: true }}
               ghostClass="sortable-ghost"
               dragClass="sortable-drag"
               className={styles.reactSortable}
+              style={{ height: '100%' }}
             >
-              {project.tasks?.map((task: A) => {
+              {status.tasks?.map((task: A) => {
                 return (
-                  <div className={styles.task} key={project.id + '' + task.id}>
-                    <Link to={`/tasks/task-detail/${task.key}/${task.id}`}>
+                  <div className={styles.task} key={status.id + '' + task.id}>
+                    <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#222' }}>
                       <div>
                         <Image src="https://d1hjkbq40fs2x4.cloudfront.net/2017-08-21/files/landscape-photography_1645.jpg" />
-                        <div>{task.summary}</div>
-                        <div dangerouslySetInnerHTML={{ __html: task?.description }} />
-                        <Tag color={task.status?.color}>{task.status?.title}</Tag>
-                        <Tag>{task.taskPrioty?.pname}</Tag>
+                        <div style={{ fontWeight: 500, fontSize: 16, lineHeight: '32px' }}>{task.summary}</div>
+                        <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
+                        <div style={{ padding: '5px 0' }}>
+                          <Tag color={task.status?.color}>{task.status?.title}</Tag>
+                          <Tag>{task.taskPrioty?.pname}</Tag>
+                        </div>
                         <div>
                           <span>{task.date}</span>
                         </div>
