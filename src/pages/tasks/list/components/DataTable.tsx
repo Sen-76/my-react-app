@@ -1,10 +1,11 @@
 import { EditOutlined, ExportOutlined, PlusOutlined, SmileOutlined, SolutionOutlined } from '@ant-design/icons';
 import { Button, Table, Tag, Tooltip, notification } from 'antd';
-import { ColumnsType } from 'antd/es/table';
+import { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import styles from '../Task.module.scss';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 interface IProps {
   data: A[];
@@ -12,9 +13,10 @@ interface IProps {
   param: Common.IDataGrid;
   openPanel: (data?: A) => void;
   onOrder: (value: string, des: boolean) => void;
+  setPage: (paging: number) => void;
 }
 function DataTable(props: IProps) {
-  const { loading, data } = props;
+  const { loading, data, param } = props;
   const { t } = useTranslation();
   const columns: ColumnsType<A> = [
     {
@@ -128,6 +130,10 @@ function DataTable(props: IProps) {
     );
   };
 
+  const handleTableChange = async (pagination: TablePaginationConfig) => {
+    await props.setPage(pagination.current ?? 1);
+  };
+
   const exportExcel = () => {
     notification.open({
       message: t('Common_ExportSuccess'),
@@ -140,7 +146,12 @@ function DataTable(props: IProps) {
       <Table
         columns={columns}
         dataSource={data}
-        pagination={false}
+        pagination={{
+          current: param.pageInfor!.pageNumber,
+          pageSize: param.pageInfor!.pageSize,
+          total: param.pageInfor!.totalItems,
+          simple: false
+        }}
         scroll={{ x: 780 }}
         locale={{
           emptyText: (
@@ -149,6 +160,7 @@ function DataTable(props: IProps) {
             </>
           )
         }}
+        onChange={handleTableChange}
         loading={loading}
         title={() => TableHeader()}
         rowKey={(record) => record.id}

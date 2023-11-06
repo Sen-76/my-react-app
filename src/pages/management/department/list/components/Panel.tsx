@@ -327,14 +327,14 @@ function Panel(props: IProps, ref: A) {
           style={{ width: '70%', margin: 'auto', marginBottom: 20 }}
           onChange={onStepChange}
           current={step}
-          items={[{ title: t('Manage_Deparment_Info') }, { title: t('Department_Allocate_Member_Entry') }]}
+          items={[{ title: t('Manage_Department_Info') }, { title: t('Department_Allocate_Member_Entry') }]}
         />
         <Form form={form} layout="vertical" className={styles.panelform}>
           {step === 0 && (
             <>
               <Form.Item
                 name="title"
-                label="Title"
+                label={t('Common_Title')}
                 rules={formRule.title}
                 className={customAlert?.title && 'customFieldAlert'}
               >
@@ -343,7 +343,7 @@ function Panel(props: IProps, ref: A) {
               {customAlert?.title && <div className="customAlert">{t('Manage_Department_Exist_Name')}</div>}
               <Form.Item
                 name="owner"
-                label="Manager"
+                label={t('Department_Manger')}
                 rules={formRule.title}
                 className={customAlert?.title && 'customFieldAlert'}
               >

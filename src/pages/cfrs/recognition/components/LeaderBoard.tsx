@@ -17,6 +17,10 @@ function LeaderBoard() {
       pageSize: 10,
       pageNumber: 1,
       totalItems: 0
+    },
+    orderInfor: {
+      orderBy: ['createdDate'],
+      isAssending: [false]
     }
   };
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);

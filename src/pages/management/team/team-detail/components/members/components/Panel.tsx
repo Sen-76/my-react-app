@@ -44,7 +44,7 @@ function Panel(props: IProps, ref: A) {
       showLoading();
       const { data } = await service.teamService.getDetail(id);
       setDepartmentId(data.departmentId);
-      setSelectedUser([...(data.users?.map((x: A) => x.id) ?? []), data.manager.id]);
+      setSelectedUser([...(data.members?.map((x: A) => x.id) ?? []), data.manager.id]);
       setMemberList(data.members.filter((x: A) => x.id !== data.manager.id));
     } catch (e) {
       console.log(e);

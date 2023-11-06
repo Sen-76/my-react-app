@@ -21,6 +21,7 @@ function TaskDetail() {
   const [statusList, setStatusList] = useState<A[]>([]);
   const [editTitle, setEditTitle] = useState<boolean>(false);
   const panelRef = useRef();
+
   const [form] = Form.useForm();
 
   const updateInfo = async () => {
@@ -138,8 +139,10 @@ function TaskDetail() {
             className={styles.title}
             type="text"
             onClick={() => {
-              setEditTitle(true);
-              form.setFieldsValue(editData);
+              if (editData.status?.title !== 'Done') {
+                setEditTitle(true);
+                form.setFieldsValue(editData);
+              }
             }}
           >
             {editData?.summary}
@@ -156,15 +159,14 @@ function TaskDetail() {
           </Form.Item>
         )}
       </Form>
-
-      <Button
+      {/* <Button
         style={{ marginRight: 10 }}
         icon={<EditOutlined />}
         disabled={editData?.status?.title !== 'Open'}
         onClick={openPanel}
       >
         Edit
-      </Button>
+      </Button> */}
       <Select
         disabled={editData?.status?.title === 'Done'}
         onChange={onChangeStatus}

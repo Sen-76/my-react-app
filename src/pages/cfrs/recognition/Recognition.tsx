@@ -16,12 +16,12 @@ function Recognition() {
   const tabItems = [
     {
       key: 'posts',
-      label: t('Posts'),
+      label: t('CFRS_Posts_Entry'),
       children: <Post />
     },
     {
       key: 'leaderBoard',
-      label: t('LeaderBoard'),
+      label: t('CFRS_LeaderBoard_Entry'),
       children: <LeaderBoard />
     }
   ];

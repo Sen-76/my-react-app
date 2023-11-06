@@ -6,7 +6,11 @@ import { useState } from 'react';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 
-function CreatePost() {
+interface IProps {
+  numberStar: number;
+}
+
+function CreatePost(prop: IProps) {
   const [editData, setEditData] = useState<Post.IPostCreateModel>();
   const { t } = useTranslation();
   const [form] = Form.useForm();
@@ -173,7 +177,7 @@ function CreatePost() {
             />
           </Form.Item>
           <Form.Item label={t('Number_Star_Send')} name="starGive" rules={formRule.starSend}>
-            <Slider defaultValue={0} onAfterChange={onAfterChange} />
+            <Slider defaultValue={0} onAfterChange={onAfterChange} max={prop.numberStar < 0 ? 0 : prop.numberStar} />
           </Form.Item>
           <Form.Item label={t('CFRs_Content_Entry')} name="description" rules={formRule.content}>
             <TextArea placeholder="Autosize height based on content lines" autoSize />

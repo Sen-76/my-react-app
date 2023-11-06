@@ -22,7 +22,7 @@ function Projects() {
       searchValue: '',
       searchColumn: ['Title']
     },
-    filter: [{ key: 'Status', value: [EStatus.Active] }]
+    filter: [{ key: 'Status', value: [EStatus.Inactive], operators: 'not in' }]
   };
   const { setBreadcrumb } = useBreadcrumb();
   const [loading, setLoading] = useState<boolean>(false);
@@ -115,6 +115,7 @@ function Projects() {
     }
     getProjectList(draftGrid);
   };
+
   const tabItems = [
     {
       label: t('Project_Active'),

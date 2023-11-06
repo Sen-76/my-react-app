@@ -24,7 +24,7 @@ function StarNumber(prop: IProps) {
       <Col span={12}>
         <Statistic
           title={`${t('start_current')}`}
-          value={prop.numberStar?.currentUserStars}
+          value={prop.numberStar?.currentUserStars < 0 ? 0 : prop.numberStar?.currentUserStars}
           valueStyle={{ color: 'blue' }}
           prefix={<StarOutlined />}
           className={styles.startNumberContent}

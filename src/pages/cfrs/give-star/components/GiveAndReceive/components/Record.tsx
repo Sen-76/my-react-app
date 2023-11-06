@@ -12,15 +12,15 @@ function Record(prop: IProps) {
     <Card style={{ width: '100%', marginBottom: '10px' }}>
       <div className={styles.record}>
         <Meta
-          avatar={<Avatar src={prop.record.userSend.avatarUrl.url} />}
+          avatar={<Avatar src={prop.record.userSend?.avatarUrl?.url} />}
           title={prop.record.userSend.userName}
-          description={prop.record.userSend.userDepartment2?.title}
+          description={prop.record.userSend?.userDepartment2?.title}
         />
         <ForwardOutlined style={{ fontSize: '30px' }} />
         <Meta
-          avatar={<Avatar src={prop.record.userGive.avatarUrl?.url} />}
+          avatar={<Avatar src={prop.record.userGive?.avatarUrl?.url} />}
           title={prop.record.userGive.userName}
-          description={prop.record.userGive.userDepartment2?.title}
+          description={prop.record.userGive?.userDepartment2?.title}
         />
       </div>
       <p className={styles.header}>{prop.record.title}</p>

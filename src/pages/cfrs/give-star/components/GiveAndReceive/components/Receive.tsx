@@ -24,7 +24,11 @@ function Receive() {
       searchValue: '',
       searchColumn: ['Title']
     },
-    filter: [{ key: 'userGive', value: [JSON.parse(user)?.user.id] }]
+    filter: [{ key: 'userGive', value: [JSON.parse(user)?.user.id] }],
+    orderInfor: {
+      orderBy: ['createdDate'],
+      isAssending: [false]
+    }
   };
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
   const [data, setData] = useState<A[]>([]);

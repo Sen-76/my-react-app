@@ -89,7 +89,7 @@ function Panel(props: IProps, ref: A) {
   return (
     <>
       <Drawer
-        title={isEdit ? t('Configuration_Prioty_Edit') : t('Configuration_Prioty_Create')}
+        title={isEdit ? t('Configuration_Priority_Edit') : t('Configuration_Priority_Create')}
         placement="right"
         open={open}
         extra={<CloseOutlined onClick={closeDrawer} />}

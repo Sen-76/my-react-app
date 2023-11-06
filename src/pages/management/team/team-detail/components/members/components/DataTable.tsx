@@ -52,7 +52,7 @@ function DataTable(props: IProps) {
               <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ maxWidth: 150, minWidth: 30 }}>
                 {record.isLeader && (
                   <Tag style={{ marginLeft: 5 }} color="red">
-                    {t('Leader')}
+                    {t('Common_Leader')}
                   </Tag>
                 )}
                 {record.fullName}

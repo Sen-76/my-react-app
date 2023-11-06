@@ -43,7 +43,7 @@ function GiveStar() {
             <StarNumber numberStar={data} />
           </Col>
           <Col span={24} className={styles.giveStar}>
-            <CreatePost />
+            <CreatePost numberStar={data.currentUserStars} />
           </Col>
         </Col>
         <Col span={12} className={styles.giveAndReceive}>

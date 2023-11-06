@@ -98,7 +98,12 @@ function DataTable(props: IProps) {
         };
         return (
           <div>
-            <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
+            <Tooltip
+              placement="bottom"
+              title={record.isDefault !== true ? t('Common_Edit') : t('Common_ToolTip_CannotEditRole')}
+              color="#ffffff"
+              arrow={true}
+            >
               <Button
                 disabled={record.isDefault}
                 type="text"
@@ -106,7 +111,12 @@ function DataTable(props: IProps) {
                 icon={<EditOutlined />}
               />
             </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+            <Tooltip
+              placement="bottom"
+              title={record.isDefault !== true ? t('Common_Delete') : t('Common_ToolTip_CannotDeleteRole')}
+              color="#ffffff"
+              arrow={true}
+            >
               <Button disabled={record.isDefault} type="text" onClick={deleteHandle} icon={<DeleteOutlined />} />
             </Tooltip>
           </div>

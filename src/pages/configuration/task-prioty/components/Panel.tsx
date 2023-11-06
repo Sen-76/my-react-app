@@ -89,7 +89,7 @@ function Panel(props: IProps, ref: A) {
   return (
     <>
       <Drawer
-        title={isEdit ? t('Configuration_Prioty_Edit') : t('Configuration_Prioty_Create')}
+        title={isEdit ? t('Configuration_Priority_Edit') : t('Configuration_Priority_Create')}
         placement="right"
         open={open}
         extra={<CloseOutlined onClick={closeDrawer} />}
@@ -106,7 +106,7 @@ function Panel(props: IProps, ref: A) {
           <Form.Item name="iconUrl" label={t('Common_Icon')} rules={formRule.iconUrl}>
             <IconPicker />
           </Form.Item>
-          <Form.Item name="colorIcon" label={t('Common_Color_Icon')}>
+          <Form.Item name="colorIcon" label={t('Common_Color')}>
             <ColorPicker />
           </Form.Item>
           <Form.Item name="description" label={t('Common_Description')}>

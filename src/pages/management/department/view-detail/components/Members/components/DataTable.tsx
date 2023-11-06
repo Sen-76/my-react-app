@@ -53,7 +53,7 @@ function DataTable(props: IProps) {
                 {record.fullName}
                 {record.isManager && (
                   <Tag style={{ width: '64px' }} color="red">
-                    {t('Manager')}
+                    {t('Department_Manger')}
                   </Tag>
                 )}
               </Paragraph>

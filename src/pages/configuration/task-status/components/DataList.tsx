@@ -102,7 +102,12 @@ function DataList(props: IProps) {
                   icon={<EditOutlined />}
                 />
               </Tooltip>
-              <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+              <Tooltip
+                placement="bottom"
+                title={item.isDefault ? t('Status_ToolTip_CannotDeleteStatus_Default') : t('Common_Delete')}
+                color="#ffffff"
+                arrow={true}
+              >
                 <Button
                   disabled={!!item?.isDefault}
                   type="text"

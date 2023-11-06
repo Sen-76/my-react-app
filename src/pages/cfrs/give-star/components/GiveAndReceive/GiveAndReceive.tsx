@@ -8,12 +8,12 @@ function GiveAndReceive() {
   const tabItems = [
     {
       key: 'give',
-      label: t('Give'),
+      label: t('CFRS_Give'),
       children: <Give />
     },
     {
-      key: 'reveive',
-      label: t('Reveive'),
+      key: 'receive',
+      label: t('CFRS_Receive'),
       children: <Receive />
     }
   ];

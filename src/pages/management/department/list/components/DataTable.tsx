@@ -19,7 +19,7 @@ interface IProps {
   param: Common.IDataGrid;
   refreshList: () => void;
 }
-function DataTable(props: IProps) {
+function DataTable(props: Readonly<IProps>) {
   const { loading, data, param } = props;
   const { Search } = Input;
   const { t } = useTranslation();
@@ -101,7 +101,7 @@ function DataTable(props: IProps) {
         const deleteDepartment = async (department: A) => {
           confirm({
             content: t('Department_Delete_Remind_Text').replace('{0}', department.title),
-            title: t('Common_Confirm'),
+            title: t('Common_Delete'),
             okText: t('Common_Delete'),
             cancelText: t('Common_Cancel'),
             onOk() {
@@ -152,30 +152,28 @@ function DataTable(props: IProps) {
   };
 
   return (
-    <>
-      <Table
-        columns={columns}
-        dataSource={data}
-        scroll={{ x: 780 }}
-        pagination={{
-          current: param.pageInfor!.pageNumber,
-          pageSize: param.pageInfor!.pageSize,
-          total: param.pageInfor!.totalItems,
-          simple: false
-        }}
-        locale={{
-          emptyText: (
-            <>
-              <SmileOutlined style={{ marginRight: 5 }} /> {t('Common_NoRecord')}
-            </>
-          )
-        }}
-        loading={loading}
-        onChange={handleTableChange}
-        title={() => TableHeader()}
-        rowKey={(record) => record.id}
-      />
-    </>
+    <Table
+      columns={columns}
+      dataSource={data}
+      scroll={{ x: 780 }}
+      pagination={{
+        current: param.pageInfor!.pageNumber,
+        pageSize: param.pageInfor!.pageSize,
+        total: param.pageInfor!.totalItems,
+        simple: false
+      }}
+      locale={{
+        emptyText: (
+          <>
+            <SmileOutlined style={{ marginRight: 5 }} /> {t('Common_NoRecord')}
+          </>
+        )
+      }}
+      loading={loading}
+      onChange={handleTableChange}
+      title={() => TableHeader()}
+      rowKey={(record) => record.id}
+    />
   );
 }
 

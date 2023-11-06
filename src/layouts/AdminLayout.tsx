@@ -11,6 +11,7 @@ import logo from '@/assets/logo.png';
 import logoLarge from '@/assets/logoLarge.png';
 import Notification from './components/notification/Notification';
 import { useLoginManager } from '@/common/helpers/login-manager';
+import { Link } from 'react-router-dom';
 
 export interface IProps {
   children?: React.ReactNode;
@@ -27,7 +28,7 @@ function AdminLayout(props: IProps) {
       key: '1',
       label: (
         <div style={{ minWidth: 150 }} onClick={() => i18next.changeLanguage('vn')}>
-          Tiếng Việt
+          {t('Common_Language_Vietnamese_Entry')}
         </div>
       )
     },
@@ -35,25 +36,24 @@ function AdminLayout(props: IProps) {
       key: '2',
       label: (
         <div style={{ minWidth: 150 }} onClick={() => i18next.changeLanguage('en')}>
-          English
+          {t('Common_Language_English_Entry')}
         </div>
       )
     }
   ];
-
-  // const test = useLoginManager().getLoginUser();
-  // console.log(test.user.userRole2.permissions);
 
   return (
     <>
       <Layout className={styles.siteLayout}>
         <div className={`${styles.lefNav} ${expandLeftNav && styles.expandLeftNav}`}>
           <div className={styles.logoWrap}>
-            {expandLeftNav ? (
-              <img src={logo} alt="Logo" width="60" height="35" />
-            ) : (
-              <img src={logoLarge} alt="Logo" width="200" height="35" />
-            )}
+            <Link to="/">
+              {expandLeftNav ? (
+                <img src={logo} alt="Logo" width="60" height="35" />
+              ) : (
+                <img src={logoLarge} alt="Logo" width="200" height="35" />
+              )}
+            </Link>
           </div>
           <LeftNav collapse={expandLeftNav}></LeftNav>
         </div>

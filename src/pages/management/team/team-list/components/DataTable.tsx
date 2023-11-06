@@ -70,7 +70,7 @@ function DataTable(props: IProps) {
       render: (_, record) => {
         return (
           <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ maxWidth: 150, minWidth: 30 }}>
-            {record.department.title}
+            {record?.department?.title}
           </Paragraph>
         );
       }
@@ -144,7 +144,7 @@ function DataTable(props: IProps) {
     confirm({
       content: user.id
         ? t('Department_Team_DeleteSingle_Remind_Text').replace('{0}', user.title)
-        : t('Department_Team_DeleteMultyple_Remind_Text'),
+        : t('Department_Team_DeleteMultiple_Remind_Text'),
       title: t('Common_Delete'),
       okText: t('Common_Delete'),
       cancelText: t('Common_Cancel'),

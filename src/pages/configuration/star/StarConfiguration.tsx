@@ -63,7 +63,7 @@ function StarConfiguration() {
           rules={[{ required: true, message: t('Common_Require_Field') }]}
           style={{ width: '50%', minWidth: 300 }}
         >
-          <InputNumber min={1} max={1000}></InputNumber>
+          <InputNumber min={1} max={100000000000}></InputNumber>
         </Form.Item>
       </Form>
       <div className="actionBtnBottom">

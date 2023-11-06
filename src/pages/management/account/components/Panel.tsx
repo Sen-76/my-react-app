@@ -152,7 +152,6 @@ function Panel(props: IProps, ref: A) {
           await service.accountService.updateAccount({
             ...editData,
             ...systemForm.getFieldsValue(),
-            userTeam: null,
             userName: systemForm.getFieldValue('userName')?.trim() ?? '',
             fullName: generalForm.getFieldValue('fullName')?.trim() ?? '',
             jobTitle: systemForm.getFieldValue('jobTitle')?.trim() ?? '',
@@ -169,7 +168,6 @@ function Panel(props: IProps, ref: A) {
           await service.accountService.addAccount({
             ...editData,
             ...systemForm.getFieldsValue(),
-            userTeam: null,
             userName: systemForm.getFieldValue('userName')?.trim() ?? '',
             fullName: generalForm.getFieldValue('fullName')?.trim() ?? '',
             jobTitle: systemForm.getFieldValue('jobTitle')?.trim() ?? '',

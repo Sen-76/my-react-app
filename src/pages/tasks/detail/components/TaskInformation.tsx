@@ -7,6 +7,7 @@ import {
   DatePicker,
   Empty,
   Form,
+  Image,
   Input,
   List,
   Modal,
@@ -26,7 +27,14 @@ import { useState, useEffect } from 'react';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import ReactQuill from 'react-quill';
-import { DeleteOutlined, FileOutlined, InboxOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  FileOutlined,
+  InboxOutlined,
+  PlusOutlined,
+  SearchOutlined
+} from '@ant-design/icons';
 import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { Link } from 'react-router-dom';
@@ -36,12 +44,12 @@ interface IProps {
   refreshData: () => void;
   setEditTitle: (value: boolean) => void;
 }
-function TaskInformation(props: IProps) {
+function TaskInformation(props: Readonly<IProps>) {
   const { data, refreshData, setEditTitle } = props;
   const { t } = useTranslation();
   const { showLoading, closeLoading } = useLoading();
-  const [editedField, setEditedFields] = useState<string>('');
-  const [mileStoneList, setMilestoneList] = useState<A[]>([]);
+  const [editedField, setEditedField] = useState<string>('');
+  const [mileStoneList, setMileStoneList] = useState<A[]>([]);
   const [priotyList, setPriotyList] = useState<A[]>([]);
   const [typeList, setTypeList] = useState<A[]>();
   const [userMemberList, setUserMemberList] = useState<A[]>([]);
@@ -107,15 +115,20 @@ function TaskInformation(props: IProps) {
     }
   };
 
-  const updateInfo = async () => {
+  const updateInfo = async (attach?: A, issueLink?: A) => {
     try {
       showLoading();
-      setEditedFields('');
+      setEditedField('');
+      const cleanData = { ...data };
+      form.getFieldValue('taskLinksMore')?.length > 0 &&
+        (issueLink = [...data.taskLinks.map((x: A) => x.id), ...form.getFieldValue('taskLinksMore')]);
       await service.taskService.update({
         ...data,
         ...form.getFieldsValue(),
-        assignee: form.getFieldValue('assignee').value ? form.getFieldValue('assignee')?.value : data.assignee,
-        reportTo: form.getFieldValue('reportTo').value ? form.getFieldValue('reportTo')?.value : data.reportTo
+        assignee: form.getFieldValue('assignee')?.value ? form.getFieldValue('assignee')?.value : data.assignee,
+        reportTo: form.getFieldValue('reportTo')?.value ? form.getFieldValue('reportTo')?.value : data.reportTo,
+        attachment: attach?.id ? attach : cleanData.fileAttachments,
+        taskLinks: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.id) ?? []
       });
       refreshData();
     } catch (e) {
@@ -127,19 +140,19 @@ function TaskInformation(props: IProps) {
 
   useEffect(() => {
     const fetchApi = async () => {
-      showLoading();
       const promises = [getMilestoneList(), getTypeList(), getPriotyList(), getTaskList()];
       await Promise.all(promises);
-      closeLoading();
     };
     fetchApi();
   }, []);
 
   const editField = (val: string) => {
-    setEditTitle(false);
-    setEditedFields(val);
-    data.dueDate = dayjs(data.dueDate);
-    form.setFieldsValue(data);
+    if (data.status?.title !== 'Done') {
+      setEditTitle(false);
+      setEditedField(val);
+      data.dueDate = dayjs(data.dueDate);
+      form.setFieldsValue(data);
+    }
   };
 
   const requiredRule = [{ required: true, message: t('Common_Require_Field') }];
@@ -168,7 +181,8 @@ function TaskInformation(props: IProps) {
       fileList.forEach((file: A) => {
         formData.append('files', file);
       });
-      await service.taskService.uploadAttach(formData);
+      const result = await service.taskService.uploadAttach(formData);
+      await updateInfo([...data.fileAttachments, ...result.data]);
       uploadFlag = true;
       refreshData();
     } catch (e) {
@@ -231,7 +245,7 @@ function TaskInformation(props: IProps) {
             )}
           </Row>
           <Row className={styles.detailRow}>
-            <Col className={styles.keyCol}>{t('Task_Prioty')}</Col>
+            <Col className={styles.keyCol}>{t('Task_Priority')}</Col>
             {editedField !== 'taskPriotyId' ? (
               <Button
                 type="text"
@@ -293,77 +307,88 @@ function TaskInformation(props: IProps) {
     );
   };
   const onRenderAttachment = () => {
-    const getSizeText = (size?: number) => {
-      if (!size) {
-        return `0KB`;
-      }
-      const result = (Number((size / 1024).toFixed(2)) * 100) / 100;
-      return `${result}KB`;
-    };
-    return data.attachment?.length != 0 ? (
-      <>
+    return data.fileAttachments?.length === 0 ? (
+      data.status?.title !== 'Done' ? (
         <Dragger {...uploadProps} multiple={true} showUploadList={false}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">Click or drag file to this area to upload</p>
-          <p className="ant-upload-hint">
-            Support for a multyple upload. Strictly prohibited from uploading company data or other banned files.
-          </p>
+          <p className="ant-upload-text">{t('Common_UploadFile_TaskDetail_Entry')}</p>
+          <p className="ant-upload-hint">{t('Common_UploadFile_TaskDetail_Description_Entry')}</p>
         </Dragger>
-      </>
+      ) : (
+        <Empty />
+      )
     ) : (
-      <>
-        {data!.attachment!.map((item: A) => (
-          <div key={item.id} className="info">
-            <div className="file-icon-box">
-              <FileOutlined className="file-icon" />
+      <List
+        itemLayout="horizontal"
+        dataSource={data.fileAttachments}
+        renderItem={(item: A) => (
+          <List.Item key={item?.fileName}>
+            <div style={{ display: 'flex', alignItems: 'center', width: 'calc(100% - 100px)' }}>
+              <div style={{ fontSize: 20, margin: '0 20px' }}>
+                {item.fileType.toLowerCase() === 'jpg' ||
+                item.fileType.toLowerCase() === 'png' ||
+                item.fileType.toLowerCase() === 'webp' ||
+                item.fileType.toLowerCase() === 'jpeg' ? (
+                  <Image width={100} height={100} src={item?.url} />
+                ) : (
+                  <FileOutlined className="file-icon" />
+                )}
+              </div>
+              <Paragraph ellipsis={{ rows: 1, expandable: false }}>
+                <div style={{ fontWeight: 500, fontSize: 18 }}>{item?.fileName}</div>
+              </Paragraph>
             </div>
             <div>
-              <div className="name">{item.name}</div>
-              <div className="size">{getSizeText(item.size)}</div>
+              <Tooltip placement="bottom" title={t('Common_Download')} color="#ffffff" arrow={true}>
+                <a href={item.url} download>
+                  <Button type="text" icon={<DownloadOutlined />} />
+                </a>
+              </Tooltip>
+              <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                <Button
+                  type="text"
+                  onClick={() => updateInfo(data.fileAttachments.filter((x: A) => x.id !== item.id))}
+                  icon={<DeleteOutlined />}
+                />
+              </Tooltip>
             </div>
-          </div>
-        ))}
-      </>
+          </List.Item>
+        )}
+      />
     );
   };
   const onRenderIssueLink = () => {
-    const datas = [
-      {
-        title: 'Ant Design Title 1'
-      },
-      {
-        title: 'Ant Design Title 2'
-      },
-      {
-        title: 'Ant Design Title 3'
-      },
-      {
-        title: 'Ant Design Title 4'
-      }
-    ];
-    return data.taskLinks?.length == 0 ? (
-      <>
-        <List
-          itemLayout="horizontal"
-          dataSource={datas}
-          renderItem={(item) => (
-            <List.Item key={item.title}>
-              <div>
-                <Link to="/">{item.title}</Link>
-                <div>Description</div>
-              </div>
+    return data.taskLinks?.length > 0 ? (
+      <List
+        itemLayout="horizontal"
+        dataSource={data.taskLinks}
+        renderItem={(item: A) => (
+          <List.Item key={item.id}>
+            <div>
+              <Link to="/">
+                [{item?.taskLink?.key}] {item?.taskLink?.summary}
+              </Link>
+            </div>
 
-              <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-                <Button type="text" onClick={() => console.log('cc')} icon={<DeleteOutlined />} />
-              </Tooltip>
-            </List.Item>
-          )}
-        />
-      </>
+            <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+              <Button
+                type="text"
+                onClick={() =>
+                  updateInfo(
+                    undefined,
+                    data.taskLinks?.filter((x: A) => x.id !== item.id)?.map((x: A) => x.id)
+                  )
+                }
+                icon={<DeleteOutlined />}
+              />
+            </Tooltip>
+          </List.Item>
+        )}
+      />
     ) : (
-      <Typography>This feature is comming soon</Typography>
+      <Empty />
     );
   };
   const onRenderPeople = () => {
@@ -376,17 +401,17 @@ function TaskInformation(props: IProps) {
               <Col className={styles.valueCol}>
                 <Button
                   type="text"
-                  style={{ padding: 5, width: '100%', display: 'flex' }}
+                  style={{ padding: 5, width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}
                   onClick={() => editField('assignee')}
                 >
+                  <Avatar
+                    size={30}
+                    src={data?.assignee2?.avatarUrl?.url}
+                    style={{ backgroundColor: util.randomColor(), width: 34 }}
+                  >
+                    {data?.assignee2?.fullName?.charAt(0)}
+                  </Avatar>
                   <Typography.Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ cursor: 'pointer' }}>
-                    <Avatar
-                      size={30}
-                      src={data?.assignee2?.avatarUrl?.url}
-                      style={{ marginRight: '7px', backgroundColor: util.randomColor() }}
-                    >
-                      {data?.assignee2?.fullName?.charAt(0)}
-                    </Avatar>
                     {data?.assignee2?.fullName}
                   </Typography.Paragraph>
                 </Button>
@@ -439,17 +464,17 @@ function TaskInformation(props: IProps) {
               <Col className={styles.valueCol}>
                 <Button
                   type="text"
-                  style={{ padding: 5, width: '100%', display: 'flex' }}
+                  style={{ padding: 5, width: '100%', display: 'flex', alignItems: 'center', gap: 8 }}
                   onClick={() => editField('reportTo')}
                 >
+                  <Avatar
+                    size={30}
+                    src={data?.reportToRelation?.avatarUrl?.url}
+                    style={{ backgroundColor: util.randomColor(), width: 34 }}
+                  >
+                    {data?.reportToRelation?.fullName?.charAt(0)}
+                  </Avatar>
                   <Typography.Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ cursor: 'pointer' }}>
-                    <Avatar
-                      size={30}
-                      src={data?.reportToRelation?.avatarUrl?.url}
-                      style={{ marginRight: '7px', backgroundColor: util.randomColor() }}
-                    >
-                      {data?.reportToRelation?.fullName?.charAt(0)}
-                    </Avatar>
                     {data?.reportToRelation?.fullName}
                   </Typography.Paragraph>
                 </Button>
@@ -554,26 +579,41 @@ function TaskInformation(props: IProps) {
   };
   const genExtraAttachment = () => (
     <Upload {...uploadProps} multiple={true} showUploadList={false}>
-      <Button style={{ padding: 10, marginBottom: '-10px' }} type="text" icon={<PlusOutlined />} />
+      <Button
+        disabled={data.status?.title === 'Done'}
+        style={{ padding: 10, marginBottom: '-10px' }}
+        type="text"
+        icon={<PlusOutlined />}
+      />
     </Upload>
   );
   const genExtraTaskLink = () => (
-    <Button style={{ padding: 10, marginBottom: '-10px' }} type="text" icon={<PlusOutlined />} onClick={showModal} />
+    <Button
+      disabled={data.status?.title === 'Done'}
+      style={{ padding: 10, marginBottom: '-10px' }}
+      type="text"
+      icon={<PlusOutlined />}
+      onClick={showModal}
+    />
   );
   const showModal = () => {
-    setIsModalOpen(true);
+    if (data.status?.title !== 'Done') {
+      setIsModalOpen(true);
+    }
   };
   const handleOk = () => {
     updateInfo();
+    form.setFieldValue('taskLinksMore', []);
     setIsModalOpen(false);
   };
   const handleCancel = () => {
+    form.setFieldValue('taskLinksMore', []);
     setIsModalOpen(false);
   };
   const leftInfo = [
     { key: 'Details', label: t('Common_Details'), children: onRenderDetail() },
     { key: 'Descriptions', label: t('Common_Descriptions'), children: onRenderDescription() },
-    { key: 'Attachments', label: t('Task_Attachements'), children: onRenderAttachment(), extra: genExtraAttachment() },
+    { key: 'Attachments', label: t('Task_Attachments'), children: onRenderAttachment(), extra: genExtraAttachment() },
     { key: 'LinkIssues', label: t('Task_Link_Issues'), children: onRenderIssueLink(), extra: genExtraTaskLink() }
   ];
   const rightInfo = [
@@ -590,7 +630,7 @@ function TaskInformation(props: IProps) {
           totalItems: 0
         }
       });
-      setMilestoneList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
+      setMileStoneList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
     }
@@ -664,7 +704,7 @@ function TaskInformation(props: IProps) {
           collapsible="icon"
         />
         <Modal title={t('Task_Add_LinkIssues')} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-          <Form.Item name="taskLinks" rules={requiredRule}>
+          <Form.Item name="taskLinksMore" rules={requiredRule}>
             <Select options={taskList} mode="multiple" />
           </Form.Item>
         </Modal>

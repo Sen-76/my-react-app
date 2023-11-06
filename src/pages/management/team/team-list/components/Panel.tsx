@@ -76,7 +76,7 @@ function Panel(props: IProps, ref: A) {
       const { data } = await service.teamService.getDetail(id);
       setEditData(data);
       data.owner = {
-        value: data.manager.id,
+        value: data.manager?.id,
         label: (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Avatar
@@ -103,9 +103,9 @@ function Panel(props: IProps, ref: A) {
           </div>
         )
       };
-      data.departmentId = data.department.id;
-      setSelectedUser([...(data.users?.map((x: A) => x.id) ?? []), data.manager.id]);
-      setMemberList(data.members.filter((x: A) => x.id !== data.manager.id));
+      data.departmentId = data.department?.id;
+      setSelectedUser([...(data.users?.map((x: A) => x?.id) ?? []), data.manager?.id]);
+      setMemberList(data.members.filter((x: A) => x?.id !== data.manager?.id));
       form.setFieldsValue(data);
     } catch (e) {
       console.log(e);

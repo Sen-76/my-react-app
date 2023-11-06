@@ -42,7 +42,7 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response.status === 401) {
+    if (error.response?.status === 401) {
       Modal.error({
         title: 'Unauthorized',
         content: 'Your session has expired. Please log in again.',
@@ -58,9 +58,9 @@ instance.interceptors.response.use(
     //     content: 'Something wrong. Please check api again!'
     //   });
     // }
-    else if (error.response.status !== 200 && error.response.status !== 422) {
+    else if (error.response?.status !== 200 && error.response?.status !== 422) {
       Modal.error({
-        title: error.response.status,
+        title: error.response?.status,
         content: 'Something wrong!'
       });
     }

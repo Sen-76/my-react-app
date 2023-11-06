@@ -22,7 +22,7 @@ export const teamService = {
   },
   async update(param: Team.ITeamUpdateModel): Promise<Response.IDefaultResponse> {
     try {
-      const response = await axiosInstance.post('/team/updateDepartment', param);
+      const response = await axiosInstance.post('/team/updateTeam', param);
       return response.data;
     } catch (error) {
       console.error('An error occurred while update:', error);

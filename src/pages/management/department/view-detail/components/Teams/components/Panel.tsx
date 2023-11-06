@@ -351,7 +351,7 @@ function Panel(props: IProps, ref: A) {
                 />
               </Form.Item>
               {customAlert?.title && <div className="customAlert">{t('Manage_Team_Exist_Title')}</div>}
-              <Form.Item name="owner" label="Leader" rules={formRule.title}>
+              <Form.Item name="owner" label={t('Common_Leader')} rules={formRule.title}>
                 <Select
                   showSearch
                   labelInValue

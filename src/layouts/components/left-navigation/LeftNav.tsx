@@ -104,13 +104,13 @@ function LeftNav(props: IProps) {
       key: 'cfrs',
       children: [
         {
-          label: 'Recognition',
+          label: t('CFRS_Recognition_Navigation'),
           path: '/cfrs/recognition',
           icon: renderIcon(ArrowRightOutlined),
           key: 'recognition'
         },
         {
-          label: 'Give star',
+          label: t('CFRS_Give_star_Navigation'),
           path: '/cfrs/give-star',
           icon: renderIcon(ArrowRightOutlined),
           key: 'give-star'

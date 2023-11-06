@@ -40,6 +40,7 @@ function Tasks() {
     // }
   };
   const [tabStatus, setTabStatus] = useState<string>('table');
+  const [loadingTable, setLoadingTable] = useState<boolean>(false);
   const [taskList, setTaskList] = useState<A[]>([]);
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
   const [des, setDes] = useState<boolean>(true);
@@ -60,11 +61,31 @@ function Tasks() {
   ];
   const getTaskList = async (drafParam?: Common.IDataGrid) => {
     try {
+      setLoadingTable(true);
       const result = await service.taskService.get(drafParam ?? param);
+      setParam({
+        ...param,
+        pageInfor: {
+          pageSize: result.prameter.pageSize,
+          pageNumber: result.prameter.pageNumber,
+          totalItems: result.prameter.totalItems
+        }
+      });
       setTaskList(result.data);
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoadingTable(false);
     }
+  };
+
+  const setPage = (val: number) => {
+    const draftGrid = { ...param };
+    if (draftGrid.pageInfor) {
+      draftGrid.pageInfor.pageNumber = val;
+    }
+    setParam(draftGrid);
+    getTaskList(draftGrid);
   };
 
   const selectFilter = (val: string) => {
@@ -138,7 +159,6 @@ function Tasks() {
   };
 
   const onSearch = async (value: string) => {
-    showLoading();
     const draftGrid = { ...param };
     if (draftGrid.searchInfor) {
       draftGrid.searchInfor.searchValue = value;
@@ -146,11 +166,9 @@ function Tasks() {
     draftGrid.pageInfor!.pageNumber = 1;
     setParam(draftGrid);
     await getTaskList(draftGrid);
-    closeLoading();
   };
 
   const onFilter = async (val: A) => {
-    showLoading();
     const draftGrid = { ...param };
     if (draftGrid.filter) {
       const projectId = draftGrid.filter.findIndex((x) => x.key === 'projectId');
@@ -197,11 +215,9 @@ function Tasks() {
         });
     }
     await getTaskList(draftGrid);
-    closeLoading();
   };
 
   const onOrder = async (value: string, des: boolean) => {
-    showLoading();
     const draftGrid = { ...param };
     if (draftGrid.orderInfor) {
       draftGrid.orderInfor.orderBy = [value];
@@ -210,7 +226,6 @@ function Tasks() {
     draftGrid.pageInfor!.pageNumber = 1;
     setParam(draftGrid);
     await getTaskList(draftGrid);
-    closeLoading();
   };
 
   return (
@@ -218,7 +233,14 @@ function Tasks() {
       <div>
         <Tabs items={tabItems} size="large" onChange={onTabChanged} tabBarExtraContent={TableHeader()} />
         {tabStatus === 'table' && (
-          <DataTable data={taskList} openPanel={openPanel} loading={false} onOrder={onOrder} param={param} />
+          <DataTable
+            data={taskList}
+            openPanel={openPanel}
+            loading={loadingTable}
+            onOrder={onOrder}
+            param={param}
+            setPage={setPage}
+          />
         )}
         {tabStatus === 'kanban' && <Kanban taskList={taskList} />}
         <Panel refreshList={getTaskList} ref={panelRef} />

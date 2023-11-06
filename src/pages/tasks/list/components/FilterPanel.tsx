@@ -203,7 +203,7 @@ function FilterPanel(props: IProps, ref: A) {
           <Form.Item name="statusId" label={t('Task_Status')}>
             <Select options={statusList} mode="multiple" />
           </Form.Item>
-          <Form.Item name="taskPriotyId" label={t('Task_Prioty')}>
+          <Form.Item name="taskPriotyId" label={t('Task_Priority')}>
             <Select options={priotyList} mode="multiple" />
           </Form.Item>
           <Form.Item name="assignee" label={t('Task_Assignee')}>

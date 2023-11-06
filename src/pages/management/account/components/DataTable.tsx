@@ -54,10 +54,10 @@ interface IProps {
   loading: boolean;
   defaultselected: Account.IAccountModel[];
 }
-function DataTable(props: IProps) {
+function DataTable(props: Readonly<IProps>) {
   const { loading, param, tabStatus } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [isModalOpen, setIsOpenModal] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [choosenUser, setChoosenUser] = useState<Account.IAccountModel | null>();
   const { showLoading, closeLoading } = useLoading();
   const [value, setValue] = useState<EDeleteState>(EDeleteState.None);
@@ -69,10 +69,11 @@ function DataTable(props: IProps) {
       title: t('name'),
       dataIndex: 'fullName',
       key: 'fullName',
+      width: 200,
       render: (_, record) => {
         return (
           <Tooltip placement="bottom" title={record.fullName} color="#ffffff" arrow={true}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', minWidth: 200 }}>
               <Avatar
                 size={40}
                 src={record.photoUrl}
@@ -181,11 +182,19 @@ function DataTable(props: IProps) {
                 <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
                   <Button type="text" onClick={() => props.openPanel(record)} icon={<EditOutlined />} />
                 </Tooltip>
-                <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                <Tooltip
+                  placement="bottom"
+                  title={
+                    record.userRole2.isDefault !== true ? t('Common_ToolTip_CannotDeleteUser') : t('Common_Delete')
+                  }
+                  color="#ffffff"
+                  arrow={true}
+                >
                   <Button
+                    disabled={record.userRole2.isDefault !== true}
                     type="text"
                     onClick={() => {
-                      setIsOpenModal(true);
+                      setIsModalOpen(true);
                       setChoosenUser(record);
                       setSelectedRowKeys([record.id]);
                     }}
@@ -230,14 +239,14 @@ function DataTable(props: IProps) {
   // };
 
   const onCancelModal = () => {
-    setIsOpenModal(false);
+    setIsModalOpen(false);
     setChoosenUser(null);
     setValue(EDeleteState.None);
   };
 
   const confirmDelete = async () => {
     try {
-      setIsOpenModal(false);
+      setIsModalOpen(false);
       await service.accountService.deleteAccount({
         // isHardDelete: value === EDeleteState.HardDelete,
         isHardDelete: false,
@@ -340,7 +349,7 @@ function DataTable(props: IProps) {
                 {t('Common_AddNew')}
               </Button>
               <Button
-                onClick={() => setIsOpenModal(true)}
+                onClick={() => setIsModalOpen(true)}
                 loading={loading}
                 type="text"
                 icon={<DeleteOutlined />}
@@ -362,17 +371,15 @@ function DataTable(props: IProps) {
             </>
           )}
           {tabStatus == EState.Deleted && (
-            <>
-              <Button
-                onClick={restoreUser}
-                loading={loading}
-                type="text"
-                icon={<UndoOutlined />}
-                disabled={selectedRowKeys.length === 0}
-              >
-                {t('Common_RestoreSelected')}
-              </Button>
-            </>
+            <Button
+              onClick={restoreUser}
+              loading={loading}
+              type="text"
+              icon={<UndoOutlined />}
+              disabled={selectedRowKeys.length === 0}
+            >
+              {t('Common_RestoreSelected')}
+            </Button>
           )}
         </div>
         <div className={styles.tableHeaderRight}>

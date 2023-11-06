@@ -49,8 +49,7 @@ export const useLoginManager = () => {
       sessionStorage.setItem('userDetail', JSON.stringify(userDetail.data));
       location.href = '/';
     } catch (e: A) {
-      console.log(e);
-      if (e.response?.data.status === 422) {
+      if (e.response?.data?.status === 422) {
         return e.response.data.errors;
       }
     }
