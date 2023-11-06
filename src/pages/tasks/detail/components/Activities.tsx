@@ -1,6 +1,6 @@
 import { Collapse, Tabs } from 'antd';
 import { useTranslation } from 'react-i18next';
-import Activity from './Activity';
+import History from './History';
 import Comment from './Comment';
 
 function Activities() {
@@ -13,9 +13,9 @@ function Activities() {
         children: <Comment />
       },
       {
-        label: t('Task_Activities'),
+        label: t('Task_Histories'),
         key: 'history',
-        children: <Activity />
+        children: <History />
       }
     ];
     const onTabChanged = () => {

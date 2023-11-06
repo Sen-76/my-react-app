@@ -19,11 +19,30 @@
     .ant-tabs-tab {
       padding: 0 0 5px 0 !important;
     }
+    .ant-tabs-nav {
+      margin-bottom: 30px !important;
+    }
   }
   .title {
     padding: 20px;
     font-weight: 600;
     font-size: 24px;
+  }
+  .leftCollapse {
+    min-width: 700;
+    width: 69%;
+  }
+  .rightCollapse {
+    min-width: 300;
+    width: 30%;
+  }
+  @media only screen and (max-width: 1365px) {
+    .leftCollapse {
+      min-width: 100%;
+    }
+    .rightCollapse {
+      min-width: 100%;
+    }
   }
 }
 .col {

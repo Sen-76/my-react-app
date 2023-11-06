@@ -42,7 +42,7 @@ function TaskDetail() {
 
   useEffect(() => {
     setBreadcrumb([{ icon: <SnippetsOutlined />, path: '/tasks', text: t('Common_Task') }, { text: data.name }]);
-  }, [t]);
+  }, [t, location.pathname]);
 
   useEffect(() => {
     const fetchApi = async () => {
@@ -52,7 +52,7 @@ function TaskDetail() {
       closeLoading();
     };
     fetchApi();
-  }, []);
+  }, [location.pathname]);
 
   const getStatusList = async () => {
     try {
@@ -139,7 +139,7 @@ function TaskDetail() {
             className={styles.title}
             type="text"
             onClick={() => {
-              if (editData.status?.title !== 'Done') {
+              if (editData.status?.title === 'Open') {
                 setEditTitle(true);
                 form.setFieldsValue(editData);
               }
@@ -159,14 +159,14 @@ function TaskDetail() {
           </Form.Item>
         )}
       </Form>
-      {/* <Button
+      <Button
         style={{ marginRight: 10 }}
         icon={<EditOutlined />}
         disabled={editData?.status?.title !== 'Open'}
         onClick={openPanel}
       >
         Edit
-      </Button> */}
+      </Button>
       <Select
         disabled={editData?.status?.title === 'Done'}
         onChange={onChangeStatus}

@@ -132,8 +132,14 @@ function Tasks() {
 
   const onTabChanged = async (e: A) => {
     showLoading();
+    const draftParam = { ...param };
+    if (e === 'kanban') draftParam.pageInfor!.pageSize = 1000;
+    else {
+      draftParam.pageInfor!.pageSize = 10;
+      draftParam.pageInfor!.pageNumber = 1;
+    }
+    await getTaskList(draftParam);
     setTabStatus(e);
-    await getTaskList();
     closeLoading();
   };
 

@@ -35,6 +35,7 @@ import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { util } from '@/common/helpers/util';
 import { useLoginManager } from '@/common/helpers/login-manager';
+import { useParams } from 'react-router';
 
 interface IProps {
   refreshList: () => void;
@@ -46,6 +47,7 @@ function Panel(props: IProps, ref: A) {
   const { showLoading, closeLoading } = useLoading();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileListFormat, setFileListFormat] = useState<UploadFile[]>([]);
   const [projectList, setProjectList] = useState<A[]>();
   const [statusList, setStatusList] = useState<A[]>();
   const [typeList, setTypeList] = useState<A[]>();
@@ -89,16 +91,15 @@ function Panel(props: IProps, ref: A) {
   const getDetail = async (id: string) => {
     try {
       const { data } = await service.taskService.getDetail(id);
-      getTaskList(data.projectId);
+      await getTaskList(data.projectId, id);
       data.dueDate = dayjs(data.dueDate);
+      setFileListFormat(data.fileAttachments);
       setFileList(
-        ...[
-          data.fileAttachments?.map((x: A) => ({
-            uid: x.id,
-            name: x.fileName,
-            status: 'done'
-          }))
-        ]
+        data.fileAttachments?.map((x: A) => ({
+          uid: x.id,
+          name: x.fileName,
+          status: 'done'
+        }))
       );
       form.setFieldsValue({
         ...data,
@@ -236,7 +237,7 @@ function Panel(props: IProps, ref: A) {
     }
   };
 
-  const getTaskList = async (projectId?: string) => {
+  const getTaskList = async (projectId?: string, id?: string) => {
     try {
       const result = await service.taskService.get({
         pageInfor: {
@@ -244,7 +245,14 @@ function Panel(props: IProps, ref: A) {
           pageNumber: 1,
           totalItems: 0
         },
-        filter: [{ key: 'projectId', value: [projectId] }]
+        filter: [
+          { key: 'projectId', value: [projectId] },
+          {
+            key: 'id',
+            value: [id ?? ''],
+            operators: 'not in'
+          }
+        ]
       });
       setTaskList(result.data?.map((x: A) => ({ label: `[` + x.key + `] ` + x.summary, value: x.id })));
     } catch (e) {
@@ -261,9 +269,9 @@ function Panel(props: IProps, ref: A) {
   const onFinish = async (val: A) => {
     try {
       showLoading();
-      let attachmentList = [...fileList];
-      fileList.length > 0 && (attachmentList = [...fileList, ...(await handleUpload())]);
-      console.log(typeof val.taskLinks[0]);
+      let attachmentList = fileListFormat;
+      fileListFormat.length > 0 &&
+        (attachmentList = [...fileListFormat.filter((x) => !x.uid?.includes('rc-upload')), ...(await handleUpload())]);
       if (isEdit) {
         await service.taskService.update({
           ...editData,
@@ -341,9 +349,9 @@ function Panel(props: IProps, ref: A) {
     return result.data;
   };
 
-  const onProjectSelect = (val: string) => {
+  const onProjectSelect = async (val: string) => {
     showLoading();
-    getTaskList(val);
+    await getTaskList(val);
     setProjectId(val);
     closeLoading();
   };
@@ -543,7 +551,19 @@ function Panel(props: IProps, ref: A) {
           {t('Task_Assign_To_Me')}
         </Button>
         <Form.Item name="attachment" label={t('Task_Attachment')}>
-          <Upload {...fileProps} listType="picture" multiple maxCount={3} defaultFileList={[...fileList]}>
+          <Upload
+            {...fileProps}
+            listType="picture"
+            multiple
+            maxCount={3}
+            // defaultFileList={[
+            //   {
+            //     uid: '-2',
+            //     name: 'zzz.png',
+            //     status: 'error'
+            //   }
+            // ]}
+          >
             <Button icon={<UploadOutlined />}>Upload</Button>
           </Upload>
         </Form.Item>

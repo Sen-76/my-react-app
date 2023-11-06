@@ -11,6 +11,7 @@ interface IProps {
 }
 function Kanban(props: IProps) {
   const { taskList } = props;
+  console.log(taskList);
   const [kanBanTaskList, setKanbanTaskList] = useState<A[]>([]);
   const { showLoading, closeLoading } = useLoading();
 

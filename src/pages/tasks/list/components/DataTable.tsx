@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { EditOutlined, ExportOutlined, PlusOutlined, SmileOutlined, SolutionOutlined } from '@ant-design/icons';
 import { Button, Table, Tag, Tooltip, notification } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table';

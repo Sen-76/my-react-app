@@ -5,6 +5,7 @@ import { Routes, BrowserRouter as ReactRouter, Route, useNavigate } from 'react-
 import LazyLoading from '@/components/lazy-loading/LazyLoading';
 import { useLoginManager } from '../helpers/login-manager';
 import Login from '@/pages/authentication/login/Login';
+import Forgot from '@/pages/authentication/forgot/Forgot';
 
 const RouteList = (list: IRouter.IRoute[]) => {
   return list?.map?.((route) => RouteItem(route)).filter((item) => item);
@@ -64,6 +65,14 @@ const Router: FC<IRouter.RouterProps> = (props) => {
                   element={
                     <Suspense fallback={<LazyLoading />}>
                       <Login />
+                    </Suspense>
+                  }
+                ></Route>
+                <Route
+                  path="/forgot"
+                  element={
+                    <Suspense fallback={<LazyLoading />}>
+                      <Forgot />
                     </Suspense>
                   }
                 ></Route>

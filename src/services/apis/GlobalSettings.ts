@@ -20,6 +20,33 @@ export const globalSettingsService = {
       throw error;
     }
   },
+  async getAllEmailTemplate(): Promise<A> {
+    try {
+      const response = await axiosInstance.get('mail/getAllType');
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while get email template:', error);
+      throw error;
+    }
+  },
+  async getAllEmailTemplateById(type: string): Promise<A> {
+    try {
+      const response = await axiosInstance.get('mail/getTeamplate/' + type);
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while get email template:', error);
+      throw error;
+    }
+  },
+  async updateEmailtemplate(type: string): Promise<A> {
+    try {
+      const response = await axiosInstance.get('mail/updateTemplate/' + type);
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while get email template:', error);
+      throw error;
+    }
+  },
   async getById(id: string): Promise<Response.IDefaultResponse> {
     try {
       const response = await axiosInstance.get('/users/update/' + id);

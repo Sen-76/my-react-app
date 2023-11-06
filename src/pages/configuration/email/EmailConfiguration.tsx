@@ -1,29 +1,20 @@
 import { SettingOutlined } from '@ant-design/icons';
-import DataTable from './components/DataTable';
 import styles from './EmailConfiguation.module.scss';
 import { useTranslation } from 'react-i18next';
 import { useBreadcrumb } from '../../../components/breadcrum/Breadcrum';
-import { useRef, useEffect } from 'react';
-import Panel from './components/Panel';
-import { Menu, MenuProps, Row } from 'antd';
+import { useEffect, useState } from 'react';
+import { Button, Menu, MenuProps, Row } from 'antd';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import 'quill/dist/quill.core.css';
-import 'quill/dist/quill.bubble.css';
+import { useLoading } from '@/common/context/useLoading';
+import { service } from '@/services/apis';
 
-const draftEmail = [
-  {
-    title: 'Test email',
-    description: 'N/A',
-    updatedDate: '2012/12/12 12:12:12',
-    status: 'Active',
-    modifiedBy: 'Sen'
-  }
-];
 function EmailConfiguration() {
   const { t } = useTranslation();
   const { setBreadcrumb } = useBreadcrumb();
-  const panelRef = useRef();
+  const { showLoading, closeLoading } = useLoading();
+  const [menuItem, setMenuItem] = useState<MenuProps['items']>();
+  const [quillValue, setQuillValue] = useState<A>();
 
   useEffect(() => {
     setBreadcrumb([
@@ -32,24 +23,46 @@ function EmailConfiguration() {
     ]);
   }, [t]);
 
-  const openPanel = (data?: A) => {
-    (panelRef.current as A).openDrawer(data);
-  };
+  useEffect(() => {
+    getTemplateList();
+  }, []);
 
-  const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e);
-  };
-
-  const items: MenuProps['items'] = [
-    {
-      label: 'Option 1',
-      key: '1'
-    },
-    {
-      label: 'Option 2',
-      key: '2'
+  const getTemplateList = async () => {
+    try {
+      showLoading();
+      await service.globalSettingsService.getAllEmailTemplate();
+      setMenuItem([
+        {
+          label: 'Option 1',
+          key: '1'
+        },
+        {
+          label: 'Option 2',
+          key: '2'
+        }
+      ]);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      closeLoading();
     }
-  ];
+  };
+
+  const onClick: MenuProps['onClick'] = async (e) => {
+    try {
+      showLoading();
+      await service.globalSettingsService.getAllEmailTemplateById(e.key as string);
+      setQuillValue('<div>Test</div>');
+    } catch (e) {
+      console.log(e);
+    } finally {
+      closeLoading();
+    }
+  };
+
+  const updateEmailTemplate = () => {
+    console.log('a');
+  };
 
   const modules = {
     toolbar: [
@@ -75,14 +88,17 @@ function EmailConfiguration() {
 
   return (
     <div className={styles.emailConfiguration}>
-      {/* <DataTable data={draftEmail} openPanel={openPanel} /> */}
-      <Panel refreshList={() => console.log('refresh')} ref={panelRef} />
       <Row className={styles.row}>
-        <Menu onClick={onClick} style={{ width: 256 }} mode="inline" items={items} className={styles.leftNav} />
+        <Menu onClick={onClick} style={{ width: 256 }} mode="inline" items={menuItem} className={styles.leftNav} />
         <div className={styles.quill}>
-          <ReactQuill theme="snow" modules={modules} />
+          <ReactQuill theme="snow" modules={modules} value={quillValue} />
         </div>
       </Row>
+      <div className="actionBtnBottom">
+        <Button type="primary" htmlType="submit" onClick={updateEmailTemplate}>
+          {t('Common_Confirm')}
+        </Button>
+      </div>
     </div>
   );
 }

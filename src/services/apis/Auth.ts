@@ -10,5 +10,14 @@ export const authsService = {
       console.error('An error occurred while login:', error);
       throw error;
     }
+  },
+  async forgot(userEmail: string): Promise<A> {
+    try {
+      const response = await axiosInstance.post('/users/resetPassword', userEmail);
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while login:', error);
+      throw error;
+    }
   }
 };

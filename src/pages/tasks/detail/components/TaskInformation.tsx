@@ -37,7 +37,7 @@ import {
 } from '@ant-design/icons';
 import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 interface IProps {
   data: A;
@@ -46,6 +46,7 @@ interface IProps {
 }
 function TaskInformation(props: Readonly<IProps>) {
   const { data, refreshData, setEditTitle } = props;
+  const paramData = useParams();
   const { t } = useTranslation();
   const { showLoading, closeLoading } = useLoading();
   const [editedField, setEditedField] = useState<string>('');
@@ -64,6 +65,12 @@ function TaskInformation(props: Readonly<IProps>) {
   useEffect(() => {
     getUsers();
   }, [userDebouncedAssignee]);
+
+  useEffect(() => {
+    if (data) {
+      getTaskList();
+    }
+  }, [data]);
 
   const getUsers = async () => {
     try {
@@ -140,14 +147,14 @@ function TaskInformation(props: Readonly<IProps>) {
 
   useEffect(() => {
     const fetchApi = async () => {
-      const promises = [getMilestoneList(), getTypeList(), getPriotyList(), getTaskList()];
+      const promises = [getMilestoneList(), getTypeList(), getPriotyList()];
       await Promise.all(promises);
     };
     fetchApi();
   }, []);
 
   const editField = (val: string) => {
-    if (data.status?.title !== 'Done') {
+    if (data.status?.title === 'Open') {
       setEditTitle(false);
       setEditedField(val);
       data.dueDate = dayjs(data.dueDate);
@@ -367,7 +374,7 @@ function TaskInformation(props: Readonly<IProps>) {
         renderItem={(item: A) => (
           <List.Item key={item.id}>
             <div>
-              <Link to="/">
+              <Link to={`/tasks/task-detail/${item?.taskLink?.key}/${item?.taskLink?.id}`}>
                 [{item?.taskLink?.key}] {item?.taskLink?.summary}
               </Link>
             </div>
@@ -407,7 +414,7 @@ function TaskInformation(props: Readonly<IProps>) {
                   <Avatar
                     size={30}
                     src={data?.assignee2?.avatarUrl?.url}
-                    style={{ backgroundColor: util.randomColor(), width: 34 }}
+                    style={{ backgroundColor: util.randomColor(), width: 30 }}
                   >
                     {data?.assignee2?.fullName?.charAt(0)}
                   </Avatar>
@@ -470,7 +477,7 @@ function TaskInformation(props: Readonly<IProps>) {
                   <Avatar
                     size={30}
                     src={data?.reportToRelation?.avatarUrl?.url}
-                    style={{ backgroundColor: util.randomColor(), width: 34 }}
+                    style={{ backgroundColor: util.randomColor(), width: 30 }}
                   >
                     {data?.reportToRelation?.fullName?.charAt(0)}
                   </Avatar>
@@ -674,7 +681,14 @@ function TaskInformation(props: Readonly<IProps>) {
           pageNumber: 1,
           totalItems: 0
         },
-        filter: [{ key: 'projectId', value: [data.projectId] }]
+        filter: [
+          { key: 'projectId', value: [data?.projectId] },
+          {
+            key: 'id',
+            value: [paramData.id],
+            operators: 'not in'
+          }
+        ]
       });
       setTaskList(result.data.map((x: A) => ({ label: `[` + x.key + `] ` + x.summary, value: x.id })));
     } catch (e) {
@@ -686,7 +700,7 @@ function TaskInformation(props: Readonly<IProps>) {
     <div>
       <Form onFinish={updateInfo} className={styles.information} form={form}>
         <Collapse
-          style={{ minWidth: 700, width: '69%' }}
+          className={styles.leftCollapse}
           items={leftInfo}
           bordered={false}
           defaultActiveKey={['Details', 'Descriptions', 'Attachments', 'LinkIssues']}
@@ -695,7 +709,7 @@ function TaskInformation(props: Readonly<IProps>) {
           collapsible="icon"
         />
         <Collapse
-          style={{ minWidth: 300, width: '30%' }}
+          className={styles.rightCollapse}
           items={rightInfo}
           bordered={false}
           defaultActiveKey={['People', 'Dates']}
