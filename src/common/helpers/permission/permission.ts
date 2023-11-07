@@ -1,4 +1,5 @@
 import { service } from '@/services/apis';
+const myPermission = JSON.parse(sessionStorage.getItem('permissions') ?? '') as string[];
 
 export const permissionManager = () => {
   const getAllPermission = async () => {
@@ -9,6 +10,7 @@ export const permissionManager = () => {
       console.log(error);
     }
   };
+
   const getAllPermissionTest = async (authToken: string) => {
     const url = import.meta.env.VITE_REACT_APP_API_URL + '/permission/get';
 
@@ -32,8 +34,13 @@ export const permissionManager = () => {
     }
   };
 
+  const checkHasPermission = (module: A) => {
+    return myPermission.some((x: string) => module.includes(x));
+  };
+
   return {
     getAllPermission,
-    getAllPermissionTest
+    getAllPermissionTest,
+    checkHasPermission
   };
 };

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {
   Avatar,
   Button,
+  Dropdown,
   Input,
   Modal,
   Radio,
@@ -21,10 +22,12 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
+  EllipsisOutlined,
   ExclamationCircleFilled,
   ExportOutlined,
   FilterOutlined,
   ImportOutlined,
+  LockOutlined,
   ManOutlined,
   PlusOutlined,
   SmileOutlined,
@@ -40,6 +43,8 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import { useTranslation } from 'react-i18next';
 import { util } from '@/common/helpers/util';
 import { service } from '@/services/apis';
+import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
+import { permissionManager } from '@/common/helpers/permission/permission';
 
 interface IProps {
   data: A[];
@@ -55,12 +60,14 @@ interface IProps {
   defaultselected: Account.IAccountModel[];
 }
 function DataTable(props: Readonly<IProps>) {
-  const { loading, param, tabStatus } = props;
+  const { loading, param, tabStatus, openPanel, openFilterPanel, openDetailPanel } = props;
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [choosenUser, setChoosenUser] = useState<Account.IAccountModel | null>();
   const { showLoading, closeLoading } = useLoading();
   const [value, setValue] = useState<EDeleteState>(EDeleteState.None);
+  const { checkHasPermission } = permissionManager();
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
   const { t } = useTranslation();
   const { Search } = Input;
 
@@ -174,44 +181,102 @@ function DataTable(props: Readonly<IProps>) {
       render: (_, record) => {
         return (
           <div>
-            <Tooltip placement="bottom" title={t('Common_ViewDetail')} color="#ffffff" arrow={true}>
+            <Dropdown
+              trigger={['click']}
+              className={styles.accountDropdown}
+              menu={{
+                items: [
+                  {
+                    key: '1',
+                    onClick: () => openDetailPanel(record),
+                    label: (
+                      <div className={styles.accountDropdownItem}>
+                        <SolutionOutlined /> {t('Common_ViewDetail')}
+                      </div>
+                    )
+                  },
+                  {
+                    key: '2',
+                    onClick: () => resetPass(record.userEmail),
+                    disabled: !checkHasPermission(allPermission?.User?.Permission_Edit_Employee),
+                    label: (
+                      <div className={styles.accountDropdownItem}>
+                        <LockOutlined /> {t('Common_ResetPass')}
+                      </div>
+                    )
+                  }
+                ]
+              }}
+              placement="bottomRight"
+              arrow={false}
+            >
+              <Tooltip placement="bottom" title={t('Common_More')} color="#ffffff" arrow={true}>
+                <Button type="text" icon={<EllipsisOutlined />} />
+              </Tooltip>
+            </Dropdown>
+            {/* <Tooltip placement="bottom" title={t('Common_ViewDetail')} color="#ffffff" arrow={true}>
               <Button type="text" onClick={() => props.openDetailPanel(record)} icon={<SolutionOutlined />} />
             </Tooltip>
+            <Tooltip placement="bottom" title={t('Common_ResetPass')} color="#ffffff" arrow={true}>
+              <Button type="text" onClick={() => resetPass(record.userEmail)} icon={<LockOutlined />} />
+            </Tooltip> */}
             {tabStatus == EState.Activate ? (
               <>
-                <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
-                  <Button type="text" onClick={() => props.openPanel(record)} icon={<EditOutlined />} />
-                </Tooltip>
-                <Tooltip
-                  placement="bottom"
-                  title={
-                    record.userRole2.isDefault !== true ? t('Common_ToolTip_CannotDeleteUser') : t('Common_Delete')
-                  }
-                  color="#ffffff"
-                  arrow={true}
-                >
-                  <Button
-                    disabled={record.userRole2.isDefault !== true}
-                    type="text"
-                    onClick={() => {
-                      setIsModalOpen(true);
-                      setChoosenUser(record);
-                      setSelectedRowKeys([record.id]);
-                    }}
-                    icon={<DeleteOutlined />}
-                  />
-                </Tooltip>
+                <PermissionBlock module={allPermission?.User?.Permission_Edit_Employee}>
+                  <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
+                    <Button type="text" onClick={() => props.openPanel(record)} icon={<EditOutlined />} />
+                  </Tooltip>
+                </PermissionBlock>
+                <PermissionBlock module={allPermission?.User?.Permission_Delete_Employee}>
+                  <Tooltip
+                    placement="bottom"
+                    title={
+                      record.userRole2.isDefault !== true ? t('Common_ToolTip_CannotDeleteUser') : t('Common_Delete')
+                    }
+                    color="#ffffff"
+                    arrow={true}
+                  >
+                    <Button
+                      disabled={record.userRole2.isDefault !== true}
+                      type="text"
+                      onClick={() => {
+                        setIsModalOpen(true);
+                        setChoosenUser(record);
+                        setSelectedRowKeys([record.id]);
+                      }}
+                      icon={<DeleteOutlined />}
+                    />
+                  </Tooltip>
+                </PermissionBlock>
               </>
             ) : (
-              <Tooltip placement="bottom" title={t('Common_Restore')} color="#ffffff" arrow={true}>
-                <Button type="text" onClick={() => restoreUser(record)} icon={<UndoOutlined />} />
-              </Tooltip>
+              <PermissionBlock module={allPermission?.User?.Permission_Restore_User_Employees}>
+                <Tooltip placement="bottom" title={t('Common_Restore')} color="#ffffff" arrow={true}>
+                  <Button type="text" onClick={() => restoreUser(record)} icon={<UndoOutlined />} />
+                </Tooltip>
+              </PermissionBlock>
             )}
           </div>
         );
       }
     }
   ];
+
+  const resetPass = async (id: string) => {
+    try {
+      showLoading();
+      setIsModalOpen(false);
+      await service.authsService.forgot({ userEmail: id });
+      notification.open({
+        message: t('Common_DeleteSuccess'),
+        type: 'success'
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      closeLoading();
+    }
+  };
 
   useEffect(() => {
     setSelectedRowKeys([]);
@@ -345,29 +410,37 @@ function DataTable(props: Readonly<IProps>) {
         <div className={styles.tableHeaderLeft}>
           {tabStatus == EState.Activate && (
             <>
-              <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
-                {t('Common_AddNew')}
-              </Button>
-              <Button
-                onClick={() => setIsModalOpen(true)}
-                loading={loading}
-                type="text"
-                icon={<DeleteOutlined />}
-                disabled={selectedRowKeys.length === 0}
-              >
-                {t('Common_DeleteSelected')}
-              </Button>
-              <Button type="text" onClick={downloadTemplate} icon={<DownloadOutlined />}>
-                {t('Common_Download_Template')}
-              </Button>
+              <PermissionBlock module={allPermission?.User?.Permission_Add_New_Employee}>
+                <Button type="text" onClick={() => openPanel()} icon={<PlusOutlined />}>
+                  {t('Common_AddNew')}
+                </Button>
+              </PermissionBlock>
+              <PermissionBlock module={allPermission?.User?.Permission_Delete_Employee}>
+                <Button
+                  onClick={() => setIsModalOpen(true)}
+                  loading={loading}
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  disabled={selectedRowKeys.length === 0}
+                >
+                  {t('Common_DeleteSelected')}
+                </Button>
+              </PermissionBlock>
+              <PermissionBlock module={allPermission?.User?.Permission_Add_New_Employee}>
+                <Button type="text" onClick={downloadTemplate} icon={<DownloadOutlined />}>
+                  {t('Common_Download_Template')}
+                </Button>
+              </PermissionBlock>
               <Button type="text" onClick={exportExcel} icon={<ExportOutlined />}>
                 {t('Common_ExportExcel')}
               </Button>
-              <Upload {...fileProps}>
-                <Button type="text" icon={<ImportOutlined />}>
-                  {t('Common_ImportExcel')}
-                </Button>
-              </Upload>
+              <PermissionBlock module={allPermission?.User?.Permission_Add_New_Employee}>
+                <Upload {...fileProps}>
+                  <Button type="text" icon={<ImportOutlined />}>
+                    {t('Common_ImportExcel')}
+                  </Button>
+                </Upload>
+              </PermissionBlock>
             </>
           )}
           {tabStatus == EState.Deleted && (
@@ -384,7 +457,7 @@ function DataTable(props: Readonly<IProps>) {
         </div>
         <div className={styles.tableHeaderRight}>
           <Tooltip placement="bottom" title={t('Common_Filter')} color="#ffffff" arrow={true}>
-            <Button type="text" onClick={() => props.openFilterPanel(param.filter)} icon={<FilterOutlined />} />
+            <Button type="text" onClick={() => openFilterPanel(param!.filter)} icon={<FilterOutlined />} />
           </Tooltip>
           <Search placeholder={t('Common_SearchByName')} allowClear onSearch={onSearch} style={{ width: 250 }} />
         </div>

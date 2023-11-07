@@ -12,6 +12,7 @@ import { util } from '@/common/helpers/util';
 import { useLoading } from '@/common/context/useLoading';
 import { service } from '@/services/apis';
 import { Link } from 'react-router-dom';
+import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
 
 interface IProps {
   data: A[];
@@ -28,6 +29,7 @@ function DataTable(props: IProps) {
   const { showLoading, closeLoading } = useLoading();
   const { confirm } = Modal;
   const { t } = useTranslation();
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
 
   const columns: ColumnsType<A> = [
     {
@@ -98,12 +100,16 @@ function DataTable(props: IProps) {
                 <Button type="text" icon={<SolutionOutlined />} />
               </Link>
             </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={() => props.openPanel(record)} icon={<EditOutlined />} />
-            </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={() => deleteTeam(record)} icon={<DeleteOutlined />} />
-            </Tooltip>
+            <PermissionBlock module={allPermission?.Team?.Permission_Update_Team}>
+              <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
+                <Button type="text" onClick={() => props.openPanel(record)} icon={<EditOutlined />} />
+              </Tooltip>
+            </PermissionBlock>
+            <PermissionBlock module={allPermission?.Team?.Permission_Delete_Team}>
+              <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                <Button type="text" onClick={() => deleteTeam(record)} icon={<DeleteOutlined />} />
+              </Tooltip>
+            </PermissionBlock>
           </div>
         );
       }

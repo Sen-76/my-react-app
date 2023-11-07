@@ -157,6 +157,7 @@ function Panel(props: IProps, ref: A) {
             jobTitle: systemForm.getFieldValue('jobTitle')?.trim() ?? '',
             dob: dayjs(generalForm.getFieldValue('dob')).format('YYYY-MM-DD'),
             userDepartment: systemForm.getFieldValue('userDepartmentId'),
+            userTeam: systemForm.getFieldValue('userTeamId'),
             userRole: systemForm.getFieldValue('userRoleId'),
             gender: generalForm.getFieldValue('gender') ?? 0
           });
@@ -173,6 +174,7 @@ function Panel(props: IProps, ref: A) {
             jobTitle: systemForm.getFieldValue('jobTitle')?.trim() ?? '',
             dob: dayjs(generalForm.getFieldValue('dob')).format('YYYY-MM-DD'),
             userDepartment: systemForm.getFieldValue('userDepartmentId'),
+            userTeam: systemForm.getFieldValue('userTeamId'),
             userRole: systemForm.getFieldValue('userRoleId'),
             gender: generalForm.getFieldValue('gender') ?? 0
           });
@@ -305,7 +307,7 @@ function Panel(props: IProps, ref: A) {
                   }}
                 />
               </Form.Item>
-              <Form.Item name="userTeam" label={t('team')}>
+              <Form.Item name="userTeamId" label={t('team')}>
                 <Select options={teamList} />
               </Form.Item>
               <Form.Item name="userRoleId" label={t('role')} rules={formRule.userRole}>

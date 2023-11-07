@@ -20,7 +20,7 @@ interface IProps {
   refreshList: () => void;
 }
 function DataTable(props: Readonly<IProps>) {
-  const { loading, data, param } = props;
+  const { loading, data, param, openPanel } = props;
   const { Search } = Input;
   const { t } = useTranslation();
   const { confirm } = Modal;
@@ -70,7 +70,7 @@ function DataTable(props: Readonly<IProps>) {
       key: 'modifiedOn',
       width: 200,
       render: (_, record) => {
-        return <div style={{ minWidth: 90 }}>{dayjs(record.updatedDate).format('DD MMM YYYY HH:mm')}</div>;
+        return <div style={{ minWidth: 90 }}>{dayjs(record.updateDate).format('DD MMM YYYY HH:mm')}</div>;
       }
     },
     {
@@ -140,7 +140,7 @@ function DataTable(props: Readonly<IProps>) {
     return (
       <>
         <div className={styles.tableHeaderLeft}>
-          <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
+          <Button type="text" onClick={() => openPanel()} icon={<PlusOutlined />}>
             {t('Common_AddNew')}
           </Button>
         </div>

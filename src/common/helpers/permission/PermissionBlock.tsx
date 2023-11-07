@@ -1,3 +1,5 @@
+import { permissionManager } from './permission';
+
 export interface IProps {
   module: string[] | string;
   children?: React.ReactNode;
@@ -5,13 +7,9 @@ export interface IProps {
 }
 function PermissionBlock(props: IProps) {
   const { children, module, noPermissionNode = null } = props;
-  const myPermission = JSON.parse(sessionStorage.getItem('permissions') ?? '') as string[];
-  console.log(myPermission);
-  const checkHasPermission = (): boolean => {
-    return myPermission.some((x: string) => module.includes(x));
-  };
+  const { checkHasPermission } = permissionManager();
 
-  return <>{checkHasPermission() ? children : noPermissionNode}</>;
+  return <>{checkHasPermission(module) ? children : noPermissionNode}</>;
 }
 
 export default PermissionBlock;

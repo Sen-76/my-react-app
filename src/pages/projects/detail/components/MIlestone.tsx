@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Button, Col, Dropdown, Empty, Modal, Progress, Row, Tree } from 'antd';
 import { DataNode } from 'antd/es/tree';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +24,8 @@ function Milestone() {
     searchInfor: {
       searchValue: '',
       searchColumn: ['Title']
-    },
-    filter: [{ key: 'ProjectId', value: [dataLocation.id] }]
+    }
+    // filter: [{ key: 'ProjectId', value: [dataLocation.id] }]
   };
   const { t } = useTranslation();
   const [treeData, setTreeData] = useState<DataNode[]>([]);

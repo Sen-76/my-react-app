@@ -1,6 +1,13 @@
 .accountconfiguration {
   padding: 0 10px;
 }
+.accountDropdownItem {
+  min-width: 200px;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .tableHeaderRight {
   display: flex;
   button {

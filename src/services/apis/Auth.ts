@@ -11,7 +11,7 @@ export const authsService = {
       throw error;
     }
   },
-  async forgot(userEmail: string): Promise<A> {
+  async forgot(userEmail: A): Promise<A> {
     try {
       const response = await axiosInstance.post('/users/resetPassword', userEmail);
       return response.data;
