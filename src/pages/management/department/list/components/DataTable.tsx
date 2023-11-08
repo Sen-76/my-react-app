@@ -90,7 +90,6 @@ function DataTable(props: Readonly<IProps>) {
           try {
             showLoading();
             await service.departmentService.delete({ isHardDelete: true, id: [id] });
-            closeLoading();
             props.refreshList();
             notification.open({
               message: t('Common_DeleteSuccess'),
@@ -98,6 +97,8 @@ function DataTable(props: Readonly<IProps>) {
             });
           } catch (e) {
             console.log(e);
+          } finally {
+            closeLoading();
           }
         };
         const deleteDepartment = async (department: A) => {

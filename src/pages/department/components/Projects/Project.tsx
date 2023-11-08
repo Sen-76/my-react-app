@@ -7,7 +7,7 @@ import { EStatus } from '@/pages/projects/list/Project.model';
 function Projects() {
   const [loading, setLoading] = useState<boolean>(false);
   const [projectList, setProjectList] = useState<Project.IProjectModel[]>([]);
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId ?? '';
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId;
   const initDataGrid: Common.IDataGrid = {
     pageInfor: {
       pageSize: 10,
@@ -19,7 +19,7 @@ function Projects() {
       searchColumn: ['Title']
     },
     filter: [
-      { key: 'Status', value: [EStatus.Active] },
+      { key: 'Status', value: [EStatus.Inactive], operators: 'not in' },
       { key: 'DepartmentId', value: [id] }
     ]
   };
@@ -30,20 +30,23 @@ function Projects() {
 
   const getProject = async (draftParam?: Common.IDataGrid) => {
     try {
-      setLoading(true);
-      const result = await service.projectService.get(draftParam ?? param);
-      setParam({
-        ...param,
-        pageInfor: {
-          pageSize: result.prameter.pageSize,
-          pageNumber: result.prameter.pageNumber,
-          totalItems: result.prameter.totalItems
-        }
-      });
-      setProjectList(result.data);
-      setLoading(false);
+      if (id) {
+        setLoading(true);
+        const result = await service.projectService.get(draftParam ?? param);
+        setParam({
+          ...param,
+          pageInfor: {
+            pageSize: result.prameter.pageSize,
+            pageNumber: result.prameter.pageNumber,
+            totalItems: result.prameter.totalItems
+          }
+        });
+        setProjectList(result.data);
+      }
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 

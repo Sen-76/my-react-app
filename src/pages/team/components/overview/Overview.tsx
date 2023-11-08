@@ -9,18 +9,19 @@ function Overview() {
   const { t } = useTranslation();
   const [editData, setEditData] = useState<A>();
   const { showLoading, closeLoading } = useLoading();
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId ?? '000';
-
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId;
   useEffect(() => {
     getTeamDetail();
   }, []);
 
   const getTeamDetail = async () => {
     try {
-      showLoading();
-      const result = await service.teamService.getDetail(id ?? '');
-      setEditData(result.data);
-      closeLoading();
+      if (id) {
+        showLoading();
+        const result = await service.teamService.getDetail(id ?? '');
+        setEditData(result.data);
+        closeLoading();
+      }
     } catch (e) {
       console.log(e);
     } finally {

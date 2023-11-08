@@ -1,5 +1,5 @@
 import { SmileOutlined, SolutionOutlined } from '@ant-design/icons';
-import { Button, Progress, Table, Tooltip } from 'antd';
+import { Button, Table, Tag, Tooltip } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import styles from '../Project.module.scss';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import Search from 'antd/es/input/Search';
+import { EStatus } from '@/pages/projects/list/Project.model';
 
 interface IProps {
   data: A[];
@@ -31,57 +32,81 @@ function DataTable(props: IProps) {
 
   const columns: ColumnsType<A> = [
     {
-      title: t('Common_Title'),
-      dataIndex: 'title',
-      key: 'title',
+      title: t('Project_Key'),
+      dataIndex: 'key',
+      key: 'key',
       render: (_, record) => {
         return (
-          <Tooltip placement="bottom" title={record.name} color="#ffffff" arrow={true}>
-            <div style={{ display: 'flex', alignItems: 'center', minWidth: 250 }}>
-              <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ maxWidth: 150, minWidth: 30 }}>
-                {record.title}
-              </Paragraph>
-            </div>
+          <Tooltip placement="bottom" title={record.key} color="#ffffff" arrow={true}>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.key}</Paragraph>
           </Tooltip>
         );
       }
     },
     {
-      title: t('Common_Description'),
-      dataIndex: 'description',
-      key: 'description',
+      title: t('Common_Title'),
+      dataIndex: 'title',
+      key: 'title',
       render: (_, record) => {
-        return record.description;
+        return (
+          <Tooltip placement="bottom" title={record.title} color="#ffffff" arrow={true}>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.title}</Paragraph>
+          </Tooltip>
+        );
       }
     },
     {
-      title: t('Project_Progress'),
-      dataIndex: 'progress',
-      key: 'progress',
+      title: t('department'),
+      dataIndex: 'department',
+      key: 'department',
       render: (_, record) => {
-        return <Progress className={styles.progress} style={{ width: 100 }} percent={record.progress} />;
+        return record.department?.title;
       }
     },
     {
-      title: t('team'),
-      dataIndex: 'team',
-      key: 'team',
+      title: t('Project_StartDate'),
+      dataIndex: 'startdate',
+      key: 'startdate',
       render: (_, record) => {
-        return record.team.name;
+        return dayjs(record.startDate).format('DD MMM YYYY');
+      }
+    },
+    {
+      title: t('Project_DueDate'),
+      dataIndex: 'duedate',
+      key: 'duedate',
+      render: (_, record) => {
+        return dayjs(record.dueDate).format('DD MMM YYYY');
+      }
+    },
+    {
+      title: t('Project_Status'),
+      dataIndex: 'status',
+      key: 'status',
+      render: (_, record) => {
+        return (
+          <>
+            {record.status === EStatus.Active && <Tag color="blue">{t('Active')}</Tag>}
+            {record.status === EStatus.Pause && <Tag color="orange">{t('Pause')}</Tag>}
+            {record.status === EStatus.Done && <Tag color="green">{t('Done')}</Tag>}
+            {record.status === EStatus.Inactive && <Tag color="red">{t('Inactive')}</Tag>}
+            {record.status === EStatus.Closed && <Tag color="black">{t('Closed')}</Tag>}
+          </>
+        );
       }
     },
     {
       title: t('Common_Action'),
       dataIndex: 'action',
       key: 'action',
-      className: 'actionCollumn',
       fixed: 'right',
-      width: 130,
+      className: 'actionCollumn',
+      width: 180,
       render: (_, record) => {
         return (
           <div>
             <Tooltip placement="bottom" title={t('Common_ViewDetail')} color="#ffffff" arrow={true}>
-              <Link to={`/${record}`}>
+              <Link to={`/projects/detail/${record.id}/${record.title}`}>
                 <Button type="text" icon={<SolutionOutlined />} />
               </Link>
             </Tooltip>
@@ -113,7 +138,7 @@ function DataTable(props: IProps) {
         columns={columns}
         dataSource={props.data}
         pagination={pagination}
-        scroll={{ x: 780 }}
+        scroll={{ x: 1230 }}
         locale={{
           emptyText: (
             <>

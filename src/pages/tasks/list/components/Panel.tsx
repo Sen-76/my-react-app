@@ -23,7 +23,7 @@ import {
   UploadProps,
   notification
 } from 'antd';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import styles from '../Task.module.scss';
 import { useTranslation } from 'react-i18next';
 import { useLoading } from '@/common/context/useLoading';
@@ -35,7 +35,7 @@ import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { util } from '@/common/helpers/util';
 import { useLoginManager } from '@/common/helpers/login-manager';
-import { useParams } from 'react-router';
+import icons from '@/assets/icons';
 
 interface IProps {
   refreshList: () => void;
@@ -201,7 +201,12 @@ function Panel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setStatusList(result.data?.map((x: A) => ({ label: x?.title, value: x.id })));
+      setStatusList(
+        result.data?.map((x: A) => ({
+          label: <div style={{ color: x?.color, fontWeight: 600 }}>{x.title}</div>,
+          value: x.id
+        }))
+      );
     } catch (e) {
       console.log(e);
     }
@@ -222,6 +227,11 @@ function Panel(props: IProps, ref: A) {
     }
   };
 
+  const IconShow = ({ value, ...props }: A) => {
+    const iconItem = icons.find((icon) => icon.value === value);
+    return iconItem ? React.cloneElement(iconItem.component, props) : null;
+  };
+
   const getPriotyList = async () => {
     try {
       const result = await service.taskPriotyService.get({
@@ -231,7 +241,17 @@ function Panel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setPriotyList(result.data?.map((x: A) => ({ label: x.pname, value: x.id })));
+      setPriotyList(
+        result.data?.map((x: A) => ({
+          label: (
+            <>
+              <IconShow value={x?.iconUrl} disabled style={{ marginRight: 10 }} />
+              {x?.pname}
+            </>
+          ),
+          value: x.id
+        }))
+      );
     } catch (e) {
       console.log(e);
     }
@@ -269,9 +289,10 @@ function Panel(props: IProps, ref: A) {
   const onFinish = async (val: A) => {
     try {
       showLoading();
+      console.log(fileList);
       let attachmentList = fileListFormat;
       fileListFormat.length > 0 &&
-        (attachmentList = [...fileListFormat.filter((x) => !x.uid?.includes('rc-upload')), ...(await handleUpload())]);
+        (attachmentList = [...fileList.filter((x) => !x.uid?.includes('rc-upload')), ...(await handleUpload())]);
       if (isEdit) {
         await service.taskService.update({
           ...editData,

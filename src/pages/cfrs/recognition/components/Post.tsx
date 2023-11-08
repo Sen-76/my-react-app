@@ -92,7 +92,7 @@ function Post() {
           </InfiniteScroll>
         ) : (
           <>
-            <SmileOutlined style={{ marginRight: 5, alignItems: 'center' }} /> {t('Common_NoRecord')}
+            <Empty />
           </>
         )}
       </div>

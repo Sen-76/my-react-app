@@ -40,21 +40,24 @@ function Members() {
 
   const getMembers = async (draftParam?: Common.IDataGrid) => {
     try {
-      setLoading(true);
-      const result = await service.teamService.getMembersDetail(id, draftParam ?? param);
-      // const result = await service.teamService.getMembers(data.id ?? '');
-      setParam({
-        ...param,
-        pageInfor: {
-          pageSize: result.prameter.pageSize,
-          pageNumber: result.prameter.pageNumber,
-          totalItems: result.prameter.totalItems
-        }
-      });
-      setMemberList(result.data);
-      setLoading(false);
+      if (id) {
+        setLoading(true);
+        const result = await service.teamService.getMembersDetail(id, draftParam ?? param);
+        // const result = await service.teamService.getMembers(data.id ?? '');
+        setParam({
+          ...param,
+          pageInfor: {
+            pageSize: result.prameter.pageSize,
+            pageNumber: result.prameter.pageNumber,
+            totalItems: result.prameter.totalItems
+          }
+        });
+        setMemberList(result.data);
+      }
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 

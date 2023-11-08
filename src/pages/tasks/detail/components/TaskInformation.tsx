@@ -23,7 +23,7 @@ import styles from '../TaskDetail.module.scss';
 import { useTranslation } from 'react-i18next';
 import { util } from '@/common/helpers/util';
 import dayjs from 'dayjs';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import ReactQuill from 'react-quill';
@@ -38,6 +38,7 @@ import {
 import useDebounce from '@/common/helpers/useDebounce';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { Link, useParams } from 'react-router-dom';
+import icons from '@/assets/icons';
 
 interface IProps {
   data: A;
@@ -178,6 +179,11 @@ function TaskInformation(props: Readonly<IProps>) {
     }
   };
 
+  const IconShow = ({ value, ...props }: A) => {
+    const iconItem = icons.find((icon) => icon.value === value);
+    return iconItem ? React.cloneElement(iconItem.component, props) : null;
+  };
+
   const handleUpload = async (fileList: A) => {
     try {
       showLoading();
@@ -259,7 +265,10 @@ function TaskInformation(props: Readonly<IProps>) {
                 style={{ padding: 5, width: 'calc(100% - 110px)' }}
                 onClick={() => editField('taskPriotyId')}
               >
-                <Col className={styles.valueCol}>{data?.taskPrioty?.pname}</Col>
+                <Col className={styles.valueCol}>
+                  <IconShow value={data?.taskPrioty?.iconUrl} disabled style={{ marginRight: 10 }} />
+                  {data?.taskPrioty?.pname}
+                </Col>
               </Button>
             ) : (
               <Form.Item name="taskPriotyId" rules={requiredRule}>
@@ -667,7 +676,17 @@ function TaskInformation(props: Readonly<IProps>) {
           totalItems: 0
         }
       });
-      setPriotyList(result.data.map((x: A) => ({ label: x.pname, value: x.id })));
+      setPriotyList(
+        result.data.map((x: A) => ({
+          label: (
+            <>
+              <IconShow value={x?.iconUrl} disabled style={{ marginRight: 10 }} />
+              {x?.pname}
+            </>
+          ),
+          value: x.id
+        }))
+      );
     } catch (e) {
       console.log(e);
     }

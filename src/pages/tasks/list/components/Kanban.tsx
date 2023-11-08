@@ -1,17 +1,18 @@
 import { ReactSortable } from 'react-sortablejs';
-import { useState, useEffect } from 'react';
-import { Image, Modal, Tag } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Modal, Tag } from 'antd';
 import styles from '../Task.module.scss';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import { Link } from 'react-router-dom';
+import icons from '@/assets/icons';
+import Paragraph from 'antd/es/typography/Paragraph';
 
 interface IProps {
   taskList: A[];
 }
 function Kanban(props: IProps) {
   const { taskList } = props;
-  console.log(taskList);
   const [kanBanTaskList, setKanbanTaskList] = useState<A[]>([]);
   const { showLoading, closeLoading } = useLoading();
 
@@ -87,6 +88,11 @@ function Kanban(props: IProps) {
     }
   };
 
+  const IconShow = ({ value, ...props }: A) => {
+    const iconItem = icons.find((icon) => icon.value === value);
+    return iconItem ? React.cloneElement(iconItem.component, props) : null;
+  };
+
   return (
     <div className={styles.kanban}>
       {kanBanTaskList?.map((status: A) => {
@@ -108,12 +114,15 @@ function Kanban(props: IProps) {
                   <div className={styles.task} key={status.id + '' + task.id}>
                     <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#222' }}>
                       <div>
-                        <Image src="https://d1hjkbq40fs2x4.cloudfront.net/2017-08-21/files/landscape-photography_1645.jpg" />
                         <div style={{ fontWeight: 500, fontSize: 16, lineHeight: '32px' }}>{task.summary}</div>
                         <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
                         <div style={{ padding: '5px 0' }}>
-                          <Tag color={task.status?.color}>{task.status?.title}</Tag>
-                          <Tag>{task.taskPrioty?.pname}</Tag>
+                          <Tag>
+                            <Paragraph ellipsis={{ rows: 1, expandable: false }}>
+                              <IconShow value={task?.taskPrioty?.iconUrl} disabled style={{ marginRight: 10 }} />
+                              {task.taskPrioty?.pname}
+                            </Paragraph>
+                          </Tag>
                         </div>
                         <div>
                           <span>{task.date}</span>

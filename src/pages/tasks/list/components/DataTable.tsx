@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import styles from '../Task.module.scss';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import icons from '@/assets/icons';
+import React from 'react';
 
 interface IProps {
   data: A[];
@@ -51,7 +52,10 @@ function DataTable(props: IProps) {
       render: (_, record) => {
         return (
           <Tag>
-            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record.taskPrioty?.pname}</Paragraph>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>
+              <IconShow value={record?.taskPrioty?.iconUrl} disabled style={{ marginRight: 10 }} />
+              {record.taskPrioty?.pname}
+            </Paragraph>
           </Tag>
         );
       }
@@ -115,6 +119,11 @@ function DataTable(props: IProps) {
     }
   ];
 
+  const IconShow = ({ value, ...props }: A) => {
+    const iconItem = icons.find((icon) => icon.value === value);
+    return iconItem ? React.cloneElement(iconItem.component, props) : null;
+  };
+
   const TableHeader = () => {
     return (
       <>
@@ -153,7 +162,7 @@ function DataTable(props: IProps) {
           total: param.pageInfor!.totalItems,
           simple: false
         }}
-        scroll={{ x: 780 }}
+        scroll={{ x: 1230 }}
         locale={{
           emptyText: (
             <>

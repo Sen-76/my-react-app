@@ -127,6 +127,7 @@ function Panel(props: IProps, ref: A) {
   const getUserInformation = async (id: string) => {
     try {
       const result = await service.accountService.getDetal(id);
+      getTeam(result.data.userDepartmentId);
       result.data.dob = dayjs(result.data.dob);
       setEditData(result.data);
       generalForm.setFieldsValue(result.data);

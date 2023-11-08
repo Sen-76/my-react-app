@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import { Avatar, Button, Drawer, Empty, Form, Select, Spin, Typography } from 'antd';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import styles from '../Task.module.scss';
 import { useTranslation } from 'react-i18next';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import useDebounce from '@/common/helpers/useDebounce';
 import { util } from '@/common/helpers/util';
+import icons from '@/assets/icons';
 
 interface IProps {
   onFilter: (val: A) => void;
@@ -105,7 +106,12 @@ function FilterPanel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setStatusList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
+      setStatusList(
+        result.data.map((x: A) => ({
+          label: <div style={{ color: x?.color, fontWeight: 600 }}>{x.title}</div>,
+          value: x.id
+        }))
+      );
     } catch (e) {
       console.log(e);
     }
@@ -126,6 +132,11 @@ function FilterPanel(props: IProps, ref: A) {
     }
   };
 
+  const IconShow = ({ value, ...props }: A) => {
+    const iconItem = icons.find((icon) => icon.value === value);
+    return iconItem ? React.cloneElement(iconItem.component, props) : null;
+  };
+
   const getPriotyList = async () => {
     try {
       const result = await service.taskPriotyService.get({
@@ -135,7 +146,17 @@ function FilterPanel(props: IProps, ref: A) {
           totalItems: 0
         }
       });
-      setPriotyList(result.data.map((x: A) => ({ label: x?.pname, value: x.id })));
+      setPriotyList(
+        result.data.map((x: A) => ({
+          label: (
+            <>
+              <IconShow value={x?.iconUrl} disabled style={{ marginRight: 10 }} />
+              {x?.pname}
+            </>
+          ),
+          value: x.id
+        }))
+      );
     } catch (e) {
       console.log(e);
     }

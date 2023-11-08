@@ -1,87 +1,54 @@
 import { useLoading } from '@/common/context/useLoading';
 import DataTable from './components/DataTable';
 import { useEffect, useState } from 'react';
+import { service } from '@/services/apis';
+import { EStatus } from '@/pages/projects/list/Project.model';
 
-const draftProject = [
-  {
-    id: 1,
-    title: 'Test Project',
-    description: 'Test Description',
-    progress: 50,
-    startDate: '2012/12/12',
-    dueDate: '2012/12/12',
-    updateDate: '2012/12/12',
-    closeDate: '2012/12/12',
-    team: {
-      id: 1,
-      name: 'Team no hope',
-      description: 'N/A',
-      members: [
-        {
-          id: 1,
-          name: 'Sen 1',
-          job: 'Developer',
-          gender: 'Male',
-          photoUrl: 'https://top10tphcm.com/wp-content/uploads/2023/02/hinh-anh-meo.jpeg',
-          description: 'N/A'
-        },
-        {
-          id: 2,
-          name: 'Sen 2',
-          job: 'Developer',
-          gender: 'Male',
-          photoUrl: 'https://top10tphcm.com/wp-content/uploads/2023/02/hinh-anh-meo.jpeg',
-          description: 'N/A'
-        },
-        {
-          id: 3,
-          name: 'Sen 3',
-          job: 'Developer',
-          gender: 'Male',
-          photoUrl: 'https://top10tphcm.com/wp-content/uploads/2023/02/hinh-anh-meo.jpeg',
-          description: 'N/A'
-        },
-        {
-          id: 4,
-          name: 'Sen 4',
-          job: 'Developer',
-          gender: 'Male',
-          photoUrl: 'https://top10tphcm.com/wp-content/uploads/2023/02/hinh-anh-meo.jpeg',
-          description: 'N/A'
-        },
-        {
-          id: 5,
-          name: 'Sen 5',
-          job: 'Developer',
-          gender: 'Male',
-          photoUrl: 'https://top10tphcm.com/wp-content/uploads/2023/02/hinh-anh-meo.jpeg',
-          description: 'N/A'
-        }
-      ]
-    }
-  }
-];
+const initDataGrid: Common.IDataGrid = {
+  pageInfor: {
+    pageSize: 10,
+    pageNumber: 1,
+    totalItems: 0
+  },
+  searchInfor: {
+    searchValue: '',
+    searchColumn: ['Title']
+  },
+  filter: [{ key: 'Status', value: [EStatus.Inactive], operators: 'not in' }]
+};
 function Projects() {
   const [loading, setLoading] = useState<boolean>(false);
   const { showLoading, closeLoading } = useLoading();
+  const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
+  const [projectList, setProjectList] = useState<Project.IProjectModel[]>([]);
 
   useEffect(() => {
-    getTeams();
+    getProjectList();
   }, []);
 
-  const getTeams = () => {
-    showLoading();
-    setLoading(true);
-    const timeout = setTimeout(() => {
-      closeLoading();
+  const getProjectList = async (draftParam?: Common.IDataGrid) => {
+    try {
+      setLoading(true);
+      const result = await service.projectService.get(draftParam ?? param);
+      setParam({
+        ...param,
+        pageInfor: {
+          pageSize: result.prameter.pageSize,
+          pageNumber: result.prameter.pageNumber,
+          totalItems: result.prameter.totalItems
+        }
+      });
+      setProjectList(result.data);
+    } catch (e) {
+      console.log(e);
+    } finally {
       setLoading(false);
-      clearTimeout(timeout);
-    }, 2000);
+    }
   };
 
   return (
     <>
-      <DataTable data={draftProject} loading={loading} refreshList={() => console.log('refresh')} />
+      <DataTable data={projectList} loading={loading} refreshList={() => console.log('refresh')} />
     </>
   );
 }

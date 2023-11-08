@@ -24,7 +24,7 @@ function Members() {
   const [loading, setLoading] = useState<boolean>(false);
   const [memberList, setMemberList] = useState<Account.IAccountModel[]>([]);
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId ?? '';
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId;
 
   useEffect(() => {
     getMembers();
@@ -40,20 +40,23 @@ function Members() {
 
   const getMembers = async (draftParam?: Common.IDataGrid) => {
     try {
-      setLoading(true);
-      const result = await service.departmentService.getMembersDetail(id, draftParam ?? param);
-      setParam({
-        ...param,
-        pageInfor: {
-          pageSize: result.prameter.pageSize,
-          pageNumber: result.prameter.pageNumber,
-          totalItems: result.prameter.totalItems
-        }
-      });
-      setMemberList(result.data);
-      setLoading(false);
+      if (id) {
+        setLoading(true);
+        const result = await service.departmentService.getMembersDetail(id, draftParam ?? param);
+        setParam({
+          ...param,
+          pageInfor: {
+            pageSize: result.prameter.pageSize,
+            pageNumber: result.prameter.pageNumber,
+            totalItems: result.prameter.totalItems
+          }
+        });
+        setMemberList(result.data);
+      }
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false);
     }
   };
 
