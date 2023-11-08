@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useLoading } from '@/common/context/useLoading';
 import { service } from '@/services/apis';
+import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
 
 interface IProps {
   data: A[];
@@ -24,6 +25,7 @@ function DataTable(props: Readonly<IProps>) {
   const { Search } = Input;
   const { t } = useTranslation();
   const { confirm } = Modal;
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
   const { showLoading, closeLoading } = useLoading();
 
   const columns: ColumnsType<A> = [
@@ -116,12 +118,16 @@ function DataTable(props: Readonly<IProps>) {
                 <Button type="text" icon={<SolutionOutlined />} />
               </Link>
             </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={editClick} icon={<EditOutlined />} />
-            </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={() => deleteDepartment(record)} icon={<DeleteOutlined />} />
-            </Tooltip>
+            <PermissionBlock module={allPermission?.Department?.Permission_Edit_Department}>
+              <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
+                <Button type="text" onClick={editClick} icon={<EditOutlined />} />
+              </Tooltip>
+            </PermissionBlock>
+            <PermissionBlock module={allPermission?.Department?.Permission_Delete_Department}>
+              <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                <Button type="text" onClick={() => deleteDepartment(record)} icon={<DeleteOutlined />} />
+              </Tooltip>
+            </PermissionBlock>
           </div>
         );
       }
@@ -140,9 +146,11 @@ function DataTable(props: Readonly<IProps>) {
     return (
       <>
         <div className={styles.tableHeaderLeft}>
-          <Button type="text" onClick={() => openPanel()} icon={<PlusOutlined />}>
-            {t('Common_AddNew')}
-          </Button>
+          <PermissionBlock module={allPermission?.Department?.Permission_Create_Department}>
+            <Button type="text" onClick={() => openPanel()} icon={<PlusOutlined />}>
+              {t('Common_AddNew')}
+            </Button>
+          </PermissionBlock>
         </div>
         <div className={styles.tableHeaderRight}>
           <Search placeholder="Search Name" allowClear onSearch={onSearch} style={{ width: 250 }} />

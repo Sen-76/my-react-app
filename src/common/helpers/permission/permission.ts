@@ -1,5 +1,4 @@
 import { service } from '@/services/apis';
-const myPermission = JSON.parse(sessionStorage.getItem('permissions') ?? '') as string[];
 
 export const permissionManager = () => {
   const getAllPermission = async () => {
@@ -35,6 +34,7 @@ export const permissionManager = () => {
   };
 
   const checkHasPermission = (module: A) => {
+    const myPermission = JSON.parse(sessionStorage.getItem('permissions') ?? '') as string[];
     return myPermission.some((x: string) => module.includes(x));
   };
 

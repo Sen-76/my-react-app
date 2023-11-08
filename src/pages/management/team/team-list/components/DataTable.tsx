@@ -164,12 +164,16 @@ function DataTable(props: IProps) {
     return (
       <>
         <div className={styles.tableHeaderLeft}>
-          <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
-            {t('Common_AddNew')}
-          </Button>
-          <Button onClick={deleteTeam} type="text" icon={<DeleteOutlined />} disabled={selectedItem.length === 0}>
-            {t('Common_DeleteSelected')}
-          </Button>
+          <PermissionBlock module={allPermission?.Team?.Permission_Update_Team}>
+            <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
+              {t('Common_AddNew')}
+            </Button>
+          </PermissionBlock>
+          <PermissionBlock module={allPermission?.Team?.Permission_Delete_Team}>
+            <Button onClick={deleteTeam} type="text" icon={<DeleteOutlined />} disabled={selectedItem.length === 0}>
+              {t('Common_DeleteSelected')}
+            </Button>
+          </PermissionBlock>
         </div>
         <div className={styles.tableHeaderRight}>
           <Search placeholder={t('Common_SearchByName')} allowClear onSearch={onSearch} style={{ width: 250 }} />

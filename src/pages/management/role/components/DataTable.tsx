@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from '../Role.module.scss';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { service } from '@/services/apis';
+import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
 
 interface IProps {
   data: Role.IRoleCreateModel[];
@@ -21,6 +22,7 @@ function DataTable(props: IProps) {
   const { t } = useTranslation();
   const { Search } = Input;
   const { confirm } = Modal;
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
 
   const columns: ColumnsType<A> = [
     {
@@ -105,7 +107,7 @@ function DataTable(props: IProps) {
               arrow={true}
             >
               <Button
-                disabled={record.isDefault}
+                disabled={record.isDefault || allPermission?.Role?.Permission_Edit_role}
                 type="text"
                 onClick={() => openPanel(record)}
                 icon={<EditOutlined />}
@@ -117,7 +119,12 @@ function DataTable(props: IProps) {
               color="#ffffff"
               arrow={true}
             >
-              <Button disabled={record.isDefault} type="text" onClick={deleteHandle} icon={<DeleteOutlined />} />
+              <Button
+                disabled={record.isDefault || allPermission?.Role?.Permission_Delete_role}
+                type="text"
+                onClick={deleteHandle}
+                icon={<DeleteOutlined />}
+              />
             </Tooltip>
           </div>
         );
@@ -137,9 +144,11 @@ function DataTable(props: IProps) {
     return (
       <>
         <div className={styles.tableHeaderLeft}>
-          <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
-            {t('Common_AddNew')}
-          </Button>
+          <PermissionBlock module={allPermission?.Role?.Permission_Create_role}>
+            <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
+              {t('Common_AddNew')}
+            </Button>
+          </PermissionBlock>
         </div>
         <div className={styles.tableHeaderRight}>
           <Search placeholder="Search Name" allowClear onSearch={onSearch} style={{ width: 250 }} />

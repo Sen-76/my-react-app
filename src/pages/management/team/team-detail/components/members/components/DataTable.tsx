@@ -18,6 +18,7 @@ import { util } from '@/common/helpers/util';
 import { useLoading } from '@/common/context/useLoading';
 import { service } from '@/services/apis';
 import { useParams } from 'react-router';
+import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
 
 interface IProps {
   data: A[];
@@ -36,6 +37,7 @@ function DataTable(props: IProps) {
   const data = useParams();
   const { confirm } = Modal;
   const { t } = useTranslation();
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
 
   const columns: ColumnsType<A> = [
     {
@@ -103,9 +105,11 @@ function DataTable(props: IProps) {
             <Tooltip placement="bottom" title={t('Common_ViewDetail')} color="#ffffff" arrow={true}>
               <Button type="text" onClick={viewDetailCLick} icon={<SolutionOutlined />} />
             </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Kick')} color="#ffffff" arrow={true}>
-              <Button type="text" onClick={() => kickoutMembers(record)} icon={<LogoutOutlined />} />
-            </Tooltip>
+            <PermissionBlock module={allPermission?.Team?.Permission_Assign_Kick_Team_Member}>
+              <Tooltip placement="bottom" title={t('Common_Kick')} color="#ffffff" arrow={true}>
+                <Button type="text" onClick={() => kickoutMembers(record)} icon={<LogoutOutlined />} />
+              </Tooltip>
+            </PermissionBlock>
           </div>
         );
       }
@@ -158,18 +162,22 @@ function DataTable(props: IProps) {
     return (
       <>
         <div className={styles.tableHeaderLeft}>
-          <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
-            {t('Common_AssignMember')}
-          </Button>
-          <Button
-            onClick={kickoutMembers}
-            loading={loading}
-            type="text"
-            icon={<LogoutOutlined />}
-            disabled={selectedRowKeys.length === 0}
-          >
-            {t('Common_Kick')}
-          </Button>
+          <PermissionBlock module={allPermission?.Team?.Permission_Assign_Team_Member}>
+            <Button type="text" onClick={() => props.openPanel()} icon={<PlusOutlined />}>
+              {t('Common_AssignMember')}
+            </Button>
+          </PermissionBlock>
+          <PermissionBlock module={allPermission?.Team?.Permission_Assign_Kick_Team_Member}>
+            <Button
+              onClick={kickoutMembers}
+              loading={loading}
+              type="text"
+              icon={<LogoutOutlined />}
+              disabled={selectedRowKeys.length === 0}
+            >
+              {t('Common_Kick')}
+            </Button>
+          </PermissionBlock>
         </div>
         <div className={styles.tableHeaderRight}>
           <Search placeholder={t('Common_SearchByName')} allowClear onSearch={onSearch} style={{ width: 250 }} />
