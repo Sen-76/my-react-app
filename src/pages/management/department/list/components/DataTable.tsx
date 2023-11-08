@@ -127,7 +127,6 @@ function DataTable(props: Readonly<IProps>) {
               <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
                 <Button type="text" onClick={() => deleteDepartment(record)} icon={<DeleteOutlined />} />
               </Tooltip>
-              /
             </PermissionBlock>
           </div>
         );
