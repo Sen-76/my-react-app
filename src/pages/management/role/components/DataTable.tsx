@@ -107,7 +107,7 @@ function DataTable(props: IProps) {
               arrow={true}
             >
               <Button
-                disabled={record.isDefault || allPermission?.Role?.Permission_Edit_role}
+                disabled={record.isDefault || !allPermission?.Role?.Permission_Edit_role}
                 type="text"
                 onClick={() => openPanel(record)}
                 icon={<EditOutlined />}
@@ -120,7 +120,7 @@ function DataTable(props: IProps) {
               arrow={true}
             >
               <Button
-                disabled={record.isDefault || allPermission?.Role?.Permission_Delete_role}
+                disabled={record.isDefault || !allPermission?.Role?.Permission_Delete_role}
                 type="text"
                 onClick={deleteHandle}
                 icon={<DeleteOutlined />}

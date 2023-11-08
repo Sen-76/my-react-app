@@ -10,7 +10,7 @@ const routes: IRouter.IRoute<'/projects'>[] = [
     name: 'projects',
     exact: true,
     element: Projects,
-    meta: { role: [ERole.Admin], pageTitle: 'Projects' }
+    meta: { role: [ERole.Admin], pageTitle: 'Projects', leftKey: 'projects' }
   },
   {
     path: '/projects/detail/:id/:name',

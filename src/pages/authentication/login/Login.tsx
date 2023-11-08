@@ -17,18 +17,18 @@ function Login() {
   const [customAlert, setCustomAlert] = useState<A>();
   const { getLoginUser } = useLoginManager();
   const { isLoading, showLoading, closeLoading } = useLoading();
+  const saveUser = JSON.parse(cookie.getCookie('userSave') ?? '');
+  const [rememberMe, setRememberMe] = useState<boolean>(saveUser?.remember ?? false);
 
   useEffect(() => {
-    const saveUser = cookie.getCookie('userSave');
-    form.setFieldsValue(JSON.parse(saveUser as string));
+    form.setFieldsValue(saveUser);
     getLoginUser() && (location.href = '/');
   }, []);
 
   const onFinish = async (values: A) => {
     try {
       showLoading();
-      const result = await loginIn(values);
-      console.log(result);
+      const result = await loginIn({ ...values, remember: rememberMe });
       setCustomAlert(result);
     } catch (e) {
       console.log(e);
@@ -48,14 +48,7 @@ function Login() {
   return (
     <div className={styles.login}>
       {isLoading && <LazyLoading />}
-      <Form
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        autoComplete="off"
-        className={styles.form}
-        layout="vertical"
-        form={form}
-      >
+      <Form onFinish={onFinish} className={styles.form} layout="vertical" form={form}>
         <div className={styles.loginIcon}>
           <UserOutlined />
           <label>{t('Common_Login')}</label>
@@ -76,14 +69,14 @@ function Login() {
         </Form.Item>
         {customAlert && <span className="customAlert">{t('Common_Login_Failed')}</span>}
 
-        <Row>
-          <Form.Item name="remember" valuePropName="checked">
-            <div className={styles.refo}>
-              <Checkbox>{t('Common_Login_RememberMe')}</Checkbox>
-              <Link to="/forgot">{t('Common_Login_ForgotPassword')} ?</Link>
-            </div>
-          </Form.Item>
-        </Row>
+        <Form.Item name="remember">
+          <div className={styles.refo}>
+            <Checkbox onChange={() => setRememberMe(!rememberMe)} defaultChecked={saveUser?.remember}>
+              {t('Common_Login_RememberMe')}
+            </Checkbox>
+            <Link to="/forgot">{t('Common_Login_ForgotPassword')} ?</Link>
+          </div>
+        </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={isLoading}>

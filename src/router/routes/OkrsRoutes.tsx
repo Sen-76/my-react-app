@@ -11,21 +11,21 @@ const routes: IRouter.IRoute<'/okrs'>[] = [
     name: 'goals',
     exact: true,
     element: Goals,
-    meta: { role: [ERole.Admin], pageTitle: 'Goals' }
+    meta: { role: [ERole.Admin], pageTitle: 'Goals', leftKey: 'goals' }
   },
   {
     path: '/okrs/reviews',
     name: 'goals',
     exact: true,
     element: Reviews,
-    meta: { role: [ERole.Admin], pageTitle: 'Reviews' }
+    meta: { role: [ERole.Admin], pageTitle: 'Reviews', leftKey: 'reviews' }
   },
   {
     path: '/okrs/feedbacks',
     name: 'feedbacks',
     exact: true,
     element: Feedbacks,
-    meta: { role: [ERole.Admin], pageTitle: 'Feedbacks' }
+    meta: { role: [ERole.Admin], pageTitle: 'Feedbacks', leftKey: 'feedbacks' }
   }
 ];
 

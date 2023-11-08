@@ -43,14 +43,14 @@ function Information(props: IProps) {
           )}
         </div>
         <span className={styles.userame}>{userLoged.fullName}</span>
-        <div>
+        <div style={{ width: 'auto' }}>
           <Row gutter={8} className={styles.row}>
             <Col className={styles.keyCol}>
               <MailOutlined /> {t('email')}
             </Col>
-            <Col>
+            <Col style={{ maxWidth: 'calc(100% - 110px)' }}>
               <Tooltip placement="bottom" title={userLoged.userEmail ?? 'N/A'} color="#ffffff" arrow={true}>
-                <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ maxWidth: 130, minWidth: 30 }}>
+                <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ maxWidth: '100%', minWidth: 30 }}>
                   <Link to={`mailto:${userLoged.userEmail}`}>{userLoged.userEmail ?? 'N/A'}</Link>
                 </Paragraph>
               </Tooltip>

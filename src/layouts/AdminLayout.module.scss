@@ -1,6 +1,15 @@
 .siteLayout {
   display: flex;
   flex-direction: row;
+  :global {
+    .ant-layout-content {
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+  }
 
   .lefNav {
     background: transparent;

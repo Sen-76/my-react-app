@@ -47,7 +47,12 @@ function Kanban(props: IProps) {
   }, []);
 
   const mapTaskList = (taskList: A[], statusList: A[]) => {
-    const track = statusList?.map((x) => ({ ...x, tasks: taskList.filter((y) => x.id === y.statusId) }));
+    const track = statusList?.map((x) => ({
+      ...x,
+      tasks: taskList.filter((y) => x.id === y.statusId),
+      count: taskList.filter((y) => x.id === y.statusId).length
+    }));
+    console.log(track);
     setKanbanTaskList(track);
   };
 
@@ -98,7 +103,9 @@ function Kanban(props: IProps) {
       {kanBanTaskList?.map((status: A) => {
         return (
           <div key={status.id} data-group={status.id}>
-            <div className={styles.title}>{status?.title}</div>
+            <div className={styles.title}>
+              {status?.title} <span style={{ opacity: 0.8 }}> ( {status.count} )</span>
+            </div>
             <ReactSortable
               list={status.tasks}
               setList={(newState: A, sortable: A) => sortList(newState, sortable)}
@@ -114,7 +121,9 @@ function Kanban(props: IProps) {
                   <div className={styles.task} key={status.id + '' + task.id}>
                     <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#222' }}>
                       <div>
-                        <div style={{ fontWeight: 500, fontSize: 16, lineHeight: '32px' }}>{task.summary}</div>
+                        <div style={{ fontWeight: 500, fontSize: 16, lineHeight: '32px' }}>
+                          [{task?.key}] {task.summary}
+                        </div>
                         <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
                         <div style={{ padding: '5px 0' }}>
                           <Tag>

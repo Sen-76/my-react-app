@@ -29,6 +29,7 @@ export const useLoginManager = () => {
           userEmail: result.user.userEmail
         }
       };
+      cookie.clearCookie('userSave');
       if (userLogin.remember) {
         cookie.setCookie('userSave', serializedObject, 30);
       }

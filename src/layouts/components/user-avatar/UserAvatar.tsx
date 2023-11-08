@@ -5,13 +5,15 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { util } from '@/common/helpers/util';
 import { useLoginManager } from '@/common/helpers/login-manager';
-import React from 'react';
+import React, { useState } from 'react';
+import ChangePassword from '../change-password/ChangePassword';
 
 function UserAvatar() {
   const { t } = useTranslation();
   const { loginOut } = useLoginManager();
   const { getLoginUser } = useLoginManager();
   const userLoged = getLoginUser().user;
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const menuStyle = {
     boxShadow: 'none'
@@ -29,10 +31,12 @@ function UserAvatar() {
       },
       {
         label: (
-          <Link to="/user/change-password" className={styles.avatarDropdownItem}>
+          // <Link to="/user/change-password" className={styles.avatarDropdownItem}>
+          <div onClick={() => setOpenModal(true)} className={styles.avatarDropdownItem}>
             <RedoOutlined />
             <div className="dropdown-item-text">{t('Common_ChangePassword')}</div>
-          </Link>
+          </div>
+          // </Link>
         ),
         key: '2'
       },
@@ -91,6 +95,7 @@ function UserAvatar() {
           {userLoged?.fullName?.charAt(0)}
         </Avatar>
       </Dropdown>
+      <ChangePassword openModal={openModal} handleCancel={() => setOpenModal(false)} />
     </>
   );
 }

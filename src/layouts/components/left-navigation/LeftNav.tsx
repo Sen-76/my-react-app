@@ -15,9 +15,17 @@ import {
 import styles from './LeftNav.module.scss';
 import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { matchRoutes } from 'react-router-dom';
+import { routers } from '@/router/RouterConfig';
+import { permissionManager } from '@/common/helpers/permission/permission';
 
 type MenuItem = Required<MenuProps>['items'][number];
-type CustomMenuItem = MenuItem & { path?: string; children?: CustomMenuItem[] };
+type CustomMenuItem = MenuItem & {
+  path?: string;
+  children?: CustomMenuItem[];
+  modules?: string[];
+  doNotHavePermission?: boolean;
+};
 interface IMenuClickEvent {
   key: string;
   keyPath: string[];
@@ -38,9 +46,42 @@ interface IProps {
 
 function LeftNav(props: IProps) {
   const [selectedKey, setSelectedKey] = useState<string[]>(['overview']);
+  const { checkHasPermission } = permissionManager();
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const matchRoutesList = matchRoutes(routers as A, location);
+    if (matchRoutesList?.length && matchRoutesList.length > 0) {
+      const theRouteDetails = matchRoutesList[matchRoutesList.length - 1];
+      const theRoute = theRouteDetails?.route as A;
+      const currentKey = theRoute?.meta?.leftKey;
+      if (currentKey) {
+        const activeKey = findItemNodeByKeyOrPath('key', currentKey);
+        if (activeKey) {
+          setSelectedKey([activeKey.key as string]);
+          return;
+        }
+      } else {
+        setSelectedKey(['']);
+        getIncludeKeyByPath(theRoute.path);
+        return;
+      }
+    } else {
+      getIncludeKeyByPath(location.pathname);
+    }
+  }, [location.pathname]);
+
+  const getIncludeKeyByPath = (pathName?: string) => {
+    const defaultPathList = pathName?.split('/');
+    const defaultPath = `/${defaultPathList?.[1] ?? ''}`;
+    const currentInclude = items.find((item) => item.path?.includes(defaultPath));
+    if (currentInclude) {
+      setSelectedKey([currentInclude.key as string]);
+    }
+  };
 
   const items: CustomMenuItem[] = [
     {
@@ -65,13 +106,17 @@ function LeftNav(props: IProps) {
       label: t('department'),
       path: '/department',
       icon: renderIcon(ContactsOutlined),
-      key: 'department'
+      key: 'department',
+      modules: [allPermission?.Department?.Permission_Can_Manager_All_Department],
+      doNotHavePermission: true
     },
     {
       label: t('team'),
       path: '/team',
       icon: renderIcon(TeamOutlined),
-      key: 'team'
+      key: 'team',
+      modules: [allPermission?.Team?.Permission_Can_Manager_All_Team],
+      doNotHavePermission: true
     },
     {
       label: 'OKRs',
@@ -126,25 +171,29 @@ function LeftNav(props: IProps) {
           label: t('Manage_Department'),
           path: '/management/department-management',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'department-management'
+          key: 'department-management',
+          modules: [allPermission?.Department?.Permission_Can_Manager_All_Department]
         },
         {
           label: t('Manage_Team'),
           path: '/management/team-management',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'team-management'
+          key: 'team-management',
+          modules: [allPermission?.Team?.Permission_Can_Manager_All_Team]
         },
         {
           label: t('Manage_Account'),
           path: '/management/account-management',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'account-management'
+          key: 'account-management',
+          modules: [allPermission?.User?.Permission_Can_Manager_All_Employees]
         },
         {
           label: t('Manage_Role'),
           path: '/management/role-management',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'role-management'
+          key: 'role-management',
+          modules: [allPermission?.Role?.Permission_Assign_permission_for_role]
         }
       ]
     },
@@ -157,25 +206,29 @@ function LeftNav(props: IProps) {
           label: t('Configuration_File'),
           path: '/configuration/file-configuration',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'file-configuration'
+          key: 'file-configuration',
+          modules: [allPermission?.Setting?.Permission_Configure_file]
         },
         {
           label: t('Configuration_Email_Template'),
           path: '/configuration/email-configuration',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'email-configuration'
+          key: 'email-configuration',
+          modules: [allPermission?.Setting?.Permission_Configure_send_email]
         },
         {
           label: t('Configuration_Email_Setting'),
           path: '/configuration/smtp-configuration',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'smtp-configuration'
+          key: 'smtp-configuration',
+          modules: [allPermission?.Setting?.Permission_Configure_send_email]
         },
         {
           label: t('Configuration_Star'),
           path: '/configuration/star-configuration',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'star-configuration'
+          key: 'star-configuration',
+          modules: [allPermission?.Setting?.Permission_Configure_stars]
         },
         {
           label: t('Configuration_Task_Status'),
@@ -192,13 +245,6 @@ function LeftNav(props: IProps) {
       ]
     }
   ];
-  useEffect(() => {
-    const pathName = location.pathname;
-    const activeKey = findItemNodeByKeyOrPath('path', pathName);
-    if (activeKey) {
-      setSelectedKey([activeKey.key as string]);
-    }
-  }, []);
 
   const menuClick = (info: IMenuClickEvent) => {
     if (info.key) {
@@ -225,6 +271,26 @@ function LeftNav(props: IProps) {
     return null;
   };
 
+  const authValidate = (menuItemList: CustomMenuItem[]) => {
+    const reuslt: CustomMenuItem[] = [];
+    menuItemList.forEach((item) => {
+      const tempItem = item;
+      const checkHasModule = !item.modules;
+      const checkPermission = item.modules && checkHasPermission(item.modules, item.doNotHavePermission);
+      const pass = checkHasModule || checkPermission;
+      if (pass && item.children) {
+        const newChildren = authValidate(item.children);
+        if (newChildren.length) {
+          tempItem.children = newChildren.filter(Boolean) as A;
+          reuslt.push(tempItem);
+          return;
+        }
+      }
+      if (pass) reuslt.push(tempItem);
+    });
+    return reuslt;
+  };
+
   return (
     <Menu
       className={`${styles.leftNav} ${props.collapse && styles.expandLeftNav}`}
@@ -232,7 +298,7 @@ function LeftNav(props: IProps) {
       inlineCollapsed={props.collapse}
       inlineIndent={12}
       mode="inline"
-      items={items as MenuItem[]}
+      items={authValidate(items) as MenuItem[]}
       onClick={menuClick}
     />
   );

@@ -23,7 +23,7 @@ function AccountManagement() {
     },
     searchInfor: {
       searchValue: '',
-      searchColumn: ['FullName']
+      searchColumn: ['FullName', 'userEmail']
     },
     filter: [{ key: 'Status', value: [EState.Activate, EState.DeActivate] }]
   };
