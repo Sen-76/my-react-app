@@ -6,15 +6,25 @@
     }
     .ant-list-item {
       height: 80px;
+      display: flex;
+      align-items: center;
+      .ant-list-item-meta {
+        width: 100%;
+      }
     }
   }
   .listheader {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 60px;
   }
   .list {
     background-color: #fff;
+    list-style: none;
+    border: 1px solid #d9d9d9;
+    padding: 0 20px;
+    border-radius: 4px;
     .itemContent {
       display: flex;
       flex-direction: row;

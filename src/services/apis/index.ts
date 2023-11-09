@@ -13,6 +13,7 @@ import { taskPriotyService } from './TaskPrioty';
 import { taskService } from './Task';
 import { postService } from './Post';
 import { taskTypeService } from './TaskType';
+import { commentService } from './Comment';
 export const service = {
   accountService,
   globalSettingsService,
@@ -28,5 +29,6 @@ export const service = {
   taskPriotyService,
   taskService,
   postService,
-  taskTypeService
+  taskTypeService,
+  commentService
 };

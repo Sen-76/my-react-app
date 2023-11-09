@@ -49,6 +49,7 @@ function TaskDetail() {
       showLoading();
       await getStatusList();
       await getDetail();
+      await getComment();
       closeLoading();
     };
     fetchApi();
@@ -69,6 +70,19 @@ function TaskDetail() {
           value: x.id
         }))
       );
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getComment = async () => {
+    try {
+      const result = await service.commentService.get({
+        maxResults: 10,
+        // orderBy: 'string',
+        taskId: data.id ?? ''
+      });
+      console.log(result);
     } catch (e) {
       console.log(e);
     }

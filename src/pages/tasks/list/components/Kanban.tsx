@@ -1,6 +1,6 @@
 import { ReactSortable } from 'react-sortablejs';
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Tag } from 'antd';
+import { Modal, Tag } from 'antd';
 import styles from '../Task.module.scss';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
