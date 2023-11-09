@@ -24,7 +24,7 @@ function Profile() {
   const { getLoginUser } = useLoginManager();
   const initDataGrid: Common.IDataGrid = {
     pageInfor: {
-      pageSize: 10,
+      pageSize: 5,
       pageNumber: 1,
       totalItems: 0
     },
@@ -41,18 +41,22 @@ function Profile() {
   };
   const [taskParam, setTaskParam] = useState<Common.IDataGrid>(initDataGrid);
   const { showLoading, closeLoading } = useLoading();
+  const [pieChartData, setpieChartData] = useState<A[]>([]);
+  const [pieChartColor, setpieChartColor] = useState<string[]>([]);
   const [user, setUser] = useState<A>(true);
 
-  const pieChartData = [
-    { name: 'Resolved', value: 5 },
-    { name: 'Open', value: 20 },
-    { name: 'Inprogress', value: 15 },
-    { name: 'Finished', value: 1 }
-  ];
   useEffect(() => {
     const fetchApi = async () => {
-      await getUserInformation();
-      await getTaskList();
+      try {
+        showLoading();
+        await getUserInformation();
+        await getTaskList();
+        await getTaskChart();
+      } catch (e) {
+        console.log(e);
+      } finally {
+        closeLoading();
+      }
     };
     fetchApi();
   }, []);
@@ -63,19 +67,57 @@ function Profile() {
 
   const getTaskList = async (drafParam?: Common.IDataGrid) => {
     try {
-      showLoading();
       const result = await service.taskService.get(drafParam ?? taskParam);
       setTaskList(result.data);
     } catch (e) {
       console.log(e);
-    } finally {
-      closeLoading();
     }
+  };
+
+  const getTaskChart = async () => {
+    try {
+      const task = await service.taskService.get({
+        pageInfor: {
+          pageSize: 1000,
+          pageNumber: 1,
+          totalItems: 0
+        },
+        searchInfor: {
+          searchValue: '',
+          searchColumn: ['summary']
+        },
+        filter: [
+          {
+            key: 'assignee',
+            value: [getLoginUser().user.id]
+          }
+        ]
+      });
+      const status = await service.taskStatusService.get({
+        pageInfor: {
+          pageSize: 100,
+          pageNumber: 1,
+          totalItems: 0
+        }
+      });
+      mapTaskList(task.data, status.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const mapTaskList = (taskList: A[], statusList: A[]) => {
+    const track = statusList?.map((x) => ({
+      name: x.title,
+      value: taskList.filter((y) => x.id === y.statusId).length
+    }));
+    const color = statusList?.map((x) => x.color);
+    setpieChartData(track);
+    setpieChartColor(color);
   };
 
   const getUserInformation = async () => {
     try {
-      showLoading();
       const result = await service.accountService.getDetal(getLoginUser().user.id);
       localStorage.setItem('avatar', result.data.photoUrl);
       cookie.setCookie(
@@ -86,8 +128,6 @@ function Profile() {
       setUser(result.data);
     } catch (e: A) {
       console.log(e);
-    } finally {
-      closeLoading();
     }
   };
 
@@ -96,6 +136,15 @@ function Profile() {
   };
   const cancelEditz = () => {
     setIsInfoEdit(false);
+  };
+
+  const setPage = (val: number) => {
+    const draftGrid = { ...taskParam };
+    if (draftGrid.pageInfor) {
+      draftGrid.pageInfor.pageNumber = val;
+    }
+    setTaskParam(draftGrid);
+    getTaskList(draftGrid);
   };
 
   return (
@@ -109,7 +158,7 @@ function Profile() {
           <RecentlyActivities />
         </Col>
         <Col className={styles.task}>
-          <Task task={taskList} />
+          <Task task={taskList} param={taskParam} setPage={setPage} />
         </Col>
         <Col className={styles.information}>
           <Row className={styles.header}>
@@ -134,7 +183,7 @@ function Profile() {
             ></Select>
           </Row>
           <div className={styles.body}>
-            <PieChart data={pieChartData} />
+            <PieChart data={pieChartData} color={pieChartColor} />
           </div>
         </Col>
       </Row>

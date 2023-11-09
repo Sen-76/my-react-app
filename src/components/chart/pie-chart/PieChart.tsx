@@ -6,7 +6,8 @@ import styles from './PieChart.module.scss';
 import { PieChartProps } from './PieChart.model';
 import { Empty } from 'antd';
 
-const generateOption = (data: PieChartProps['data']) => {
+const generateOption = (props: PieChartProps) => {
+  const { data, color } = props;
   return {
     tooltip: {
       trigger: 'item',
@@ -47,7 +48,8 @@ const generateOption = (data: PieChartProps['data']) => {
         labelLine: {
           show: false
         },
-        data
+        data,
+        color
       }
     ]
   };
@@ -61,7 +63,7 @@ const PieChart = (props: PieChartProps) => {
   const [isEmpty, setIsEmpty] = useState(true);
 
   useEffect(() => {
-    chartInstance.current?.setOption(generateOption(data));
+    chartInstance.current?.setOption(generateOption(props));
     const isEmptyResult = data.filter((item) => !!item.value).length === 0;
     setIsEmpty(isEmptyResult);
     if (isEmptyResult) {
@@ -76,7 +78,7 @@ const PieChart = (props: PieChartProps) => {
       chartInstance.current = echarts.init(ref, null, {
         height: '370px'
       });
-      chartInstance.current?.setOption(generateOption(data));
+      chartInstance.current?.setOption(generateOption(props));
       // chartInstance.current.on('click', (params) => {
       //   if (onClick) {
       //     const { name, dataIndex, value } = params;

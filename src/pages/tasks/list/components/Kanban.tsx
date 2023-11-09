@@ -1,6 +1,6 @@
 import { ReactSortable } from 'react-sortablejs';
 import React, { useState, useEffect } from 'react';
-import { Modal, Tag } from 'antd';
+import { Button, Modal, Tag } from 'antd';
 import styles from '../Task.module.scss';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
@@ -14,6 +14,7 @@ interface IProps {
 function Kanban(props: IProps) {
   const { taskList } = props;
   const [kanBanTaskList, setKanbanTaskList] = useState<A[]>([]);
+  const [count, setCount] = useState<number>(0);
   const { showLoading, closeLoading } = useLoading();
 
   const getStatusList = async () => {
@@ -47,12 +48,14 @@ function Kanban(props: IProps) {
   }, []);
 
   const mapTaskList = (taskList: A[], statusList: A[]) => {
-    const track = statusList?.map((x) => ({
-      ...x,
-      tasks: taskList.filter((y) => x.id === y.statusId),
-      count: taskList.filter((y) => x.id === y.statusId).length
-    }));
-    console.log(track);
+    const track = statusList?.map((x) => {
+      setCount(count + 1);
+      return {
+        ...x,
+        tasks: taskList.filter((y) => x.id === y.statusId),
+        count: taskList.filter((y) => x.id === y.statusId).length
+      };
+    });
     setKanbanTaskList(track);
   };
 
@@ -65,7 +68,6 @@ function Kanban(props: IProps) {
           taskGroup.tasks = newState;
           const sortedItem = newState.find((item: A, index: A) => item.id !== oldState[index]?.id);
           if (sortedItem) {
-            console.log('Sorted item:', { ...sortedItem, status: groupId });
             onChangeStatus(sortedItem.id, groupId);
           }
         }
@@ -83,7 +85,6 @@ function Kanban(props: IProps) {
         status: val
       });
     } catch (e: A) {
-      console.log(e);
       Modal.error({
         title: 'This is an error message',
         content: e.message()
@@ -102,7 +103,11 @@ function Kanban(props: IProps) {
     <div className={styles.kanban}>
       {kanBanTaskList?.map((status: A) => {
         return (
-          <div key={status.id} data-group={status.id}>
+          <div
+            key={status.id}
+            data-group={status.id}
+            style={{ height: '100%', minWidth: 250, width: `calc(100% / ${count})` }}
+          >
             <div className={styles.title}>
               {status?.title} <span style={{ opacity: 0.8 }}> ( {status.count} )</span>
             </div>
@@ -119,25 +124,25 @@ function Kanban(props: IProps) {
               {status.tasks?.map((task: A) => {
                 return (
                   <div className={styles.task} key={status.id + '' + task.id}>
-                    <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#222' }}>
-                      <div>
+                    <div>
+                      <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#222' }}>
                         <div style={{ fontWeight: 500, fontSize: 16, lineHeight: '32px' }}>
                           [{task?.key}] {task.summary}
                         </div>
-                        <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
-                        <div style={{ padding: '5px 0' }}>
-                          <Tag>
-                            <Paragraph ellipsis={{ rows: 1, expandable: false }}>
-                              <IconShow value={task?.taskPrioty?.iconUrl} disabled style={{ marginRight: 10 }} />
-                              {task.taskPrioty?.pname}
-                            </Paragraph>
-                          </Tag>
-                        </div>
-                        <div>
-                          <span>{task.date}</span>
-                        </div>
+                      </Link>
+                      <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
+                      <div style={{ padding: '5px 0 0 0' }}>
+                        <Tag>
+                          <Paragraph ellipsis={{ rows: 1, expandable: false }}>
+                            <IconShow value={task?.taskPrioty?.iconUrl} disabled style={{ marginRight: 10 }} />
+                            {task.taskPrioty?.pname}
+                          </Paragraph>
+                        </Tag>
                       </div>
-                    </Link>
+                      <div>
+                        <span>{task.date}</span>
+                      </div>
+                    </div>
                   </div>
                 );
               })}

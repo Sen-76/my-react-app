@@ -23,7 +23,6 @@
   }
 
   .reactSortable {
-    width: 250px;
     border: 1px solid #d9d9d9;
     background: #f4f5f7;
     padding: 5px;
@@ -33,7 +32,6 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-
     .task {
       border: 1px solid #d9d9d9;
       padding: 10px;

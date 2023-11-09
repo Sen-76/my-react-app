@@ -24,7 +24,7 @@ type CustomMenuItem = MenuItem & {
   path?: string;
   children?: CustomMenuItem[];
   modules?: string[];
-  doNotHavePermission?: boolean;
+  donothavepermission?: string;
 };
 interface IMenuClickEvent {
   key: string;
@@ -108,7 +108,7 @@ function LeftNav(props: IProps) {
       icon: renderIcon(ContactsOutlined),
       key: 'department',
       modules: [allPermission?.Department?.Permission_Can_Manager_All_Department],
-      doNotHavePermission: true
+      donothavepermission: 'true'
     },
     {
       label: t('team'),
@@ -116,7 +116,7 @@ function LeftNav(props: IProps) {
       icon: renderIcon(TeamOutlined),
       key: 'team',
       modules: [allPermission?.Team?.Permission_Can_Manager_All_Team],
-      doNotHavePermission: true
+      donothavepermission: 'true'
     },
     {
       label: 'OKRs',
@@ -276,7 +276,8 @@ function LeftNav(props: IProps) {
     menuItemList.forEach((item) => {
       const tempItem = item;
       const checkHasModule = !item.modules;
-      const checkPermission = item.modules && checkHasPermission(item.modules, item.doNotHavePermission);
+      const checkPermission =
+        item.modules && checkHasPermission(item.modules, item.donothavepermission === 'true' ? true : false);
       const pass = checkHasModule || checkPermission;
       if (pass && item.children) {
         const newChildren = authValidate(item.children);

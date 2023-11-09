@@ -5,4 +5,5 @@ interface DataItem {
 
 export interface PieChartProps {
   data: DataItem[];
+  color?: string[];
 }
