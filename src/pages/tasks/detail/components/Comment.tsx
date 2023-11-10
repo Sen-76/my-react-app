@@ -6,6 +6,10 @@ import { useTranslation } from 'react-i18next';
 import ReactQuill from 'react-quill';
 import { useState } from 'react';
 import { useLoading } from '@/common/context/useLoading';
+import dayjs from 'dayjs';
+import styles from '../TaskDetail.module.scss';
+import { service } from '@/services/apis';
+import { useParams } from 'react-router';
 
 const initDataGrid: Common.IDataGrid = {
   pageInfor: {
@@ -19,7 +23,13 @@ const initDataGrid: Common.IDataGrid = {
   }
   // filter: [{ key: 'Status', value: [EState.Activate, EState.DeActivate] }]
 };
-function Comment() {
+interface IProps {
+  commentList: A[];
+  refreshCommentList: () => void;
+}
+function Comment(props: Readonly<IProps>) {
+  const { commentList, refreshCommentList } = props;
+  const data = useParams();
   const { t } = useTranslation();
   const avatar = localStorage.getItem('avatar');
   const user = JSON.parse(sessionStorage.getItem('userDetail') ?? '');
@@ -49,29 +59,13 @@ function Comment() {
       ['clean']
     ]
   };
-  const data = [
-    {
-      id: '1',
-      title: 'Ant Design Title 1'
-    },
-    {
-      id: '2',
-      title: 'Ant Design Title 2'
-    },
-    {
-      id: '3',
-      title: 'Ant Design Title 3'
-    },
-    {
-      id: '4',
-      title: 'Ant Design Title 4'
-    }
-  ];
 
   const onAddComment = async (val: A) => {
     try {
       showLoading();
       form.resetFields();
+      await service.commentService.add({ ...val, userId: user.id, taskId: data.id ?? '' });
+      refreshCommentList();
       console.log(val);
     } catch (e) {
       console.log(e);
@@ -120,7 +114,7 @@ function Comment() {
   };
 
   return (
-    <>
+    <div className={styles.comment}>
       <Row style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 20 }}>
         <Avatar size={44} src={avatar} style={{ marginRight: 10, backgroundColor: util.randomColor() }}>
           {user.fullName?.charAt(0)}
@@ -140,7 +134,7 @@ function Comment() {
         ) : (
           <Col style={{ width: 'calc(100% - 60px)' }}>
             <Form form={form} onFinish={onAddComment}>
-              <Form.Item name="comment">
+              <Form.Item name="conttent">
                 <ReactQuill
                   theme="snow"
                   modules={modules}
@@ -164,78 +158,90 @@ function Comment() {
           </Col>
         )}
       </Row>
-      <>
-        <List
-          pagination={{
-            current: param.pageInfor!.pageNumber,
-            pageSize: param.pageInfor!.pageSize,
-            total: param.pageInfor!.totalItems,
-            simple: false,
-            onChange: (page) => handleTableChange(page)
-          }}
-          dataSource={data}
-          renderItem={(item, index) => (
-            <List.Item>
-              {editComment?.id !== item?.id ? (
-                <>
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        size={44}
-                        src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
-                        style={{ marginRight: 10, backgroundColor: util.randomColor() }}
-                      >
-                        {user.fullName?.charAt(0)}
-                      </Avatar>
-                    }
-                    title={
-                      <div style={{ display: 'flex' }}>
-                        <div>{item.title}</div>
-                        <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>10 Jan 2099</div>
+      <List
+        pagination={{
+          current: param.pageInfor!.pageNumber,
+          pageSize: param.pageInfor!.pageSize,
+          total: param.pageInfor!.totalItems,
+          simple: false,
+          onChange: (page) => handleTableChange(page)
+        }}
+        dataSource={commentList}
+        renderItem={(item) => (
+          <List.Item>
+            {editComment?.id !== item?.id ? (
+              <>
+                <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      size={44}
+                      src={item.user?.avatar ?? ''}
+                      style={{ marginRight: 10, backgroundColor: util.randomColor() }}
+                    >
+                      {user.fullName?.charAt(0)}
+                    </Avatar>
+                  }
+                  title={
+                    <div style={{ display: 'flex' }}>
+                      <div>{user.fullName}</div>
+                      <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
+                        {dayjs(item.createdDate).format('DD MMM YYYY HH:mm')}
                       </div>
-                    }
-                    description="Ant Design, a design language for background applications, is refined by Ant UED Team"
+                    </div>
+                  }
+                  description={
+                    <div className="ql-editor" style={{ width: '100%', padding: 0 }}>
+                      <div dangerouslySetInnerHTML={{ __html: item?.conttent }} />
+                    </div>
+                  }
+                />
+                {user.id === item.user.id && (
+                  <>
+                    <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                          setEditComment(item);
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                      <Button type="text" onClick={deleteComment} icon={<DeleteOutlined />} />
+                    </Tooltip>
+                  </>
+                )}
+              </>
+            ) : (
+              <Row style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 50, width: '100%' }}>
+                <Avatar
+                  size={44}
+                  src={item.user?.avatar ?? ''}
+                  style={{ marginRight: 10, backgroundColor: util.randomColor() }}
+                >
+                  {user.fullName?.charAt(0)}
+                </Avatar>
+                <Col style={{ width: 'calc(100% - 50px)' }}>
+                  <ReactQuill
+                    value={editComment.conttent}
+                    theme="snow"
+                    modules={modules}
+                    style={{ display: 'flex', flexDirection: 'column', height: 150 }}
+                    onChange={(value) => setEditComment({ ...editComment, title: value })}
                   />
-                  <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-                    <Button
-                      type="text"
-                      icon={<EditOutlined />}
-                      onClick={() => {
-                        setEditComment(item);
-                      }}
-                    />
-                  </Tooltip>
-                  <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-                    <Button type="text" onClick={deleteComment} icon={<DeleteOutlined />} />
-                  </Tooltip>
-                </>
-              ) : (
-                <Row style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 50, width: '100%' }}>
-                  <Avatar size={44} src={avatar} style={{ marginRight: 10, backgroundColor: util.randomColor() }}>
-                    {user.fullName?.charAt(0)}
-                  </Avatar>
-                  <Col style={{ width: 'calc(100% - 50px)' }}>
-                    <ReactQuill
-                      value={editComment.title}
-                      theme="snow"
-                      modules={modules}
-                      style={{ display: 'flex', flexDirection: 'column', height: 150 }}
-                      onChange={(value) => setEditComment({ ...editComment, title: value })}
-                    />
-                    <Button style={{ marginTop: 10 }} onClick={() => setEditComment({})}>
-                      {t('Common_Cancel')}
-                    </Button>
-                    <Button style={{ marginTop: 10 }} type="primary" onClick={onEditComment}>
-                      {t('Common_Send')}
-                    </Button>
-                  </Col>
-                </Row>
-              )}
-            </List.Item>
-          )}
-        />
-      </>
-    </>
+                  <Button style={{ marginTop: 10 }} onClick={() => setEditComment({})}>
+                    {t('Common_Cancel')}
+                  </Button>
+                  <Button style={{ marginTop: 10 }} type="primary" onClick={onEditComment}>
+                    {t('Common_Send')}
+                  </Button>
+                </Col>
+              </Row>
+            )}
+          </List.Item>
+        )}
+      />
+    </div>
   );
 }
 

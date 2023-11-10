@@ -130,7 +130,9 @@ function Kanban(props: IProps) {
                           [{task?.key}] {task.summary}
                         </div>
                       </Link>
-                      <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
+                      <div className="ql-editor" style={{ width: '100%' }}>
+                        <div style={{ padding: '5px 0' }} dangerouslySetInnerHTML={{ __html: task?.description }} />
+                      </div>
                       <div style={{ padding: '5px 0 0 0' }}>
                         <Tag>
                           <Paragraph ellipsis={{ rows: 1, expandable: false }}>

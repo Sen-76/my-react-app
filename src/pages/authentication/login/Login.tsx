@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Input, Row } from 'antd';
+import { Button, Checkbox, Form, Input } from 'antd';
 import styles from './Login.module.scss';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -17,7 +17,8 @@ function Login() {
   const [customAlert, setCustomAlert] = useState<A>();
   const { getLoginUser } = useLoginManager();
   const { isLoading, showLoading, closeLoading } = useLoading();
-  const saveUser = JSON.parse(cookie.getCookie('userSave') ?? '');
+  const test = cookie.getCookie('userSave');
+  const saveUser = test ? JSON.parse(test) : {};
   const [rememberMe, setRememberMe] = useState<boolean>(saveUser?.remember ?? false);
 
   useEffect(() => {

@@ -26,6 +26,13 @@
       margin: 0;
     }
   }
+  .comment {
+    :global {
+      .ant-form-item {
+        width: 100% !important;
+      }
+    }
+  }
   .title {
     padding: 20px;
     font-weight: 600;
@@ -80,4 +87,11 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+}
+.description {
+  div {
+    p {
+      display: flex;
+    }
+  }
 }

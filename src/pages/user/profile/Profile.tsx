@@ -41,8 +41,8 @@ function Profile() {
   };
   const [taskParam, setTaskParam] = useState<Common.IDataGrid>(initDataGrid);
   const { showLoading, closeLoading } = useLoading();
-  const [pieChartData, setpieChartData] = useState<A[]>([]);
-  const [pieChartColor, setpieChartColor] = useState<string[]>([]);
+  const [pieChartData, setPieChartData] = useState<A[]>([]);
+  const [pieChartColor, setPieChartColor] = useState<string[]>([]);
   const [user, setUser] = useState<A>(true);
 
   useEffect(() => {
@@ -112,8 +112,8 @@ function Profile() {
       value: taskList.filter((y) => x.id === y.statusId).length
     }));
     const color = statusList?.map((x) => x.color);
-    setpieChartData(track);
-    setpieChartColor(color);
+    setPieChartData(track);
+    setPieChartColor(color);
   };
 
   const getUserInformation = async () => {
@@ -148,46 +148,44 @@ function Profile() {
   };
 
   return (
-    <>
-      <Row className={styles.profile}>
-        <Col className={styles.information}>
-          {!isInfoEdit && <Information userLoged={user} edit={edit} />}
-          {isInfoEdit && <EditProfile userLoged={user} cancelEdit={cancelEditz} refreshData={getUserInformation} />}
-        </Col>
-        <Col className={styles.task}>
-          <RecentlyActivities />
-        </Col>
-        <Col className={styles.task}>
-          <Task task={taskList} param={taskParam} setPage={setPage} />
-        </Col>
-        <Col className={styles.information}>
-          <Row className={styles.header}>
-            <span>{t('statistical')}</span>
-            <Select
-              style={{ width: 100 }}
-              defaultValue={'Month'}
-              options={[
-                {
-                  value: 'Month',
-                  label: 'Month'
-                },
-                {
-                  value: 'Week',
-                  label: 'Week'
-                },
-                {
-                  value: 'Day',
-                  label: 'Day'
-                }
-              ]}
-            ></Select>
-          </Row>
-          <div className={styles.body}>
-            <PieChart data={pieChartData} color={pieChartColor} />
-          </div>
-        </Col>
-      </Row>
-    </>
+    <Row className={styles.profile}>
+      <Col className={styles.information}>
+        {!isInfoEdit && <Information userLoged={user} edit={edit} />}
+        {isInfoEdit && <EditProfile userLoged={user} cancelEdit={cancelEditz} refreshData={getUserInformation} />}
+      </Col>
+      <Col className={styles.task}>
+        <RecentlyActivities />
+      </Col>
+      <Col className={styles.task}>
+        <Task task={taskList} param={taskParam} setPage={setPage} />
+      </Col>
+      <Col className={styles.information}>
+        <Row className={styles.header}>
+          <span>{t('statistical')}</span>
+          <Select
+            style={{ width: 100 }}
+            defaultValue={'Month'}
+            options={[
+              {
+                value: 'Month',
+                label: 'Month'
+              },
+              {
+                value: 'Week',
+                label: 'Week'
+              },
+              {
+                value: 'Day',
+                label: 'Day'
+              }
+            ]}
+          ></Select>
+        </Row>
+        <div className={styles.body}>
+          <PieChart data={pieChartData} color={pieChartColor} />
+        </div>
+      </Col>
+    </Row>
   );
 }
 

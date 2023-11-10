@@ -19,6 +19,7 @@ function TaskDetail() {
   const { showLoading, closeLoading } = useLoading();
   const [editData, setEditData] = useState<A>({});
   const [statusList, setStatusList] = useState<A[]>([]);
+  const [commentList, setCommentList] = useState<A[]>([]);
   const [editTitle, setEditTitle] = useState<boolean>(false);
   const panelRef = useRef();
 
@@ -82,6 +83,7 @@ function TaskDetail() {
         // orderBy: 'string',
         taskId: data.id ?? ''
       });
+      setCommentList(result.data);
       console.log(result);
     } catch (e) {
       console.log(e);
@@ -190,7 +192,7 @@ function TaskDetail() {
       />
       <Col style={{ marginTop: 10 }}>
         <TaskInformation data={editData} refreshData={getDetail} setEditTitle={setEditTitle} />
-        <Activities />
+        <Activities commentList={commentList} refreshCommentList={getComment} />
       </Col>
       <Panel ref={panelRef} refreshList={() => console.log('cc')} />
     </div>

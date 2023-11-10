@@ -307,24 +307,28 @@ function TaskInformation(props: Readonly<IProps>) {
         style={{ padding: 5, display: 'flex', width: '100%', alignItems: 'center', height: 'auto' }}
         onClick={() => editField('description')}
       >
-        <div>
+        <div className="ql-editor" style={{ width: '100%' }}>
           <div dangerouslySetInnerHTML={{ __html: data?.description }} />
         </div>
       </Button>
     ) : (
-      <Form.Item name="description" rules={requiredRule} style={{ width: '100%' }}>
-        <ReactQuill
-          theme="snow"
-          modules={modules}
-          style={{ display: 'flex', flexDirection: 'column', height: 200 }}
-          onBlur={updateInfo}
-        />
-      </Form.Item>
+      <>
+        <Form.Item name="description" rules={requiredRule} style={{ width: '100%' }}>
+          <ReactQuill
+            theme="snow"
+            modules={modules}
+            style={{ display: 'flex', flexDirection: 'column', height: 200 }}
+          />
+        </Form.Item>
+        <Button type="primary" onClick={updateInfo} style={{ marginTop: 5 }}>
+          Save
+        </Button>
+      </>
     );
   };
   const onRenderAttachment = () => {
     return data.fileAttachments?.length === 0 ? (
-      data.status?.title !== 'Done' ? (
+      data.status?.title === 'Open' ? (
         <Dragger {...uploadProps} multiple={true} showUploadList={false}>
           <p className="ant-upload-drag-icon">
             <InboxOutlined />

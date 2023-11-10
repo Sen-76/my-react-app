@@ -3,14 +3,19 @@ import { useTranslation } from 'react-i18next';
 import History from './History';
 import Comment from './Comment';
 
-function Activities() {
+interface IProps {
+  commentList: A[];
+  refreshCommentList: () => void;
+}
+function Activities(props: Readonly<IProps>) {
+  const { commentList, refreshCommentList } = props;
   const { t } = useTranslation();
   const onRenderNothing = () => {
     const tabItems = [
       {
         label: t('Task_Comments'),
         key: 'comment',
-        children: <Comment />
+        children: <Comment commentList={commentList} refreshCommentList={refreshCommentList} />
       },
       {
         label: t('Task_Histories'),

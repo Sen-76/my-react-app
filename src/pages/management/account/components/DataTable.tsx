@@ -231,13 +231,13 @@ function DataTable(props: Readonly<IProps>) {
                   <Tooltip
                     placement="bottom"
                     title={
-                      record.userRole2.isDefault !== true ? t('Common_ToolTip_CannotDeleteUser') : t('Common_Delete')
+                      record.userRole2?.isDefault !== true ? t('Common_ToolTip_CannotDeleteUser') : t('Common_Delete')
                     }
                     color="#ffffff"
                     arrow={true}
                   >
                     <Button
-                      disabled={record.userRole2.isDefault !== true}
+                      disabled={record.userRole2?.isDefault !== true}
                       type="text"
                       onClick={() => {
                         setIsModalOpen(true);

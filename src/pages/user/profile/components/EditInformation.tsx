@@ -19,6 +19,8 @@ function EditInformation(props: IProps) {
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
+  
+
   useEffect(() => {
     userLoged.dob = dayjs(userLoged.dob);
     form.setFieldsValue(userLoged);
