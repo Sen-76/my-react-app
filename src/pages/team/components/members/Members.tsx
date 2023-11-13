@@ -24,7 +24,7 @@ function Members() {
   const [loading, setLoading] = useState<boolean>(false);
   const [memberList, setMemberList] = useState<Account.IAccountModel[]>([]);
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId;
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}')?.teamId;
 
   useEffect(() => {
     getMembers();

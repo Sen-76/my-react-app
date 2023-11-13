@@ -80,7 +80,7 @@ function Panel(props: IProps, ref: A) {
         }
       });
       setDepartmentList([
-        { label: 'Common_None', value: null },
+        { label: t('Common_None'), value: null },
         ...result.data.map((department: A) => ({
           label: department.title,
           value: department.id
@@ -103,7 +103,7 @@ function Panel(props: IProps, ref: A) {
         filter: [{ key: 'DepartmentId', value: [departmentId] }]
       });
       setTeamList([
-        { label: 'Common_None', value: null },
+        { label: t('Common_None'), value: null },
         ...result.data.map((team: A) => ({
           label: team.title,
           value: team.id
@@ -158,7 +158,7 @@ function Panel(props: IProps, ref: A) {
             jobTitle: systemForm.getFieldValue('jobTitle')?.trim() ?? '',
             dob: dayjs(generalForm.getFieldValue('dob')).format('YYYY-MM-DD'),
             userDepartment: systemForm.getFieldValue('userDepartmentId'),
-            userTeam: systemForm.getFieldValue('userTeamId'),
+            teamId: systemForm.getFieldValue('userTeamId'),
             userRole: systemForm.getFieldValue('userRoleId'),
             gender: generalForm.getFieldValue('gender') ?? 0
           });
@@ -175,7 +175,7 @@ function Panel(props: IProps, ref: A) {
             jobTitle: systemForm.getFieldValue('jobTitle')?.trim() ?? '',
             dob: dayjs(generalForm.getFieldValue('dob')).format('YYYY-MM-DD'),
             userDepartment: systemForm.getFieldValue('userDepartmentId'),
-            userTeam: systemForm.getFieldValue('userTeamId'),
+            teamId: systemForm.getFieldValue('userTeamId'),
             userRole: systemForm.getFieldValue('userRoleId'),
             gender: generalForm.getFieldValue('gender') ?? 0
           });

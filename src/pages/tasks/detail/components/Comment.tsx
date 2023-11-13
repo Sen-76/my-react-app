@@ -32,7 +32,7 @@ function Comment(props: Readonly<IProps>) {
   const data = useParams();
   const { t } = useTranslation();
   const avatar = localStorage.getItem('avatar');
-  const user = JSON.parse(sessionStorage.getItem('userDetail') ?? '');
+  const user = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}');
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
   const [form] = Form.useForm();
   const { confirm } = Modal;
@@ -175,15 +175,15 @@ function Comment(props: Readonly<IProps>) {
                   avatar={
                     <Avatar
                       size={44}
-                      src={item.user?.avatar ?? ''}
+                      src={item.author?.avatarUrl.url ?? ''}
                       style={{ marginRight: 10, backgroundColor: util.randomColor() }}
                     >
-                      {user.fullName?.charAt(0)}
+                      {item.author?.fullName?.charAt(0)}
                     </Avatar>
                   }
                   title={
                     <div style={{ display: 'flex' }}>
-                      <div>{user.fullName}</div>
+                      <div>{item.author?.fullName}</div>
                       <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
                         {dayjs(item.createdDate).format('DD MMM YYYY HH:mm')}
                       </div>
@@ -195,7 +195,7 @@ function Comment(props: Readonly<IProps>) {
                     </div>
                   }
                 />
-                {user.id === item.user.id && (
+                {user?.id === item.user?.id && (
                   <>
                     <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
                       <Button

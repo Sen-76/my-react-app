@@ -9,11 +9,12 @@ import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { SmileOutlined } from '@ant-design/icons';
+import { forwardRef, useImperativeHandle } from 'react';
 
-function Give() {
+function Give(props: A, ref: A) {
   const { t } = useTranslation();
   const { showLoading, closeLoading } = useLoading();
-  const user: A = cookie.getCookie('userLogin');
+  const user: A = cookie.getCookie('userLogin') ?? '{}';
   const initDataGrid: Common.IDataGrid = {
     pageInfor: {
       pageSize: 10,
@@ -35,6 +36,10 @@ function Give() {
   useEffect(() => {
     getUserGiveList();
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    addPost
+  }));
 
   const getUserGiveList = async (draftParam?: Common.IDataGrid) => {
     try {
@@ -65,6 +70,10 @@ function Give() {
     }
   };
 
+  const addPost = () => {
+    getUserGiveList();
+  };
+
   const handleScroll = async () => {
     const draftParam = { ...param };
     draftParam.pageInfor!.pageNumber = (param.pageInfor!.pageNumber ?? 0) + 1;
@@ -74,10 +83,6 @@ function Give() {
 
   return (
     <div className={styles.contentLibary}>
-      <Space direction="horizontal" className={styles.spacePicker}>
-        <DatePicker picker="year" defaultValue={dayjs()} />
-        <DatePicker picker="month" defaultValue={dayjs()} />
-      </Space>
       <div className={styles.overFollow} id="scrollableDivGive">
         {data.length > 0 ? (
           <InfiniteScroll
@@ -102,4 +107,4 @@ function Give() {
   );
 }
 
-export default Give;
+export default forwardRef(Give);

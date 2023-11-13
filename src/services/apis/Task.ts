@@ -72,5 +72,14 @@ export const taskService = {
       console.error('An error occurred while import files:', error);
       throw error;
     }
+  },
+  async history(param: A): Promise<A> {
+    try {
+      const response = await axiosInstance.post('/task/historyTask', param);
+      return response.data;
+    } catch (error) {
+      console.error('An error occurred while get history:', error);
+      throw error;
+    }
   }
 };

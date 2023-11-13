@@ -23,7 +23,7 @@ function Login() {
 
   useEffect(() => {
     form.setFieldsValue(saveUser);
-    getLoginUser() && (location.href = '/');
+    getLoginUser()?.user && (location.href = '/');
   }, []);
 
   const onFinish = async (values: A) => {

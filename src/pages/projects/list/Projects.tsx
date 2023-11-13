@@ -141,7 +141,7 @@ function Projects() {
       if (e === 'mine' && draftGrid.filter) {
         draftGrid.filter?.push({
           key: 'teamId',
-          value: [JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId ?? '']
+          value: [JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId ?? '{}']
         });
       } else if (Number(e) === EStatus.Active)
         draftGrid.filter?.push({ key: 'Status', value: [Number(EStatus.Inactive)], operators: 'not in' });

@@ -7,7 +7,7 @@ import { EStatus } from '@/pages/projects/list/Project.model';
 function Projects() {
   const [loading, setLoading] = useState<boolean>(false);
   const [projectList, setProjectList] = useState<Project.IProjectModel[]>([]);
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.userDepartmentId;
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}')?.userDepartmentId;
   const initDataGrid: Common.IDataGrid = {
     pageInfor: {
       pageSize: 10,

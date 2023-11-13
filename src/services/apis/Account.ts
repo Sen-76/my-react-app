@@ -108,5 +108,15 @@ export const accountService = {
       console.error('An error occurred while import files:', error);
       throw error;
     }
+  },
+
+  async exportUsers(parameter: A): Promise<A> {
+    try {
+      const response = await axiosInstance.post('users/export', parameter, { responseType: 'blob' });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 };

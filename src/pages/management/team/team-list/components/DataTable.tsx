@@ -29,7 +29,7 @@ function DataTable(props: IProps) {
   const { showLoading, closeLoading } = useLoading();
   const { confirm } = Modal;
   const { t } = useTranslation();
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
 
   const columns: ColumnsType<A> = [
     {

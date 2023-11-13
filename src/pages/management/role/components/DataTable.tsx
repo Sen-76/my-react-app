@@ -22,7 +22,7 @@ function DataTable(props: IProps) {
   const { t } = useTranslation();
   const { Search } = Input;
   const { confirm } = Modal;
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
 
   const columns: ColumnsType<A> = [
     {

@@ -9,7 +9,7 @@ function Overview() {
   const { t } = useTranslation();
   const [editData, setEditData] = useState<A>();
   const { showLoading, closeLoading } = useLoading();
-  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '')?.teamId;
+  const id = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}')?.teamId;
   useEffect(() => {
     getTeamDetail();
   }, []);

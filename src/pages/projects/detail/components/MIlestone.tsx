@@ -11,6 +11,7 @@ import { useLoading } from '@/common/context/useLoading';
 import Panel from './Panel';
 import Search from 'antd/es/input/Search';
 import { useParams } from 'react-router';
+
 import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
 
 function Milestone() {
@@ -23,15 +24,15 @@ function Milestone() {
     },
     searchInfor: {
       searchValue: '',
-      searchColumn: ['Title']
-    }
-    // filter: [{ key: 'ProjectId', value: [dataLocation.id] }]
+      searchColumn: ['title']
+    },
+    filter: [{ key: 'projectId', value: [dataLocation.id] }]
   };
   const { t } = useTranslation();
   const [treeData, setTreeData] = useState<DataNode[]>([]);
   const { showLoading, closeLoading } = useLoading();
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
   const panelRef = useRef();
   const { confirm } = Modal;
 
@@ -69,7 +70,7 @@ function Milestone() {
             </Col>
             <Row>
               <Col className={styles.progressCol}>
-                <Progress percent={50} />
+                <Progress percent={item.percentDone} />
               </Col>
               <Col>
                 <Dropdown

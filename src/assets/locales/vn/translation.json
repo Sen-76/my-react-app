@@ -312,5 +312,10 @@
     "Task_Activities" : "Hoạt động",
     "Task_Comments" : "Bình luận",
     "CFRS_Receive" : "Nhận",
-    "CFRS_Give" : "Cho"
+    "CFRS_Give" : "Cho",
+    "Common_ResetPass" : "Đặt lại mật khẩu",
+    "ResetPassword_Success" : "Đặt lại mật khẩu thành công!",
+    "Common_More" : "Thêm",
+    "Task_Histories" : "Lịch sử",
+    "Task_Add_Comment" : "Thêm bình luận ở đây"
 }

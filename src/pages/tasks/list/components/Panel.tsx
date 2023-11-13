@@ -47,10 +47,10 @@ function Panel(props: IProps, ref: A) {
   const { showLoading, closeLoading } = useLoading();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [fileListFormat, setFileListFormat] = useState<UploadFile[]>([]);
+  const [fileListFormat, setFileListFormat] = useState<A[]>([]);
   const [projectList, setProjectList] = useState<A[]>();
   const [statusList, setStatusList] = useState<A[]>();
-  const [typeList, setTypeList] = useState<A[]>();
+  // const [typeList, setTypeList] = useState<A[]>();
   const [selectLoading, setSelectLoading] = useState<boolean>();
   const [userMemberList, setUserMemberList] = useState<A[]>([]);
   const [mileStoneList, setMileStoneList] = useState<A[]>([]);
@@ -75,7 +75,7 @@ function Panel(props: IProps, ref: A) {
       showLoading();
       setOpen(true);
       setIsEdit(false);
-      const promises = [getProjectList(), getStatusList(), getMilestoneList(), getTypeList(), getPriotyList()];
+      const promises = [getProjectList(), getStatusList(), getMilestoneList(), getPriotyList()];
       await Promise.all(promises);
       if (data) {
         setIsEdit(true);
@@ -129,7 +129,7 @@ function Panel(props: IProps, ref: A) {
       const draftParam = { ...initDataGrid };
       draftParam.searchInfor!.searchValue = userDebouncedAssignee ?? '';
       const result = await service.accountService.getAccount(draftParam);
-      const loginUser = JSON.parse(sessionStorage.getItem('userDetail') ?? '');
+      const loginUser = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}');
       const data = [...result.data, loginUser];
       const optionsValue = data?.map((x: A) => ({
         label: (
@@ -177,20 +177,20 @@ function Panel(props: IProps, ref: A) {
     }
   };
 
-  const getTypeList = async () => {
-    try {
-      const result = await service.taskTypeService.get({
-        pageInfor: {
-          pageSize: 100,
-          pageNumber: 1,
-          totalItems: 0
-        }
-      });
-      setTypeList(result.data?.map((x: A) => ({ label: x?.title, value: x.id })));
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // const getTypeList = async () => {
+  //   try {
+  //     const result = await service.taskTypeService.get({
+  //       pageInfor: {
+  //         pageSize: 100,
+  //         pageNumber: 1,
+  //         totalItems: 0
+  //       }
+  //     });
+  //     setTypeList(result.data?.map((x: A) => ({ label: x?.title, value: x.id })));
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   const getStatusList = async () => {
     try {
@@ -289,10 +289,10 @@ function Panel(props: IProps, ref: A) {
   const onFinish = async (val: A) => {
     try {
       showLoading();
-      console.log(fileList);
       let attachmentList = fileListFormat;
-      fileListFormat.length > 0 &&
-        (attachmentList = [...fileList.filter((x) => !x.uid?.includes('rc-upload')), ...(await handleUpload())]);
+      console.log(fileListFormat);
+      fileList.length > 0 &&
+        (attachmentList = [...fileListFormat.filter((x) => !x.uid?.includes('rc-upload')), ...(await handleUpload())]);
       if (isEdit) {
         await service.taskService.update({
           ...editData,
@@ -300,7 +300,7 @@ function Panel(props: IProps, ref: A) {
           assignee: typeof val.assignee === 'string' ? val.assignee : val.assignee.value,
           reportTo: typeof val.reportTo === 'string' ? val.reportTo : val.reportTo.value,
           dueDate: dayjs(val.dueDate).format('YYYY-MM-DD'),
-          attachment: attachmentList,
+          attachments: attachmentList,
           taskLinkIds: typeof val.taskLinks[0] === 'string' ? val.taskLinks : val.taskLinks.value
         });
         notification.open({
@@ -313,7 +313,12 @@ function Panel(props: IProps, ref: A) {
           assignee: val.assignee ? val.assignee.value : '',
           reportTo: val.reportTo.value ?? '',
           dueDate: dayjs(val.dueDate).format('YYYY-MM-DD'),
-          attachment: attachmentList
+          attachment: attachmentList,
+          taskLinks: Array.isArray(val.taskLinks)
+            ? typeof val.taskLinks[0] === 'string'
+              ? val.taskLinks
+              : val.taskLinks.value
+            : []
         });
         notification.open({
           message: t('Common_CreateSuccess'),
@@ -335,7 +340,6 @@ function Panel(props: IProps, ref: A) {
     key: [{ required: true, message: t('Common_Require_Field') }],
     summary: [{ required: true, message: t('Common_Require_Field') }],
     dueDate: [{ required: true, message: t('Common_Require_Field') }],
-    description: [{ required: true, message: t('Common_Require_Field') }],
     reportTo: [{ required: true, message: t('Common_Require_Field') }]
   };
 
@@ -349,6 +353,7 @@ function Panel(props: IProps, ref: A) {
       const newFileList = fileList.slice();
       newFileList.splice(index, 1);
       setFileList(newFileList);
+      setFileListFormat(fileListFormat.filter((x) => x.id !== file.uid));
     },
     beforeUpload: (file) => {
       setFileList([...fileList, file]);
@@ -400,9 +405,9 @@ function Panel(props: IProps, ref: A) {
         <Form.Item name="projectId" label={t('Task_Project')} rules={formRule.project}>
           <Select options={projectList} onSelect={onProjectSelect} />
         </Form.Item>
-        <Form.Item name="taskType" label={t('Task_Type')} rules={formRule.project}>
+        {/* <Form.Item name="taskType" label={t('Task_Type')} rules={formRule.project}>
           <Select options={typeList} />
-        </Form.Item>
+        </Form.Item> */}
         {isEdit && (
           <Form.Item name="statusId" label={t('Common_Status')} rules={formRule.status}>
             <Select options={statusList} />
@@ -414,7 +419,7 @@ function Panel(props: IProps, ref: A) {
         <Form.Item name="dueDate" label={t('Task_DueDate')} rules={formRule.dueDate}>
           <DatePicker format={'DD MMM YYYY'} disabledDate={disabledDate} />
         </Form.Item>
-        <Form.Item name="description" label={t('Common_Description')} rules={formRule.description}>
+        <Form.Item name="description" label={t('Common_Description')}>
           <ReactQuill theme="snow" />
         </Form.Item>
         <Form.Item name="assignee" label={t('Task_Assignee')} rules={formRule.summary}>
@@ -491,7 +496,7 @@ function Panel(props: IProps, ref: A) {
         >
           {t('Task_Assign_To_Me')}
         </Button>
-        <Form.Item name="milestoneId" label={t('Task_Milestone')} rules={formRule.summary}>
+        <Form.Item name="milestoneId" label={t('Task_Milestone')}>
           <Select options={mileStoneList} />
         </Form.Item>
         <Form.Item name="taskPriotyId" label={t('Task_Priority')} rules={formRule.summary}>

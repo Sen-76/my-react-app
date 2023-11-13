@@ -25,7 +25,7 @@ function DataTable(props: Readonly<IProps>) {
   const { Search } = Input;
   const { t } = useTranslation();
   const { confirm } = Modal;
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
   const { showLoading, closeLoading } = useLoading();
 
   const columns: ColumnsType<A> = [

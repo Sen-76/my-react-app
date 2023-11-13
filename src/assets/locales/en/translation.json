@@ -317,5 +317,11 @@
     "Task_Activities" : "Activities",
     "Task_Comments" : "Comments",
     "CFRS_Receive" : "Receive",
-    "CFRS_Give" : "Give"
+    "CFRS_Give" : "Give",
+    "Common_ResetPass" : "Reset password",
+    "ResetPassword_Success" : "Reset password successfully!",
+    "Common_More" : "More",
+    "Task_Histories" : "Histories",
+    "Task_Add_Comment" : "Add more comments in here",
+    "Task_Add_LinkIssues" : "Link tasks"
 }

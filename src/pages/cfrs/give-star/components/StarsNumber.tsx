@@ -9,7 +9,6 @@ interface IProps {
 
 function StarNumber(prop: IProps) {
   const { t } = useTranslation();
-  console.log(prop.numberStar);
   return (
     <Row gutter={16}>
       <Col span={12}>

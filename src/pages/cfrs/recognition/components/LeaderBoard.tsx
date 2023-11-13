@@ -62,8 +62,7 @@ function LeaderBoard() {
   return (
     <div className={styles.contentLibary}>
       <Space direction="horizontal" className={styles.spacePicker}>
-        <DatePicker picker="year" defaultValue={dayjs()} />
-        <DatePicker picker="month" defaultValue={dayjs()} format={'MMM'} />
+        <DatePicker.MonthPicker defaultValue={dayjs()} />
       </Space>
       <div className={styles.overFollow} id="scrollableDivGive">
         {data.length > 0 ? (

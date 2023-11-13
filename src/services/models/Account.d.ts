@@ -28,7 +28,7 @@ declare namespace Account {
     gender: number;
     jobTitle: string;
     userDepartment?: string;
-    userTeam?: string;
+    teamId?: string;
     userRole?: string;
   }
   export interface IAccountUpdateModel {

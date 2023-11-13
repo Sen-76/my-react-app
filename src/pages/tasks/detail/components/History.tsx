@@ -16,26 +16,13 @@ const initDataGrid: Common.IDataGrid = {
   }
   // filter: [{ key: 'Status', value: [EState.Activate, EState.DeActivate] }]
 };
-function History() {
+interface IProps {
+  historyList: A[];
+  refreshHistoryList: () => void;
+}
+function History(props: Readonly<IProps>) {
+  const { historyList, refreshHistoryList } = props;
   const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
-  const data = [
-    {
-      id: '1',
-      title: 'Ant Design Title 1'
-    },
-    {
-      id: '2',
-      title: 'Ant Design Title 2'
-    },
-    {
-      id: '3',
-      title: 'Ant Design Title 3'
-    },
-    {
-      id: '4',
-      title: 'Ant Design Title 4'
-    }
-  ];
 
   const handleTableChange = (pagination: A) => {
     console.log(pagination);
@@ -50,23 +37,23 @@ function History() {
         simple: false,
         onChange: (page) => handleTableChange(page)
       }}
-      dataSource={data}
-      renderItem={(item, index) => (
-        <List.Item>
+      dataSource={historyList}
+      renderItem={(item) => (
+        <List.Item key={item.id}>
           <List.Item.Meta
             avatar={
               <Avatar
                 size={44}
-                src={`https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}`}
+                src={item.author2?.avatarUrl?.url}
                 style={{ marginRight: 10, backgroundColor: util.randomColor() }}
               >
-                dm
+                {item.author2?.fullName}
               </Avatar>
             }
             title={
               <div style={{ display: 'flex' }}>
                 <div>{item.title}</div>
-                <div style={{ fontWeight: 400, marginLeft: 5 }}>changed status</div>
+                <div style={{ fontWeight: 400, marginLeft: 5 }}>{item.author2?.fullName} changed status</div>
                 <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>10 Jan 2099</div>
               </div>
             }

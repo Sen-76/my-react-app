@@ -5,11 +5,11 @@ import StarNumber from './components/StarsNumber';
 import CreatePost from './components/createPost/CreatePost';
 import GiveAndReceive from './components/GiveAndReceive/GiveAndReceive';
 import Chart from './components/Chart';
-import { useEffect, useState } from 'react';
 import { useBreadcrumb } from '@/components/breadcrum/Breadcrum';
 import { StarOutlined } from '@ant-design/icons';
 import { useLoading } from '@/common/context/useLoading';
 import { service } from '@/services/apis';
+import { useEffect, useRef, useState } from 'react';
 
 function GiveStar() {
   const { t } = useTranslation();
@@ -35,6 +35,12 @@ function GiveStar() {
     }
   };
 
+  const postRef = useRef();
+
+  const addPost = () => {
+    (postRef.current as A).addPost();
+  };
+
   return (
     <>
       <Row gutter={[16, 16]} className={styles.start}>
@@ -43,11 +49,11 @@ function GiveStar() {
             <StarNumber numberStar={data} />
           </Col>
           <Col span={24} className={styles.giveStar}>
-            <CreatePost numberStar={data.currentUserStars} />
+            <CreatePost numberStar={data.currentUserStars} addPost={addPost} />
           </Col>
         </Col>
         <Col span={12} className={styles.giveAndReceive}>
-          <GiveAndReceive />
+          <GiveAndReceive ref={postRef} />
         </Col>
       </Row>
       <Row className={styles.start}>

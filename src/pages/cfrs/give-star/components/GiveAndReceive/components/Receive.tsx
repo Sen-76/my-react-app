@@ -13,7 +13,7 @@ import { SmileOutlined } from '@ant-design/icons';
 function Receive() {
   const { t } = useTranslation();
   const { showLoading, closeLoading } = useLoading();
-  const user: A = cookie.getCookie('userLogin');
+  const user: A = cookie.getCookie('userLogin') ?? '{}';
   const initDataGrid: Common.IDataGrid = {
     pageInfor: {
       pageSize: 10,
@@ -68,10 +68,6 @@ function Receive() {
 
   return (
     <div className={styles.contentLibary}>
-      <Space direction="horizontal" className={styles.spacePicker}>
-        <DatePicker picker="year" defaultValue={dayjs()} />
-        <DatePicker picker="month" defaultValue={dayjs()} />
-      </Space>
       <div className={styles.overFollow} id="scrollableDivGive">
         {data.length > 0 ? (
           <InfiniteScroll

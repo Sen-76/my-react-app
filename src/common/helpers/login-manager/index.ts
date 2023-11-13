@@ -36,11 +36,11 @@ export const useLoginManager = () => {
       cookie.setCookie('userLogin', JSON.stringify(data), 1);
       localStorage.setItem('token', data.token);
       localStorage.setItem('avatar', result.user.photoUrl);
-      sessionStorage.setItem('permissions', JSON.stringify(result.user.userRole2.permissions.map((x: A) => x.id)));
+      sessionStorage.setItem('permissions', JSON.stringify(result.user.userRole2.permissions.map((x: A) => x.content)));
       const permissions = await getAllPermissionTest(result.token);
       const customPermission = permissions.data.reduce((result: A, x: A) => {
         result[x.title] = x.permissions.reduce((result2: A, y: A) => {
-          result2[y.keyI18n] = y.id;
+          result2[y.keyI18n] = y.content;
           return result2;
         }, {});
         return result;
@@ -80,12 +80,12 @@ export const useLoginManager = () => {
   };
 
   const getSaveUser = () => {
-    const user = cookie.getCookie('userSave');
+    const user = cookie.getCookie('userSave') ?? '{}';
     return JSON.parse(user as string);
   };
 
   const getLoginUser = () => {
-    const user = cookie.getCookie('userLogin');
+    const user = cookie.getCookie('userLogin') ?? '{}';
     return JSON.parse(user as string);
   };
 

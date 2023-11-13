@@ -6,9 +6,11 @@ import Comment from './Comment';
 interface IProps {
   commentList: A[];
   refreshCommentList: () => void;
+  historyList: A[];
+  refreshHistoryList: () => void;
 }
 function Activities(props: Readonly<IProps>) {
-  const { commentList, refreshCommentList } = props;
+  const { commentList, refreshCommentList, historyList, refreshHistoryList } = props;
   const { t } = useTranslation();
   const onRenderNothing = () => {
     const tabItems = [
@@ -20,7 +22,7 @@ function Activities(props: Readonly<IProps>) {
       {
         label: t('Task_Histories'),
         key: 'history',
-        children: <History />
+        children: <History historyList={historyList} refreshHistoryList={refreshHistoryList} />
       }
     ];
     const onTabChanged = () => {

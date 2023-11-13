@@ -47,7 +47,7 @@ interface IProps {
 function LeftNav(props: IProps) {
   const [selectedKey, setSelectedKey] = useState<string[]>(['overview']);
   const { checkHasPermission } = permissionManager();
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();

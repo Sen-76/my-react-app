@@ -90,7 +90,7 @@ function TaskInformation(props: Readonly<IProps>) {
       const draftParam = { ...initDataGrid };
       draftParam.searchInfor!.searchValue = userDebouncedAssignee ?? '';
       const result = await service.accountService.getAccount(draftParam);
-      const loginUser = JSON.parse(sessionStorage.getItem('userDetail') ?? '');
+      const loginUser = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}');
       const data = [...result.data, loginUser];
       const optionsValue = data?.map((x: A) => ({
         label: (
@@ -128,6 +128,8 @@ function TaskInformation(props: Readonly<IProps>) {
       showLoading();
       setEditedField('');
       const cleanData = { ...data };
+      console.log(attach);
+      console.log(cleanData.fileAttachments);
       form.getFieldValue('taskLinksMore')?.length > 0 &&
         (issueLink = [...data.taskLinks.map((x: A) => x.id), ...form.getFieldValue('taskLinksMore')]);
       await service.taskService.update({
@@ -135,8 +137,8 @@ function TaskInformation(props: Readonly<IProps>) {
         ...form.getFieldsValue(),
         assignee: form.getFieldValue('assignee')?.value ? form.getFieldValue('assignee')?.value : data.assignee,
         reportTo: form.getFieldValue('reportTo')?.value ? form.getFieldValue('reportTo')?.value : data.reportTo,
-        attachment: attach?.id ? attach : cleanData.fileAttachments,
-        taskLinks: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.id) ?? []
+        attachments: attach ? attach : cleanData.fileAttachments,
+        taskLinkIds: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.id) ?? []
       });
       refreshData();
     } catch (e) {
@@ -209,7 +211,7 @@ function TaskInformation(props: Readonly<IProps>) {
     return (
       <Row style={{ display: 'flex', gap: 10 }}>
         <Col style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
-          <Row className={styles.detailRow}>
+          {/* <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Key')}</Col>
             {editedField !== 'key' ? (
               <Button
@@ -224,7 +226,7 @@ function TaskInformation(props: Readonly<IProps>) {
                 <Input style={{ width: '100%' }} onBlur={updateInfo} />
               </Form.Item>
             )}
-          </Row>
+          </Row> */}
           <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Milestone')}</Col>
             {editedField !== 'milestoneId' ? (
@@ -241,7 +243,7 @@ function TaskInformation(props: Readonly<IProps>) {
               </Form.Item>
             )}
           </Row>
-          <Row className={styles.detailRow}>
+          {/* <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Type')}</Col>
             {editedField !== 'taskType' ? (
               <Button
@@ -256,7 +258,7 @@ function TaskInformation(props: Readonly<IProps>) {
                 <Select options={typeList} style={{ width: '100%' }} onBlur={updateInfo} />
               </Form.Item>
             )}
-          </Row>
+          </Row> */}
           <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Priority')}</Col>
             {editedField !== 'taskPriotyId' ? (

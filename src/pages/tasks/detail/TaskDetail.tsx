@@ -20,6 +20,7 @@ function TaskDetail() {
   const [editData, setEditData] = useState<A>({});
   const [statusList, setStatusList] = useState<A[]>([]);
   const [commentList, setCommentList] = useState<A[]>([]);
+  const [historyList, setHistoryList] = useState<A[]>([]);
   const [editTitle, setEditTitle] = useState<boolean>(false);
   const panelRef = useRef();
 
@@ -51,6 +52,7 @@ function TaskDetail() {
       await getStatusList();
       await getDetail();
       await getComment();
+      await getHistory();
       closeLoading();
     };
     fetchApi();
@@ -80,11 +82,25 @@ function TaskDetail() {
     try {
       const result = await service.commentService.get({
         maxResults: 10,
-        // orderBy: 'string',
+        orderBy: 'createdDate',
+        page: 1,
         taskId: data.id ?? ''
       });
       setCommentList(result.data);
-      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getHistory = async () => {
+    try {
+      const result = await service.taskService.history({
+        maxResults: 10,
+        orderBy: 'created',
+        page: 1,
+        taskId: data.id ?? ''
+      });
+      setHistoryList(result.data);
     } catch (e) {
       console.log(e);
     }
@@ -175,14 +191,14 @@ function TaskDetail() {
           </Form.Item>
         )}
       </Form>
-      <Button
+      {/* <Button
         style={{ marginRight: 10 }}
         icon={<EditOutlined />}
         disabled={editData?.status?.title !== 'Open'}
         onClick={openPanel}
       >
         Edit
-      </Button>
+      </Button> */}
       <Select
         disabled={editData?.status?.title === 'Done'}
         onChange={onChangeStatus}
@@ -192,7 +208,12 @@ function TaskDetail() {
       />
       <Col style={{ marginTop: 10 }}>
         <TaskInformation data={editData} refreshData={getDetail} setEditTitle={setEditTitle} />
-        <Activities commentList={commentList} refreshCommentList={getComment} />
+        <Activities
+          commentList={commentList}
+          refreshCommentList={getComment}
+          historyList={historyList}
+          refreshHistoryList={getHistory}
+        />
       </Col>
       <Panel ref={panelRef} refreshList={() => console.log('cc')} />
     </div>

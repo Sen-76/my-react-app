@@ -3,7 +3,7 @@ import { Modal } from 'antd';
 import axios, { Canceler } from 'axios';
 
 const apiUrl = import.meta.env.VITE_REACT_APP_API_URL;
-const user: A = cookie.getCookie('userLogin');
+const user: A = cookie.getCookie('userLogin') ?? '{}';
 const token = JSON.parse(user)?.token ?? '';
 const source = axios.CancelToken.source();
 let cancelToken: Canceler | undefined;

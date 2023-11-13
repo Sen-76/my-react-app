@@ -45,6 +45,7 @@ import { util } from '@/common/helpers/util';
 import { service } from '@/services/apis';
 import PermissionBlock from '@/common/helpers/permission/PermissionBlock';
 import { permissionManager } from '@/common/helpers/permission/permission';
+import { accountService } from '@/services/apis/Account';
 
 interface IProps {
   data: A[];
@@ -67,7 +68,7 @@ function DataTable(props: Readonly<IProps>) {
   const { showLoading, closeLoading } = useLoading();
   const [value, setValue] = useState<EDeleteState>(EDeleteState.None);
   const { checkHasPermission } = permissionManager();
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
   const { t } = useTranslation();
   const { Search } = Input;
 
@@ -172,6 +173,18 @@ function DataTable(props: Readonly<IProps>) {
       }
     },
     {
+      title: t('role'),
+      dataIndex: 'role',
+      key: 'role',
+      render: (_, record) => {
+        return (
+          <Tooltip placement="bottom" title={record?.role} color="#ffffff" arrow={true}>
+            <Paragraph ellipsis={{ rows: 1, expandable: false }}>{record?.role}</Paragraph>
+          </Tooltip>
+        );
+      }
+    },
+    {
       title: t('Common_Action'),
       dataIndex: 'action',
       key: 'action',
@@ -228,16 +241,8 @@ function DataTable(props: Readonly<IProps>) {
                   </Tooltip>
                 </PermissionBlock>
                 <PermissionBlock module={allPermission?.User?.Permission_Delete_Employee}>
-                  <Tooltip
-                    placement="bottom"
-                    title={
-                      record.userRole2?.isDefault !== true ? t('Common_ToolTip_CannotDeleteUser') : t('Common_Delete')
-                    }
-                    color="#ffffff"
-                    arrow={true}
-                  >
+                  <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
                     <Button
-                      disabled={record.userRole2?.isDefault !== true}
                       type="text"
                       onClick={() => {
                         setIsModalOpen(true);
@@ -268,7 +273,7 @@ function DataTable(props: Readonly<IProps>) {
       setIsModalOpen(false);
       await service.authsService.forgot({ userEmail: id });
       notification.open({
-        message: t('Common_DeleteSuccess'),
+        message: t('ResetPassword_Success'),
         type: 'success'
       });
     } catch (e) {
@@ -346,11 +351,29 @@ function DataTable(props: Readonly<IProps>) {
     }
   };
 
-  const exportExcel = () => {
-    notification.open({
-      message: t('Common_ExportSuccess'),
-      type: 'success'
-    });
+  const exportExcel = async () => {
+    try {
+      showLoading();
+      const result = await accountService.exportUsers(param);
+      const blob = new Blob([result], { type: 'application/octet-stream' });
+      if (blob instanceof Blob) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Export_All_Users.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+      notification.open({
+        message: t('Common_ExportSuccess'),
+        type: 'success'
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      closeLoading();
+    }
   };
 
   const fileProps: UploadProps = {
@@ -388,7 +411,7 @@ function DataTable(props: Readonly<IProps>) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Create_User_Teamplate.xlsx';
+        a.download = 'Create_Users_Template.xlsx';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);

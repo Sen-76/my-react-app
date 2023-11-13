@@ -7,6 +7,7 @@ declare namespace Milestone {
     dueDate: Date;
     startDate: Date;
     updateDate: DateTime;
+    percentDone: number;
     __entity: string;
   }
   export interface IMilestoneCreateModel {

@@ -37,7 +37,7 @@ function DataTable(props: IProps) {
   const data = useParams();
   const { confirm } = Modal;
   const { t } = useTranslation();
-  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '');
+  const allPermission = JSON.parse(sessionStorage.getItem('allPermissions') ?? '{}');
 
   const columns: ColumnsType<A> = [
     {

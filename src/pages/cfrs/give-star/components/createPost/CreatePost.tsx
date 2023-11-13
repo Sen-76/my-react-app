@@ -1,13 +1,13 @@
 import { Button, Empty, Form, Input, Row, Select, Slider, Spin, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import styles from '../../GiveStar.module.scss';
-import TextArea from 'antd/es/input/TextArea';
 import { useState } from 'react';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 
 interface IProps {
   numberStar: number;
+  addPost: () => void;
 }
 
 function CreatePost(prop: IProps) {
@@ -19,6 +19,7 @@ function CreatePost(prop: IProps) {
   const [customAlert, setCustomAlert] = useState<A>();
   const { showLoading, closeLoading } = useLoading();
   const [selectLoading, setSelectLoading] = useState<boolean>();
+  const { TextArea } = Input;
 
   const getDepartmentList = async () => {
     try {
@@ -81,6 +82,8 @@ function CreatePost(prop: IProps) {
           ...editData,
           ...form.getFieldsValue()
         });
+        form.resetFields();
+        prop.addPost();
         notification.open({
           message: t('Common_CreateSuccess'),
           type: 'success'
@@ -96,9 +99,6 @@ function CreatePost(prop: IProps) {
     }
   };
 
-  function onAfterChange(value: A) {
-    console.log('onAfterChange: ', value);
-  }
   const formRule = {
     title: [{ required: true, message: t('Common_Require_Field') }],
     reciver: [{ required: true, message: t('Common_Require_Field') }],
@@ -144,7 +144,7 @@ function CreatePost(prop: IProps) {
             />
           </Form.Item>
           <Form.Item label={t('CFRs_Title_Entry')} name="title" rules={formRule.title}>
-            <Input />
+            <Input maxLength={100} showCount />
           </Form.Item>
           <Form.Item label={t('CFRs_Receiver_Entry')} name="userGive" rules={formRule.reciver}>
             <Select
@@ -177,10 +177,10 @@ function CreatePost(prop: IProps) {
             />
           </Form.Item>
           <Form.Item label={t('Number_Star_Send')} name="starGive" rules={formRule.starSend}>
-            <Slider defaultValue={0} onAfterChange={onAfterChange} max={prop.numberStar < 0 ? 0 : prop.numberStar} />
+            <Slider defaultValue={0} max={prop.numberStar < 0 ? 0 : prop.numberStar} />
           </Form.Item>
           <Form.Item label={t('CFRs_Content_Entry')} name="description" rules={formRule.content}>
-            <TextArea placeholder="Autosize height based on content lines" autoSize />
+            <TextArea style={{ height: 100, resize: 'none' }} maxLength={500} showCount />
           </Form.Item>
           <div className="actionBtnBottom">
             <Button type="primary" htmlType="submit" onClick={onConfirm}>
