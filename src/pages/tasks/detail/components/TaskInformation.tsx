@@ -625,10 +625,10 @@ function TaskInformation(props: Readonly<IProps>) {
       <></>
     );
   const showModal = () => {
-    form.setFieldValue(
-      'taskLinksMore',
-      data.taskLinks.map((x: A) => ({ label: `[` + x.taskLink.key + `] ` + x.taskLink.summary, value: x.id }))
-    );
+    // form.setFieldValue(
+    //   'taskLinksMore',
+    //   data.taskLinks.map((x: A) => ({ label: `[` + x.taskLink.key + `] ` + x.taskLink.summary, value: x.id }))
+    // );
     setIsModalOpen(true);
   };
   const handleOk = () => {
@@ -753,7 +753,12 @@ function TaskInformation(props: Readonly<IProps>) {
         />
         <Modal title={t('Task_Add_LinkIssues')} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
           <Form.Item name="taskLinksMore" rules={requiredRule}>
-            <Select options={taskList} mode="multiple" />
+            <Select
+              labelInValue
+              options={taskList}
+              mode="multiple"
+              defaultValue={data.taskLinks?.map((x: A) => x.id)}
+            />
           </Form.Item>
         </Modal>
       </Form>

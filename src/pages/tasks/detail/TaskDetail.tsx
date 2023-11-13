@@ -100,9 +100,11 @@ function TaskDetail() {
         page: !nextPage ? currentHistoryPage : nextPage,
         taskId: data.id ?? ''
       });
-      const test = result.data.map((x: A) => {
-        return { ...x, actionBody: JSON.parse(x.actionBody ?? '') };
-      });
+      const test = result.data.actionBody
+        ? result.data.map((x: A) => {
+            return { ...x, actionBody: JSON.parse(x.actionBody ?? '') };
+          })
+        : result.data;
       console.log(test);
       setHistoryList(test);
     } catch (e) {

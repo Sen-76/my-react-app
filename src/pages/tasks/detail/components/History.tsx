@@ -46,7 +46,7 @@ function History(props: Readonly<IProps>) {
                   src={item.author?.avatarUrl?.url}
                   style={{ marginRight: 10, backgroundColor: util.randomColor() }}
                 >
-                  {item.author?.fullName}
+                  {item.author?.fullName.charAt(0)}
                 </Avatar>
               }
               title={
