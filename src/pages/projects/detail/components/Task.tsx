@@ -1,24 +1,32 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { EditOutlined, ExportOutlined, PlusOutlined, SmileOutlined, SolutionOutlined } from '@ant-design/icons';
-import { Button, Table, Tag, Tooltip, notification } from 'antd';
+import { EditOutlined, SmileOutlined, SolutionOutlined } from '@ant-design/icons';
+import { Button, Table, Tag, Tooltip } from 'antd';
 import { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { useTranslation } from 'react-i18next';
-import styles from '../Task.module.scss';
 import Paragraph from 'antd/es/typography/Paragraph';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import icons from '@/assets/icons';
-import React from 'react';
+import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect } from 'react';
+import { service } from '@/services/apis';
 
-interface IProps {
-  data: A[];
-  loading: boolean;
-  param: Common.IDataGrid;
-  openPanel: (data?: A) => void;
-  onOrder: (value: string, des: boolean) => void;
-  setPage: (paging: number) => void;
-}
-function DataTable(props: IProps) {
-  const { loading, data, param } = props;
+function Task() {
+  const initDataGrid: Common.IDataGrid = {
+    pageInfor: {
+      pageSize: 10,
+      pageNumber: 1,
+      totalItems: 0
+    },
+    searchInfor: {
+      searchValue: '',
+      searchColumn: ['summary']
+    },
+    filter: [{ key: 'projectId', value: [useParams().id ?? ''] }]
+  };
+  const projectId = useParams().id;
+  console.log(projectId);
+  const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
+  const [loadingTable, setLoadingTable] = useState<boolean>(false);
+  const [taskList, setTaskList] = useState<A[]>([]);
   const { t } = useTranslation();
   const columns: ColumnsType<A> = [
     {
@@ -105,14 +113,6 @@ function DataTable(props: IProps) {
                 <Button type="text" icon={<SolutionOutlined />} />
               </Link>
             </Tooltip>
-            <Tooltip placement="bottom" title={t('Common_Edit')} color="#ffffff" arrow={true}>
-              <Button
-                type="text"
-                disabled={record.status?.title !== 'Open'}
-                onClick={() => props.openPanel(record)}
-                icon={<EditOutlined />}
-              />
-            </Tooltip>
           </div>
         );
       }
@@ -124,37 +124,47 @@ function DataTable(props: IProps) {
     return iconItem ? React.cloneElement(iconItem.component, props) : null;
   };
 
-  const TableHeader = () => {
-    return (
-      <>
-        <div className={styles.tableHeaderLeft}>
-          <Button type="text" icon={<PlusOutlined />} onClick={() => props.openPanel()}>
-            {t('Common_AddNew')}
-          </Button>
-          <Button type="text" onClick={exportExcel} icon={<ExportOutlined />}>
-            {t('Common_ExportExcel')}
-          </Button>
-        </div>
-        <div className={styles.tableHeaderRight}></div>
-      </>
-    );
+  useEffect(() => {
+    getTaskList();
+  }, []);
+
+  const getTaskList = async (drafParam?: Common.IDataGrid) => {
+    try {
+      setLoadingTable(true);
+      const result = await service.taskService.get(drafParam ?? param);
+      setParam({
+        ...param,
+        pageInfor: {
+          pageSize: result.prameter.pageSize,
+          pageNumber: result.prameter.pageNumber,
+          totalItems: result.prameter.totalItems
+        }
+      });
+      setTaskList(result.data);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoadingTable(false);
+    }
   };
 
-  const handleTableChange = async (pagination: TablePaginationConfig) => {
-    await props.setPage(pagination.current ?? 1);
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    setPage(pagination.current ?? 1);
   };
 
-  const exportExcel = () => {
-    notification.open({
-      message: t('Common_ExportSuccess'),
-      type: 'success'
-    });
+  const setPage = (val: number) => {
+    const draftGrid = { ...param };
+    if (draftGrid.pageInfor) {
+      draftGrid.pageInfor.pageNumber = val;
+    }
+    setParam(draftGrid);
+    getTaskList(draftGrid);
   };
 
   return (
     <Table
       columns={columns}
-      dataSource={data}
+      dataSource={taskList}
       pagination={{
         current: param.pageInfor!.pageNumber,
         pageSize: param.pageInfor!.pageSize,
@@ -170,11 +180,10 @@ function DataTable(props: IProps) {
         )
       }}
       onChange={handleTableChange}
-      loading={loading}
-      title={() => TableHeader()}
+      loading={loadingTable}
       rowKey={(record) => record.id}
     />
   );
 }
 
-export default DataTable;
+export default Task;

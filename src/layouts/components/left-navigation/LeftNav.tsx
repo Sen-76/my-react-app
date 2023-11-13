@@ -166,6 +166,12 @@ function LeftNav(props: IProps) {
       label: t('management'),
       icon: renderIcon(ClusterOutlined),
       key: 'management',
+      modules: [
+        allPermission?.Department?.Permission_Can_Manager_All_Department,
+        allPermission?.Team?.Permission_Can_Manager_All_Team,
+        allPermission?.User?.Permission_Can_Manager_All_Employees,
+        allPermission?.Role?.Permission_Assign_permission_for_role
+      ],
       children: [
         {
           label: t('Manage_Department'),

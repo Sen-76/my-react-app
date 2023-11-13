@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useTranslation } from 'react-i18next';
-import Record from './Record';
 import styles from '../Recognition.module.scss';
-import { DatePicker, Divider, Empty, Skeleton, Space } from 'antd';
-import dayjs from 'dayjs';
+import { Divider, Empty, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { SmileOutlined } from '@ant-design/icons';
+import Record from './Record';
 
 function Post() {
   const { t } = useTranslation();
@@ -68,9 +66,6 @@ function Post() {
 
   return (
     <div className={styles.contentLibary}>
-      <Space direction="horizontal" className={styles.spacePicker}>
-        <DatePicker.MonthPicker defaultValue={dayjs()} />
-      </Space>
       <div className={styles.overFollow} id="scrollableDivGive">
         {data.length > 0 ? (
           <InfiniteScroll

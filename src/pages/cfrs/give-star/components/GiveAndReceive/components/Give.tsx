@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useTranslation } from 'react-i18next';
 import Record from './Record';
 import styles from '../../../GiveStar.module.scss';
-import { DatePicker, Divider, Skeleton, Space } from 'antd';
-import dayjs from 'dayjs';
+import { Divider, Skeleton } from 'antd';
 import { cookie } from '@/common/helpers/cookie/cookie';
 import { useEffect, useState } from 'react';
 import { service } from '@/services/apis';
@@ -41,11 +41,11 @@ function Give(props: A, ref: A) {
     addPost
   }));
 
-  const getUserGiveList = async (draftParam?: Common.IDataGrid) => {
+  const getUserGiveList = async (draftParam?: Common.IDataGrid, isDelete?: boolean) => {
     try {
       showLoading();
       const result = await service.postService.get(draftParam ?? param);
-      const newData = [...data, ...result.data];
+      const newData = isDelete ? result.data : [...data, ...result.data];
       setParam({
         ...param,
         pageInfor: {
@@ -54,7 +54,7 @@ function Give(props: A, ref: A) {
           totalItems: result.prameter.totalItems
         }
       });
-      const uniqueData = newData.reduce((acc, current) => {
+      const uniqueData = newData.reduce((acc: A, current: A) => {
         const x = acc.find((item: A) => item.id === current.id);
         if (!x) {
           return acc.concat([current]);
@@ -70,8 +70,14 @@ function Give(props: A, ref: A) {
     }
   };
 
-  const addPost = () => {
-    getUserGiveList();
+  const addPost = async () => {
+    await getUserGiveList();
+    await props.getStar();
+  };
+
+  const deletePost = async () => {
+    await getUserGiveList(undefined, true);
+    await props.getStar();
   };
 
   const handleScroll = async () => {
@@ -94,7 +100,7 @@ function Give(props: A, ref: A) {
             scrollableTarget="scrollableDivGive"
           >
             {data.map((item, index) => {
-              return <Record key={index} record={item} />;
+              return <Record key={index} record={item} refreshList={deletePost} deleteAble={true} />;
             })}
           </InfiniteScroll>
         ) : (

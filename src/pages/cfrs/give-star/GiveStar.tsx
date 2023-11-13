@@ -13,12 +13,19 @@ import { useEffect, useRef, useState } from 'react';
 
 function GiveStar() {
   const { t } = useTranslation();
-  const { showLoading } = useLoading();
+  const { showLoading, closeLoading } = useLoading();
   const { setBreadcrumb } = useBreadcrumb();
   const [data, setData] = useState<A>(true);
+  const [journeyData, setJourneyData] = useState<A>();
 
   useEffect(() => {
-    getStar();
+    const fetchData = async () => {
+      showLoading();
+      await getStar();
+      await getJourney();
+      closeLoading();
+    };
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -27,9 +34,17 @@ function GiveStar() {
 
   const getStar = async () => {
     try {
-      showLoading();
       const result = await service.postService.getStarOfNumber();
       setData(result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getJourney = async () => {
+    try {
+      const result = await service.postService.getJourney({ numberMonth: 12 });
+      setJourneyData(result.data);
     } catch (e) {
       console.log(e);
     }
@@ -38,6 +53,7 @@ function GiveStar() {
   const postRef = useRef();
 
   const addPost = () => {
+    getStar();
     (postRef.current as A).addPost();
   };
 
@@ -53,12 +69,12 @@ function GiveStar() {
           </Col>
         </Col>
         <Col span={12} className={styles.giveAndReceive}>
-          <GiveAndReceive ref={postRef} />
+          <GiveAndReceive getStar={getStar} ref={postRef} />
         </Col>
       </Row>
       <Row className={styles.start}>
         <Col className={styles.draft}>
-          <Chart />
+          <Chart data={journeyData} />
         </Col>
       </Row>
     </>

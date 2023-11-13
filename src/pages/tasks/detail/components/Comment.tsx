@@ -11,18 +11,6 @@ import styles from '../TaskDetail.module.scss';
 import { service } from '@/services/apis';
 import { useParams } from 'react-router';
 
-const initDataGrid: Common.IDataGrid = {
-  pageInfor: {
-    pageSize: 10,
-    pageNumber: 1,
-    totalItems: 20
-  },
-  searchInfor: {
-    searchValue: '',
-    searchColumn: []
-  }
-  // filter: [{ key: 'Status', value: [EState.Activate, EState.DeActivate] }]
-};
 interface IProps {
   commentList: A[];
   refreshCommentList: () => void;
@@ -33,7 +21,6 @@ function Comment(props: Readonly<IProps>) {
   const { t } = useTranslation();
   const avatar = localStorage.getItem('avatar');
   const user = JSON.parse(sessionStorage.getItem('userDetail') ?? '{}');
-  const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
   const [form] = Form.useForm();
   const { confirm } = Modal;
   const { showLoading, closeLoading } = useLoading();
@@ -65,6 +52,7 @@ function Comment(props: Readonly<IProps>) {
       showLoading();
       form.resetFields();
       await service.commentService.add({ ...val, userId: user.id, taskId: data.id ?? '' });
+      setAddComment(false);
       refreshCommentList();
       console.log(val);
     } catch (e) {
@@ -77,8 +65,9 @@ function Comment(props: Readonly<IProps>) {
   const onEditComment = async () => {
     try {
       showLoading();
-      console.log(editComment);
+      await service.commentService.update({ ...editComment, Id: editComment.id });
       setEditComment({});
+      refreshCommentList();
     } catch (e) {
       console.log(e);
     } finally {
@@ -86,11 +75,8 @@ function Comment(props: Readonly<IProps>) {
     }
   };
 
-  const handleTableChange = (pagination: A) => {
-    console.log(pagination);
-  };
-
   const deleteComment = async (comment: A) => {
+    console.log(comment);
     confirm({
       content: t('Comment_Delete_Remind_Text').replace('{0}', comment.title),
       title: t('Common_Delete'),
@@ -105,7 +91,8 @@ function Comment(props: Readonly<IProps>) {
   const confirmDelete = async (id: string) => {
     try {
       showLoading();
-      console.log(id);
+      console.log({ id: id, taskId: data.id ?? '' });
+      await service.commentService.delete({ id: id, taskId: data.id ?? '' });
     } catch (e) {
       console.log(e);
     } finally {
@@ -159,13 +146,6 @@ function Comment(props: Readonly<IProps>) {
         )}
       </Row>
       <List
-        pagination={{
-          current: param.pageInfor!.pageNumber,
-          pageSize: param.pageInfor!.pageSize,
-          total: param.pageInfor!.totalItems,
-          simple: false,
-          onChange: (page) => handleTableChange(page)
-        }}
         dataSource={commentList}
         renderItem={(item) => (
           <List.Item>
@@ -195,7 +175,7 @@ function Comment(props: Readonly<IProps>) {
                     </div>
                   }
                 />
-                {user?.id === item.user?.id && (
+                {user?.id === item.author?.id && (
                   <>
                     <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
                       <Button
@@ -207,13 +187,13 @@ function Comment(props: Readonly<IProps>) {
                       />
                     </Tooltip>
                     <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-                      <Button type="text" onClick={deleteComment} icon={<DeleteOutlined />} />
+                      <Button type="text" onClick={() => deleteComment(item)} icon={<DeleteOutlined />} />
                     </Tooltip>
                   </>
                 )}
               </>
             ) : (
-              <Row style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 50, width: '100%' }}>
+              <Row style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 20 }}>
                 <Avatar
                   size={44}
                   src={item.user?.avatar ?? ''}
@@ -221,13 +201,16 @@ function Comment(props: Readonly<IProps>) {
                 >
                   {user.fullName?.charAt(0)}
                 </Avatar>
-                <Col style={{ width: 'calc(100% - 50px)' }}>
+                <Col style={{ width: 'calc(100% - 60px)' }}>
                   <ReactQuill
-                    value={editComment.conttent}
+                    defaultValue={editComment.conttent}
                     theme="snow"
                     modules={modules}
                     style={{ display: 'flex', flexDirection: 'column', height: 150 }}
-                    onChange={(value) => setEditComment({ ...editComment, title: value })}
+                    onChange={(value) => {
+                      console.log(value);
+                      setEditComment({ ...editComment, conttent: value });
+                    }}
                   />
                   <Button style={{ marginTop: 10 }} onClick={() => setEditComment({})}>
                     {t('Common_Cancel')}

@@ -3,9 +3,10 @@ import { StarOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './Recognition.module.scss';
-import { Tabs } from 'antd';
+import { DatePicker, Space, Tabs } from 'antd';
 import Post from './components/Post';
 import LeaderBoard from './components/LeaderBoard';
+import dayjs from 'dayjs';
 
 function Recognition() {
   const { setBreadcrumb } = useBreadcrumb();
@@ -25,10 +26,16 @@ function Recognition() {
       children: <LeaderBoard />
     }
   ];
+
+  const onrenderTabExtra = () => (
+    <Space direction="horizontal" className={styles.spacePicker}>
+      <DatePicker.MonthPicker defaultValue={dayjs()} />
+    </Space>
+  );
   return (
     <div className={styles.recognitions}>
       <div className={styles.giveAndReceive}>
-        <Tabs items={tabItems} size="large" className={styles.tabs} />
+        <Tabs items={tabItems} size="large" className={styles.tabs} tabBarExtraContent={onrenderTabExtra()} />
       </div>
     </div>
   );

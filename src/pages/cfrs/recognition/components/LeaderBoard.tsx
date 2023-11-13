@@ -1,93 +1,96 @@
 import { useTranslation } from 'react-i18next';
-import Record from './Record';
 import styles from '../Recognition.module.scss';
-import { DatePicker, Divider, Empty, Skeleton, Space } from 'antd';
-import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { Avatar, List } from 'antd';
+import { useState, useEffect } from 'react';
 import { service } from '@/services/apis';
-import { useLoading } from '@/common/context/useLoading';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { SmileOutlined } from '@ant-design/icons';
+import { util } from '@/common/helpers/util';
+import { StarOutlined } from '@ant-design/icons';
 
 function LeaderBoard() {
   const { t } = useTranslation();
-  const { showLoading, closeLoading } = useLoading();
-  const initDataGrid: Common.IDataGrid = {
-    pageInfor: {
-      pageSize: 10,
-      pageNumber: 1,
-      totalItems: 0
-    },
-    orderInfor: {
-      orderBy: ['createdDate'],
-      isAssending: [false]
-    }
-  };
-  const [param, setParam] = useState<Common.IDataGrid>(initDataGrid);
-  const [data, setData] = useState<A[]>([]);
-  const [total, setTotal] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
+  const [data, setData] = useState<A>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
   useEffect(() => {
-    getUserGiveList();
+    getStar();
   }, []);
 
-  const getUserGiveList = async (page?: number) => {
+  const getStar = async () => {
     try {
-      showLoading();
-      if (page && param.pageInfor) param.pageInfor.pageNumber = page;
-      const result = await service.postService.get(param);
-      const newData = [...data, ...result.data];
-      setTotal(result.prameter.totalItems);
-      setPage(result.prameter.pageNumber);
-      const uniqueData = newData.reduce((acc, current) => {
-        const x = acc.find((item: A) => item.id === current.id);
-        if (!x) {
-          return acc.concat([current]);
-        } else {
-          return acc;
-        }
-      }, []);
-      setData(uniqueData);
+      const result = await service.postService.getTop10({ year: 2023, month: 10 });
+      setData(result.data);
     } catch (e) {
       console.log(e);
-    } finally {
-      closeLoading();
     }
   };
 
-  const handleScroll = async () => {
-    getUserGiveList(page + 1);
-  };
+  const item = (item: A, index: number) =>
+    index > 2 && (
+      <List.Item>
+        <List.Item.Meta
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar style={{ marginRight: '16px', backgroundColor: 'gray' }} size={40}>
+                  {index + 1}
+                </Avatar>
+                <Avatar
+                  src={item.user?.avatarUrl?.url}
+                  style={{ marginRight: '16px', backgroundColor: util.randomColor() }}
+                  size={40}
+                >
+                  {item.user?.fullName?.charAt(0)}
+                </Avatar>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div>{item.user?.fullName}</div>
+
+                  <div style={{ fontWeight: 500 }}>{item.user?.userEmail}</div>
+                </div>
+              </div>
+              <div>
+                {item.numberStars}
+                <StarOutlined style={{ marginLeft: 10 }} />
+              </div>
+            </div>
+          }
+        />
+      </List.Item>
+    );
 
   return (
     <div className={styles.contentLibary}>
-      <Space direction="horizontal" className={styles.spacePicker}>
-        <DatePicker.MonthPicker defaultValue={dayjs()} />
-      </Space>
-      <div className={styles.overFollow} id="scrollableDivGive">
-        {data.length > 0 ? (
-          <InfiniteScroll
-            dataLength={data.length}
-            next={handleScroll}
-            hasMore={data.length < total}
-            loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-            endMessage={
-              <Divider plain>
-                <Empty />
-              </Divider>
-            }
-            scrollableTarget="scrollableDivGive"
-          >
-            {data.map((item, index) => {
-              return <Record key={index} record={item} />;
-            })}
-          </InfiniteScroll>
-        ) : (
-          <>
-            <Empty />
-          </>
-        )}
+      <div style={{ marginBottom: 20 }}>
+        <div>
+          <div className="top-1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span style={{ fontWeight: 600 }}>Top 1</span>
+            <Avatar src={data[0]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
+              {data[0]?.user?.fullName?.charAt(0)}
+            </Avatar>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+          <div className="top-2" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span style={{ fontWeight: 600 }}>Top 2</span>
+            <Avatar src={data[1]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
+              {data[1]?.user?.fullName?.charAt(0)}
+            </Avatar>
+          </div>
+          <div className="top-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span style={{ fontWeight: 600 }}>Top 3</span>
+            <Avatar src={data[2]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
+              {data[2]?.user?.fullName?.charAt(0)}
+            </Avatar>
+          </div>
+        </div>
       </div>
+      <List
+        itemLayout="horizontal"
+        dataSource={data}
+        className={styles.list}
+        bordered
+        renderItem={item}
+        loading={loading}
+      />
     </div>
   );
 }

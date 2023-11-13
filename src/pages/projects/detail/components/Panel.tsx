@@ -73,8 +73,9 @@ function Panel(props: IProps, ref: A) {
       closeDrawer();
       props.refreshList();
     } catch (e: A) {
-      if (e.response?.data.status === 422) {
+      if (e.response?.data.status === 400) {
         const errors: A = e.response.data.errors;
+        console.log(e.response.data);
         setCustomAlert(errors);
       }
     } finally {
@@ -107,46 +108,44 @@ function Panel(props: IProps, ref: A) {
   };
 
   return (
-    <>
-      <Drawer
-        title={isEdit ? `${t('Milestone_Edit_Entry')}` : `${t('Milestone_AddNew_Entry')}`}
-        placement="right"
-        open={open}
-        extra={<CloseOutlined onClick={closeDrawer} />}
-        onClose={closeDrawer}
-        maskClosable={false}
-        closable={false}
-        width={720}
-        destroyOnClose={true}
-      >
-        <Form form={form} layout="vertical" onFinish={onFinish} className={styles.panelform}>
-          <Form.Item
-            name="title"
-            label={t('Common_Title')}
-            rules={formRule.title}
-            className={customAlert?.userEmail && 'customFieldAlert'}
-          >
-            <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, title: '' })} />
-          </Form.Item>
-          {customAlert?.title && <div className="customAlert">{t('Common_TitleExist')}</div>}
-          <Form.Item name="startDate" label={t('Milestone_StartDate')} rules={formRule.startDate}>
-            <DatePicker format={'DD MMM YYYY'} disabledDate={disabledStartDate} />
-          </Form.Item>
-          <Form.Item name="dueDate" label={t('Milestone_DueDate')} rules={formRule.dueDate}>
-            <DatePicker format={'DD MMM YYYY'} disabledDate={disabledDueDate} />
-          </Form.Item>
-          <Form.Item name="description" label={t('Common_Description')}>
-            <TextArea maxLength={1000} rows={5} showCount />
-          </Form.Item>
-          <div className="actionBtnBottom">
-            <Button onClick={closeDrawer}>{t('Common_Cancel')}</Button>
-            <Button type="primary" htmlType="submit">
-              {t('Common_Confirm')}
-            </Button>
-          </div>
-        </Form>
-      </Drawer>
-    </>
+    <Drawer
+      title={isEdit ? `${t('Milestone_Edit_Entry')}` : `${t('Milestone_AddNew_Entry')}`}
+      placement="right"
+      open={open}
+      extra={<CloseOutlined onClick={closeDrawer} />}
+      onClose={closeDrawer}
+      maskClosable={false}
+      closable={false}
+      width={720}
+      destroyOnClose={true}
+    >
+      <Form form={form} layout="vertical" onFinish={onFinish} className={styles.panelform}>
+        <Form.Item
+          name="title"
+          label={t('Common_Title')}
+          rules={formRule.title}
+          className={customAlert?.userEmail && 'customFieldAlert'}
+        >
+          <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, title: '' })} />
+        </Form.Item>
+        {customAlert?.title && <div className="customAlert">{t('Common_TitleExist')}</div>}
+        <Form.Item name="startDate" label={t('Milestone_StartDate')} rules={formRule.startDate}>
+          <DatePicker format={'DD MMM YYYY'} disabledDate={disabledStartDate} />
+        </Form.Item>
+        <Form.Item name="dueDate" label={t('Milestone_DueDate')} rules={formRule.dueDate}>
+          <DatePicker format={'DD MMM YYYY'} disabledDate={disabledDueDate} />
+        </Form.Item>
+        <Form.Item name="description" label={t('Common_Description')}>
+          <TextArea maxLength={1000} rows={5} showCount />
+        </Form.Item>
+        <div className="actionBtnBottom">
+          <Button onClick={closeDrawer}>{t('Common_Cancel')}</Button>
+          <Button type="primary" htmlType="submit">
+            {t('Common_Confirm')}
+          </Button>
+        </div>
+      </Form>
+    </Drawer>
   );
 }
 

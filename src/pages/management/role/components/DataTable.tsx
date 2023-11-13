@@ -100,6 +100,7 @@ function DataTable(props: IProps) {
         };
         return (
           <div>
+            {/* <PermissionBlock module={allPermission?.Role?.Permission_Edit_role}> */}
             <Tooltip
               placement="bottom"
               title={record.isDefault !== true ? t('Common_Edit') : t('Common_ToolTip_CannotEditRole')}
@@ -113,6 +114,7 @@ function DataTable(props: IProps) {
                 icon={<EditOutlined />}
               />
             </Tooltip>
+            {/* </PermissionBlock> */}
             <Tooltip
               placement="bottom"
               title={record.isDefault !== true ? t('Common_Delete') : t('Common_ToolTip_CannotDeleteRole')}
@@ -158,30 +160,28 @@ function DataTable(props: IProps) {
   };
 
   return (
-    <>
-      <Table
-        columns={columns}
-        dataSource={data}
-        scroll={{ x: 780 }}
-        locale={{
-          emptyText: (
-            <>
-              <SmileOutlined style={{ marginRight: 5 }} /> {t('Common_NoRecord')}
-            </>
-          )
-        }}
-        pagination={{
-          current: param.pageInfor!.pageNumber,
-          pageSize: param.pageInfor!.pageSize,
-          total: param.pageInfor!.totalItems,
-          simple: false
-        }}
-        loading={loading}
-        onChange={handleTableChange}
-        title={() => TableHeader()}
-        rowKey={(record) => record.id}
-      />
-    </>
+    <Table
+      columns={columns}
+      dataSource={data}
+      scroll={{ x: 780 }}
+      locale={{
+        emptyText: (
+          <>
+            <SmileOutlined style={{ marginRight: 5 }} /> {t('Common_NoRecord')}
+          </>
+        )
+      }}
+      pagination={{
+        current: param.pageInfor!.pageNumber,
+        pageSize: param.pageInfor!.pageSize,
+        total: param.pageInfor!.totalItems,
+        simple: false
+      }}
+      loading={loading}
+      onChange={handleTableChange}
+      title={() => TableHeader()}
+      rowKey={(record) => record.id}
+    />
   );
 }
 

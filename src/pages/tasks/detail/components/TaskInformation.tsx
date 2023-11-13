@@ -128,8 +128,6 @@ function TaskInformation(props: Readonly<IProps>) {
       showLoading();
       setEditedField('');
       const cleanData = { ...data };
-      console.log(attach);
-      console.log(cleanData.fileAttachments);
       form.getFieldValue('taskLinksMore')?.length > 0 &&
         (issueLink = [...data.taskLinks.map((x: A) => x.id), ...form.getFieldValue('taskLinksMore')]);
       await service.taskService.update({
@@ -137,7 +135,7 @@ function TaskInformation(props: Readonly<IProps>) {
         ...form.getFieldsValue(),
         assignee: form.getFieldValue('assignee')?.value ? form.getFieldValue('assignee')?.value : data.assignee,
         reportTo: form.getFieldValue('reportTo')?.value ? form.getFieldValue('reportTo')?.value : data.reportTo,
-        attachments: attach ? attach : cleanData.fileAttachments,
+        attachments: attach && attach.length > 0 ? attach : cleanData.fileAttachments,
         taskLinkIds: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.id) ?? []
       });
       refreshData();
@@ -368,13 +366,15 @@ function TaskInformation(props: Readonly<IProps>) {
                   <Button type="text" icon={<DownloadOutlined />} />
                 </a>
               </Tooltip>
-              <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
-                <Button
-                  type="text"
-                  onClick={() => updateInfo(data.fileAttachments.filter((x: A) => x.id !== item.id))}
-                  icon={<DeleteOutlined />}
-                />
-              </Tooltip>
+              {data.status?.title === 'Open' && (
+                <Tooltip placement="bottom" title={t('Common_Delete')} color="#ffffff" arrow={true}>
+                  <Button
+                    type="text"
+                    onClick={() => updateInfo(data.fileAttachments.filter((x: A) => x.id !== item.id))}
+                    icon={<DeleteOutlined />}
+                  />
+                </Tooltip>
+              )}
             </div>
           </List.Item>
         )}
@@ -599,32 +599,41 @@ function TaskInformation(props: Readonly<IProps>) {
       </Row>
     );
   };
-  const genExtraAttachment = () => (
-    <Upload {...uploadProps} multiple={true} showUploadList={false}>
+  const genExtraAttachment = () =>
+    data.status?.title === 'Open' ? (
+      <Upload {...uploadProps} multiple={true} showUploadList={false}>
+        <Button
+          disabled={data.status?.title === 'Done'}
+          style={{ padding: 10, marginBottom: '-10px' }}
+          type="text"
+          icon={<PlusOutlined />}
+        />
+      </Upload>
+    ) : (
+      <></>
+    );
+  const genExtraTaskLink = () =>
+    data.status?.title === 'Open' ? (
       <Button
         disabled={data.status?.title === 'Done'}
         style={{ padding: 10, marginBottom: '-10px' }}
         type="text"
         icon={<PlusOutlined />}
+        onClick={showModal}
       />
-    </Upload>
-  );
-  const genExtraTaskLink = () => (
-    <Button
-      disabled={data.status?.title === 'Done'}
-      style={{ padding: 10, marginBottom: '-10px' }}
-      type="text"
-      icon={<PlusOutlined />}
-      onClick={showModal}
-    />
-  );
+    ) : (
+      <></>
+    );
   const showModal = () => {
-    if (data.status?.title !== 'Done') {
-      setIsModalOpen(true);
-    }
+    form.setFieldValue(
+      'taskLinksMore',
+      data.taskLinks.map((x: A) => ({ label: `[` + x.taskLink.key + `] ` + x.taskLink.summary, value: x.id }))
+    );
+    setIsModalOpen(true);
   };
   const handleOk = () => {
-    updateInfo();
+    console.log(form.getFieldValue('taskLinksMore'));
+    updateInfo(undefined, form.getFieldValue('taskLinksMore'));
     form.setFieldValue('taskLinksMore', []);
     setIsModalOpen(false);
   };

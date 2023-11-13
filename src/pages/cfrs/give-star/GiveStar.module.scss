@@ -7,6 +7,16 @@
     .ant-col {
       margin-bottom: 0px;
     }
+    .ant-card-meta {
+      .ant-card-meta-avatar {
+        display: flex;
+        align-items: center;
+        padding: 0 !important;
+      }
+      .ant-card-meta-title {
+        margin: 0 !important;
+      }
+    }
   }
   .header {
     display: flex;
@@ -111,10 +121,11 @@
   .record {
     display: flex;
     align-content: stretch;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-around;
     padding-bottom: 10px;
     border-bottom: 1px solid #e6e6e6;
+    height: 80px;
   }
   .contentRecord {
     border-bottom: 1px solid #e6e6e6;
@@ -130,7 +141,6 @@
   .spacePicker {
     gap: 8px;
     display: flex;
-    padding-bottom: 10px;
     flex-direction: row-reverse;
   }
 }

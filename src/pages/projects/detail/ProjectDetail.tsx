@@ -7,6 +7,7 @@ import { useParams } from 'react-router';
 import styles from './ProjectDetail.module.scss';
 import Milestone from './components/MIlestone';
 import GeneralInfo from './components/GeneralInfo';
+import Task from './components/Task';
 
 function ProjectDetail() {
   const { setBreadcrumb } = useBreadcrumb();
@@ -27,6 +28,11 @@ function ProjectDetail() {
       key: 'milestone',
       label: t('Project_Milestone'),
       children: <Milestone />
+    },
+    {
+      key: 'task',
+      label: t('Project_Task'),
+      children: <Task />
     }
   ];
 

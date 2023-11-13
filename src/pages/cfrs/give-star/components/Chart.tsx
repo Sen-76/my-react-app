@@ -1,10 +1,17 @@
 import BarChart from '@/components/chart/bar-chart/BarChart';
 import styles from '../GiveStar.module.scss';
-import useGetData from '@/pages/overview/useGetData';
 import { useTranslation } from 'react-i18next';
 
-function Chart() {
-  const { barChartData } = useGetData();
+interface IProps {
+  data: A[];
+}
+function Chart(props: IProps) {
+  const monthNumber = 12;
+  const monthsInYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const barChartData = {
+    labels: monthsInYear,
+    values: [10, 52, 200, 334, 390, 330, 220]
+  };
   const { t } = useTranslation();
   return (
     <div className={styles.draft}>

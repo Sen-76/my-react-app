@@ -12,7 +12,7 @@ function GiveAndReceive(props: A, ref: A) {
     {
       key: 'give',
       label: t('CFRS_Give'),
-      children: <Give ref={postRef} />
+      children: <Give getStar={props.getStar} ref={postRef} />
     },
     {
       key: 'receive',

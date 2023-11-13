@@ -88,23 +88,21 @@ function Panel(props: IProps, ref: A) {
       key: x.title,
       label: x.title,
       children: (
-        <>
-          <Form.Item name={x.title}>
-            <Checkbox.Group>
-              <Row>
-                {x.permissions.map((x: A) => (
-                  <Col span={24} key={x.id}>
-                    <Checkbox value={x.id}>
-                      <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ minWidth: '100%' }}>
-                        {t(x.keyI18n)}
-                      </Paragraph>
-                    </Checkbox>
-                  </Col>
-                ))}
-              </Row>
-            </Checkbox.Group>
-          </Form.Item>
-        </>
+        <Form.Item name={x.title}>
+          <Checkbox.Group>
+            <Row>
+              {x.permissions.map((x: A) => (
+                <Col span={24} key={x.id}>
+                  <Checkbox value={x.id}>
+                    <Paragraph ellipsis={{ rows: 1, expandable: false }} style={{ minWidth: '100%' }}>
+                      {t(x.keyI18n)}
+                    </Paragraph>
+                  </Checkbox>
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
+        </Form.Item>
       )
     }));
     setRolesItem(item);
@@ -188,67 +186,65 @@ function Panel(props: IProps, ref: A) {
   };
 
   return (
-    <>
-      <Drawer
-        title={isEdit ? `${t('Manage_Role_Edit')}` : `${t('Manage_Role_Add')}`}
-        placement="right"
-        open={open}
-        extra={<CloseOutlined onClick={closeDrawer} />}
-        onClose={closeDrawer}
-        maskClosable={false}
-        closable={false}
-        width={720}
-        destroyOnClose={true}
-      >
-        {contextHolder}
-        <Steps
-          style={{ width: '70%', margin: 'auto', marginBottom: 20 }}
-          onChange={onStepChange}
-          current={step}
-          items={[{ title: t('Manage_Role_Info') }, { title: t('Manage_Role_Permission') }]}
-        />
-        {step === 0 && (
-          <>
-            <Form form={generalForm} layout="vertical" className={styles.panelform}>
-              <Form.Item
-                name="title"
-                label={t('Common_Title')}
-                rules={formRule.title}
-                className={customAlert?.userEmail && 'customFieldAlert'}
-              >
-                <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, title: '' })} />
-              </Form.Item>
-              {customAlert?.title && <div className="customAlert">{t('Common_TitleExist')}</div>}
-              <Form.Item name="description" label={t('Common_Description')}>
-                <TextArea maxLength={1000} rows={5} showCount />
-              </Form.Item>
-            </Form>
-          </>
-        )}
-        {step === 1 && (
-          <>
-            <Form form={permissionForm} layout="vertical" className={styles.panelform}>
-              <Collapse
-                items={roleItems}
-                bordered={false}
-                ghost
-                size="large"
-                expandIconPosition="end"
-                collapsible="icon"
-                defaultActiveKey={openDefault}
-              />
-            </Form>
-          </>
-        )}
-        <div className="actionBtnBottom">
-          <Button onClick={closeDrawer}>{t('Common_Cancel')}</Button>
-          {step !== 0 && <Button onClick={backStep}>{t('Common_Back')}</Button>}
-          <Button type="primary" onClick={onConfirm}>
-            {step === 1 ? t('Common_Confirm') : t('Common_Next')}
-          </Button>
-        </div>
-      </Drawer>
-    </>
+    <Drawer
+      title={isEdit ? `${t('Manage_Role_Edit')}` : `${t('Manage_Role_Add')}`}
+      placement="right"
+      open={open}
+      extra={<CloseOutlined onClick={closeDrawer} />}
+      onClose={closeDrawer}
+      maskClosable={false}
+      closable={false}
+      width={720}
+      destroyOnClose={true}
+    >
+      {contextHolder}
+      <Steps
+        style={{ width: '70%', margin: 'auto', marginBottom: 20 }}
+        onChange={onStepChange}
+        current={step}
+        items={[{ title: t('Manage_Role_Info') }, { title: t('Manage_Role_Permission') }]}
+      />
+      {step === 0 && (
+        <>
+          <Form form={generalForm} layout="vertical" className={styles.panelform}>
+            <Form.Item
+              name="title"
+              label={t('Common_Title')}
+              rules={formRule.title}
+              className={customAlert?.userEmail && 'customFieldAlert'}
+            >
+              <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, title: '' })} />
+            </Form.Item>
+            {customAlert?.title && <div className="customAlert">{t('Common_TitleExist')}</div>}
+            <Form.Item name="description" label={t('Common_Description')}>
+              <TextArea maxLength={1000} rows={5} showCount />
+            </Form.Item>
+          </Form>
+        </>
+      )}
+      {step === 1 && (
+        <>
+          <Form form={permissionForm} layout="vertical" className={styles.panelform}>
+            <Collapse
+              items={roleItems}
+              bordered={false}
+              ghost
+              size="large"
+              expandIconPosition="end"
+              collapsible="icon"
+              defaultActiveKey={openDefault}
+            />
+          </Form>
+        </>
+      )}
+      <div className="actionBtnBottom">
+        <Button onClick={closeDrawer}>{t('Common_Cancel')}</Button>
+        {step !== 0 && <Button onClick={backStep}>{t('Common_Back')}</Button>}
+        <Button type="primary" onClick={onConfirm}>
+          {step === 1 ? t('Common_Confirm') : t('Common_Next')}
+        </Button>
+      </div>
+    </Drawer>
   );
 }
 

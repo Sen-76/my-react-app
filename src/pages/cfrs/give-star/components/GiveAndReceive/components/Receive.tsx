@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import Record from './Record';
 import styles from '../../../GiveStar.module.scss';
-import { DatePicker, Divider, Skeleton, Space } from 'antd';
-import dayjs from 'dayjs';
+import { Divider, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
@@ -79,7 +78,7 @@ function Receive() {
             scrollableTarget="scrollableDivGive"
           >
             {data.map((item, index) => {
-              return <Record key={index} record={item} />;
+              return <Record key={index} record={item} refreshList={() => console.log('')} />;
             })}
           </InfiniteScroll>
         ) : (

@@ -233,99 +233,97 @@ function Panel(props: IProps, ref: A) {
   };
 
   return (
-    <>
-      <Drawer
-        title={isEdit ? `${t('edit account')}` : `${t('add account')}`}
-        placement="right"
-        open={open}
-        extra={<CloseOutlined onClick={closeDrawer} />}
-        onClose={closeDrawer}
-        maskClosable={false}
-        closable={false}
-        width={720}
-        destroyOnClose={true}
-      >
-        <Steps
-          style={{ width: '70%', margin: 'auto', marginBottom: 20 }}
-          onChange={onStepChange}
-          current={step}
-          items={[{ title: t('Manage_Account_GeneralInfo') }, { title: t('Manage_Account_SystemInfo') }]}
-        />
-        {step === 0 && (
-          <>
-            <Form form={generalForm} layout="vertical" className={styles.panelform}>
-              <Form.Item name="fullName" label={t('name')} rules={formRule.fullName}>
-                <Input maxLength={250} showCount />
-              </Form.Item>
-              <Form.Item
-                name="userEmail"
-                label={t('email')}
-                rules={formRule.userEmail}
-                className={customAlert?.userEmail && 'customFieldAlert'}
-              >
-                <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, userEmail: '' })} />
-              </Form.Item>
-              {customAlert?.userEmail && <div className="customAlert">{t('Manage_Account_Exist_Email')}</div>}
-              <Form.Item
-                name="userPhone"
-                label={t('phone')}
-                rules={formRule.userPhone}
-                className={customAlert?.userPhone && 'customFieldAlert'}
-              >
-                <Input onChange={() => setCustomAlert({ ...customAlert, userPhone: '' })} />
-              </Form.Item>
-              {customAlert?.userPhone && <div className="customAlert">{t('Manage_Account_Exist_Phone')}</div>}
-              <Form.Item name="dob" label={t('date of birth')} rules={formRule.dob}>
-                <DatePicker format={'DD MMM YYYY'} disabledDate={disabledDate} />
-              </Form.Item>
-              <Form.Item name="gender" label={t('gender')}>
-                <Select options={GenderOptions} />
-              </Form.Item>
-            </Form>
-          </>
-        )}
-        {step === 1 && (
-          <>
-            <Form form={systemForm} layout="vertical" className={styles.panelform}>
-              <Form.Item
-                name="userName"
-                label={t('username')}
-                rules={formRule.userName}
-                className={customAlert?.userName ? 'customFieldAlert' : ''}
-              >
-                <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, userName: '' })} />
-              </Form.Item>
-              {customAlert?.userName && <div className="customAlert">{t('Manage_Account_Exist_Username')}</div>}
-              <Form.Item name="jobTitle" label={t('job')}>
-                <Input maxLength={250} showCount />
-              </Form.Item>
-              <Form.Item name="userDepartmentId" label={t('department')}>
-                <Select
-                  options={departmentList}
-                  onSelect={(val) => {
-                    systemForm.setFieldValue('userTeam', '');
-                    getTeam(val);
-                  }}
-                />
-              </Form.Item>
-              <Form.Item name="userTeamId" label={t('team')}>
-                <Select options={teamList} />
-              </Form.Item>
-              <Form.Item name="userRoleId" label={t('role')} rules={formRule.userRole}>
-                <Select options={roleList} />
-              </Form.Item>
-            </Form>
-          </>
-        )}
-        <div className="actionBtnBottom">
-          <Button onClick={closeDrawer}>{t('Common_Cancel')}</Button>
-          {step !== 0 && <Button onClick={backStep}>{t('Common_Back')}</Button>}
-          <Button type="primary" onClick={onConfirm}>
-            {step === 1 ? t('Common_Confirm') : t('Common_Next')}
-          </Button>
-        </div>
-      </Drawer>
-    </>
+    <Drawer
+      title={isEdit ? `${t('edit account')}` : `${t('add account')}`}
+      placement="right"
+      open={open}
+      extra={<CloseOutlined onClick={closeDrawer} />}
+      onClose={closeDrawer}
+      maskClosable={false}
+      closable={false}
+      width={720}
+      destroyOnClose={true}
+    >
+      <Steps
+        style={{ width: '70%', margin: 'auto', marginBottom: 20 }}
+        onChange={onStepChange}
+        current={step}
+        items={[{ title: t('Manage_Account_GeneralInfo') }, { title: t('Manage_Account_SystemInfo') }]}
+      />
+      {step === 0 && (
+        <>
+          <Form form={generalForm} layout="vertical" className={styles.panelform}>
+            <Form.Item name="fullName" label={t('name')} rules={formRule.fullName}>
+              <Input maxLength={250} showCount />
+            </Form.Item>
+            <Form.Item
+              name="userEmail"
+              label={t('email')}
+              rules={formRule.userEmail}
+              className={customAlert?.userEmail && 'customFieldAlert'}
+            >
+              <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, userEmail: '' })} />
+            </Form.Item>
+            {customAlert?.userEmail && <div className="customAlert">{t('Manage_Account_Exist_Email')}</div>}
+            <Form.Item
+              name="userPhone"
+              label={t('phone')}
+              rules={formRule.userPhone}
+              className={customAlert?.userPhone && 'customFieldAlert'}
+            >
+              <Input onChange={() => setCustomAlert({ ...customAlert, userPhone: '' })} />
+            </Form.Item>
+            {customAlert?.userPhone && <div className="customAlert">{t('Manage_Account_Exist_Phone')}</div>}
+            <Form.Item name="dob" label={t('date of birth')} rules={formRule.dob}>
+              <DatePicker format={'DD MMM YYYY'} disabledDate={disabledDate} />
+            </Form.Item>
+            <Form.Item name="gender" label={t('gender')}>
+              <Select options={GenderOptions} />
+            </Form.Item>
+          </Form>
+        </>
+      )}
+      {step === 1 && (
+        <>
+          <Form form={systemForm} layout="vertical" className={styles.panelform}>
+            <Form.Item
+              name="userName"
+              label={t('username')}
+              rules={formRule.userName}
+              className={customAlert?.userName ? 'customFieldAlert' : ''}
+            >
+              <Input maxLength={250} showCount onChange={() => setCustomAlert({ ...customAlert, userName: '' })} />
+            </Form.Item>
+            {customAlert?.userName && <div className="customAlert">{t('Manage_Account_Exist_Username')}</div>}
+            <Form.Item name="jobTitle" label={t('job')}>
+              <Input maxLength={250} showCount />
+            </Form.Item>
+            <Form.Item name="userDepartmentId" label={t('department')}>
+              <Select
+                options={departmentList}
+                onSelect={(val) => {
+                  systemForm.setFieldValue('userTeam', '');
+                  getTeam(val);
+                }}
+              />
+            </Form.Item>
+            <Form.Item name="userTeamId" label={t('team')}>
+              <Select options={teamList} />
+            </Form.Item>
+            <Form.Item name="userRoleId" label={t('role')} rules={formRule.userRole}>
+              <Select options={roleList} />
+            </Form.Item>
+          </Form>
+        </>
+      )}
+      <div className="actionBtnBottom">
+        <Button onClick={closeDrawer}>{t('Common_Cancel')}</Button>
+        {step !== 0 && <Button onClick={backStep}>{t('Common_Back')}</Button>}
+        <Button type="primary" onClick={onConfirm}>
+          {step === 1 ? t('Common_Confirm') : t('Common_Next')}
+        </Button>
+      </div>
+    </Drawer>
   );
 }
 

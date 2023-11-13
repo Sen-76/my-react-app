@@ -22,6 +22,7 @@ function TaskDetail() {
   const [commentList, setCommentList] = useState<A[]>([]);
   const [historyList, setHistoryList] = useState<A[]>([]);
   const [editTitle, setEditTitle] = useState<boolean>(false);
+  const [currentHistoryPage, setCurrentHistoryPage] = useState<number>(1);
   const panelRef = useRef();
 
   const [form] = Form.useForm();
@@ -52,7 +53,6 @@ function TaskDetail() {
       await getStatusList();
       await getDetail();
       await getComment();
-      await getHistory();
       closeLoading();
     };
     fetchApi();
@@ -92,23 +92,34 @@ function TaskDetail() {
     }
   };
 
-  const getHistory = async () => {
+  const getHistory = async (nextPage?: number) => {
     try {
       const result = await service.taskService.history({
         maxResults: 10,
         orderBy: 'created',
-        page: 1,
+        page: !nextPage ? currentHistoryPage : nextPage,
         taskId: data.id ?? ''
       });
-      setHistoryList(result.data);
+      const test = result.data.map((x: A) => {
+        return { ...x, actionBody: JSON.parse(x.actionBody ?? '') };
+      });
+      console.log(test);
+      setHistoryList(test);
     } catch (e) {
       console.log(e);
     }
   };
 
+  const nextHistory = async () => {
+    const newPage = currentHistoryPage + 1;
+    setCurrentHistoryPage(newPage);
+    getHistory(newPage);
+  };
+
   const getDetail = async () => {
     try {
       const result = await service.taskService.getDetail(data.id ?? '');
+      await getHistory();
       setEditData(result.data);
     } catch (e) {
       console.log(e);
@@ -211,8 +222,8 @@ function TaskDetail() {
         <Activities
           commentList={commentList}
           refreshCommentList={getComment}
+          nextHistory={nextHistory}
           historyList={historyList}
-          refreshHistoryList={getHistory}
         />
       </Col>
       <Panel ref={panelRef} refreshList={() => console.log('cc')} />

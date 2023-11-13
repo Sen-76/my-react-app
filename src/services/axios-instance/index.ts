@@ -58,7 +58,7 @@ instance.interceptors.response.use(
     //     content: 'Something wrong. Please check api again!'
     //   });
     // }
-    else if (error.response?.status !== 200 && error.response?.status !== 422) {
+    else if (error.response?.status !== 200 && error.response?.status !== 422 && error.response?.status !== 400) {
       Modal.error({
         title: error.response?.status,
         content: 'Something wrong!'
