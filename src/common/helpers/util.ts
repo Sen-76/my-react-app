@@ -1,3 +1,5 @@
+import dayjs, { Dayjs } from 'dayjs';
+
 export const util = {
   newGuid() {
     if (crypto?.randomUUID) {
@@ -104,5 +106,9 @@ export const util = {
 
     const hexColor = `#${redHex}${greenHex}${blueHex}${alphaHex}`;
     return hexColor;
+  },
+
+  formatDate(date: string | Date | Dayjs) {
+    return dayjs(date).format('DD/MM/YYYY');
   }
 };

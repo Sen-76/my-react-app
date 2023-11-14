@@ -317,5 +317,8 @@
     "ResetPassword_Success" : "Đặt lại mật khẩu thành công!",
     "Common_More" : "Thêm",
     "Task_Histories" : "Lịch sử",
-    "Task_Add_Comment" : "Thêm bình luận ở đây"
+    "Task_Add_Comment" : "Thêm bình luận ở đây",
+    "OKR_My_ORKs": "Mục tiêu của tôi",
+    "OKR_Check_In": "Check In",
+    "Project_Task" : "Nhiệm vụ"
 }

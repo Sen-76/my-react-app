@@ -323,5 +323,8 @@
     "Common_More" : "More",
     "Task_Histories" : "Histories",
     "Task_Add_Comment" : "Add more comments in here",
-    "Task_Add_LinkIssues" : "Link tasks"
+    "Task_Add_LinkIssues" : "Link tasks",
+    "OKR_My_ORKs": "My OKRs",
+    "OKR_Check_In": "Check In",
+    "Project_Task" : "Tasks"
 }

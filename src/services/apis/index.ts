@@ -14,6 +14,7 @@ import { taskService } from './Task';
 import { postService } from './Post';
 import { taskTypeService } from './TaskType';
 import { commentService } from './Comment';
+import { okrService } from './OKR';
 export const service = {
   accountService,
   globalSettingsService,
@@ -30,5 +31,6 @@ export const service = {
   taskService,
   postService,
   taskTypeService,
-  commentService
+  commentService,
+  okrService
 };

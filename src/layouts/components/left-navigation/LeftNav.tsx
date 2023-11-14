@@ -124,22 +124,16 @@ function LeftNav(props: IProps) {
       key: 'okrs',
       children: [
         {
-          label: t('goals'),
-          path: '/okrs/goals',
+          label: t('OKR_My_ORKs'),
+          path: '/okrs/my-okrs',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'goals'
+          key: 'my-okrs'
         },
         {
-          label: t('reviews'),
-          path: '/okrs/reviews',
+          label: t('OKR_Check_In'),
+          path: '/okrs/check-in',
           icon: renderIcon(ArrowRightOutlined),
-          key: 'reviews'
-        },
-        {
-          label: t('feedbacks'),
-          path: '/okrs/feedbacks',
-          icon: renderIcon(ArrowRightOutlined),
-          key: 'feedbacks'
+          key: 'check-in'
         }
       ]
     },

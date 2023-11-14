@@ -1,31 +1,31 @@
-import { ERole } from '../../common/ERole';
 import { lazy } from 'react';
+import { ERole } from '../../common/ERole';
 
-const Goals = lazy(() => import('../../pages/okrs/goals/Goals'));
-const Reviews = lazy(() => import('../../pages/okrs/reviews/Reviews'));
-const Feedbacks = lazy(() => import('../../pages/okrs/feedbacks/Feedbacks'));
+const MyOKRs = lazy(() => import('../../pages/okrs/my-okrs/list/MyOKRsList'));
+const MyOKRDetail = lazy(() => import('../../pages/okrs/my-okrs/details/MyOKRDetails'));
+const Reviews = lazy(() => import('../../pages/okrs/check-in/CheckIn'));
 
 const routes: IRouter.IRoute<'/okrs'>[] = [
   {
-    path: '/okrs/goals',
-    name: 'goals',
+    path: '/okrs/my-okrs',
+    name: 'my-okrs',
     exact: true,
-    element: Goals,
-    meta: { role: [ERole.Admin], pageTitle: 'Goals', leftKey: 'goals' }
+    element: MyOKRs,
+    meta: { role: [ERole.Admin], pageTitle: 'My OKRs', leftKey: 'my-okrs' }
   },
   {
-    path: '/okrs/reviews',
-    name: 'goals',
+    path: '/okrs/my-okrs/:id',
+    name: 'my-okrs-details',
+    exact: true,
+    element: MyOKRDetail,
+    meta: { role: [ERole.Admin], pageTitle: 'OKRs Detail', leftKey: 'my-okrs' }
+  },
+  {
+    path: '/okrs/check-in',
+    name: 'check-in',
     exact: true,
     element: Reviews,
     meta: { role: [ERole.Admin], pageTitle: 'Reviews', leftKey: 'reviews' }
-  },
-  {
-    path: '/okrs/feedbacks',
-    name: 'feedbacks',
-    exact: true,
-    element: Feedbacks,
-    meta: { role: [ERole.Admin], pageTitle: 'Feedbacks', leftKey: 'feedbacks' }
   }
 ];
 

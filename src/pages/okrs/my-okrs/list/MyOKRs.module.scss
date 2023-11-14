@@ -1,0 +1,23 @@
+.myOKRs {
+    margin: 16px;
+
+    :global {
+        .month-picker {
+            display: block;
+            width: 25%;
+            margin-left: auto;
+        }
+
+        .status-count-box {
+            border: 1px solid #c2c2c2;
+            border-radius: 5%; 
+            padding: 0.5rem 1rem
+        }
+
+        .color-dot {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+        }
+    }
+}
