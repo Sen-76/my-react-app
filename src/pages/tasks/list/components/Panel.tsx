@@ -60,6 +60,7 @@ function Panel(props: IProps, ref: A) {
   const [editData, setEditData] = useState<A>();
   const [searchAssigneeValue, setSearchAssigneeValue] = useState<string>('');
   const userDebouncedAssignee = useDebounce(searchAssigneeValue, 300);
+  const [fileAccept, setFileAccept] = useState<A>();
   const { getLoginUser } = useLoginManager();
 
   useEffect(() => {
@@ -347,6 +348,7 @@ function Panel(props: IProps, ref: A) {
     return current && current < dayjs().startOf('day');
   };
 
+  let uploadFlag = false;
   const fileProps: UploadProps = {
     onRemove: (file) => {
       const index = fileList.indexOf(file);
@@ -355,10 +357,34 @@ function Panel(props: IProps, ref: A) {
       setFileList(newFileList);
       setFileListFormat(fileListFormat.filter((x) => x.id !== file.uid));
     },
-    beforeUpload: (file) => {
-      setFileList([...fileList, file]);
-
-      return false;
+    beforeUpload: (file, list) => {
+      if (!uploadFlag) {
+        uploadFlag = true;
+        let test: A[] = [];
+        list.forEach((filex) => {
+          let fileType = filex.type;
+          if (filex.type === 'application/msword') fileType = 'application/docs';
+          const type = fileAccept.fileAccept.split(', ').includes(fileType.split('/')[1]);
+          if (!type) {
+            notification.open({
+              message: t(`You can only upload ${fileAccept.fileAccept} file!`),
+              type: 'error'
+            });
+            return false;
+          }
+          const size = filex.size < fileAccept.fileSize * 1024 * 1024;
+          if (!size) {
+            notification.open({
+              message: t(`Image must be smaller than ${fileAccept.fileSize}MB!`),
+              type: 'error'
+            });
+            return false;
+          } else {
+            test = [...test, filex];
+          }
+        });
+        setFileList([...fileList, ...test]);
+      }
     },
     fileList
   };
@@ -380,6 +406,18 @@ function Panel(props: IProps, ref: A) {
     await getTaskList(val);
     setProjectId(val);
     closeLoading();
+  };
+  useEffect(() => {
+    getFileConfig();
+  }, []);
+
+  const getFileConfig = async () => {
+    try {
+      const result = await service.globalSettingsService.getByType(1);
+      setFileAccept(result.detail.filter((x: A) => x.title === 'Attachments')[0]);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

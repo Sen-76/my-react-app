@@ -33,7 +33,9 @@ function TaskDetail() {
       setEditTitle(false);
       await service.taskService.update({
         ...editData,
-        ...form.getFieldsValue()
+        ...form.getFieldsValue(),
+        taskLinkIds: editData.taskLinks.map((x: A) => x.tasklink.id),
+        attachments: editData.fileAttachments
       });
       getDetail();
     } catch (e) {
@@ -100,12 +102,9 @@ function TaskDetail() {
         page: !nextPage ? currentHistoryPage : nextPage,
         taskId: data.id ?? ''
       });
-      const test = result.data.actionBody
-        ? result.data.map((x: A) => {
-            return { ...x, actionBody: JSON.parse(x.actionBody ?? '') };
-          })
-        : result.data;
-      console.log(test);
+      const test = result.data.map((x: A) => {
+        return { ...x, actionBody: x.actionBody ? JSON.parse(x.actionBody ?? '') : {} };
+      });
       setHistoryList(test);
     } catch (e) {
       console.log(e);

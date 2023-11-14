@@ -8,7 +8,6 @@ import {
   Empty,
   Form,
   Image,
-  Input,
   List,
   Modal,
   Row,
@@ -17,7 +16,8 @@ import {
   Tooltip,
   Typography,
   Upload,
-  UploadProps
+  UploadProps,
+  notification
 } from 'antd';
 import styles from '../TaskDetail.module.scss';
 import { useTranslation } from 'react-i18next';
@@ -60,6 +60,7 @@ function TaskInformation(props: Readonly<IProps>) {
   const [searchAssigneeValue, setSearchAssigneeValue] = useState<string>('');
   const userDebouncedAssignee = useDebounce(searchAssigneeValue, 300);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fileAccept, setFileAccept] = useState<A>();
   const [form] = Form.useForm();
   const { Dragger } = Upload;
 
@@ -136,7 +137,7 @@ function TaskInformation(props: Readonly<IProps>) {
         assignee: form.getFieldValue('assignee')?.value ? form.getFieldValue('assignee')?.value : data.assignee,
         reportTo: form.getFieldValue('reportTo')?.value ? form.getFieldValue('reportTo')?.value : data.reportTo,
         attachments: attach && attach.length > 0 ? attach : cleanData.fileAttachments,
-        taskLinkIds: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.id) ?? []
+        taskLinkIds: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.taskLinkId) ?? []
       });
       refreshData();
     } catch (e) {
@@ -171,11 +172,48 @@ function TaskInformation(props: Readonly<IProps>) {
 
   let uploadFlag = false;
   const uploadProps: UploadProps = {
-    beforeUpload: (file: A, fileList: A) => {
+    beforeUpload: (file: A, list: A) => {
       if (!uploadFlag) {
-        handleUpload(fileList);
+        let test: A[] = [];
+        list.forEach((filex: A) => {
+          let fileType = filex.type;
+          if (filex.type === 'application/msword') fileType = 'application/docs';
+          const type = fileAccept.fileAccept.split(', ').includes(fileType.split('/')[1]);
+          if (!type) {
+            notification.open({
+              message: t(`You can only upload ${fileAccept.fileAccept} file!`),
+              type: 'error'
+            });
+            return false;
+          }
+          const size = filex.size < fileAccept.fileSize * 1024 * 1024;
+          if (!size) {
+            notification.open({
+              message: t(`Image must be smaller than ${fileAccept.fileSize}MB!`),
+              type: 'error'
+            });
+            return false;
+          } else {
+            test = [...test, filex];
+          }
+        });
+        handleUpload(test);
+        uploadFlag = true;
       }
       return false;
+    }
+  };
+
+  useEffect(() => {
+    getFileConfig();
+  }, []);
+
+  const getFileConfig = async () => {
+    try {
+      const result = await service.globalSettingsService.getByType(1);
+      setFileAccept(result.detail.filter((x: A) => x.title === 'Attachments')[0]);
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -196,12 +234,12 @@ function TaskInformation(props: Readonly<IProps>) {
       });
       const result = await service.taskService.uploadAttach(formData);
       await updateInfo([...data.fileAttachments, ...result.data]);
-      uploadFlag = true;
       refreshData();
     } catch (e) {
       console.log(e);
     } finally {
       closeLoading();
+      uploadFlag = false;
     }
   };
 
@@ -302,15 +340,25 @@ function TaskInformation(props: Readonly<IProps>) {
       ]
     };
     return editedField !== 'description' ? (
-      <Button
-        type="text"
-        style={{ padding: 5, display: 'flex', width: '100%', alignItems: 'center', height: 'auto' }}
-        onClick={() => editField('description')}
-      >
-        <div className="ql-editor" style={{ width: '100%' }}>
-          <div dangerouslySetInnerHTML={{ __html: data?.description }} />
-        </div>
-      </Button>
+      data?.description ? (
+        <Button
+          type="text"
+          style={{ padding: 5, display: 'flex', width: '100%', alignItems: 'center', height: 'auto' }}
+          onClick={() => editField('description')}
+        >
+          <div className="ql-editor" style={{ width: '100%' }}>
+            <div dangerouslySetInnerHTML={{ __html: data?.description }} />
+          </div>
+        </Button>
+      ) : (
+        <Button
+          type="text"
+          style={{ padding: 5, display: 'flex', width: '100%', alignItems: 'center', height: 'auto' }}
+          onClick={() => editField('description')}
+        >
+          <Empty />
+        </Button>
+      )
     ) : (
       <>
         <Form.Item name="description" rules={requiredRule} style={{ width: '100%' }}>
@@ -400,7 +448,7 @@ function TaskInformation(props: Readonly<IProps>) {
                 onClick={() =>
                   updateInfo(
                     undefined,
-                    data.taskLinks?.filter((x: A) => x.id !== item.id)?.map((x: A) => x.id)
+                    data.taskLinks?.filter((x: A) => x.taskLinkId !== item.taskLinkId)?.map((x: A) => x.taskLinkId)
                   )
                 }
                 icon={<DeleteOutlined />}
@@ -605,6 +653,7 @@ function TaskInformation(props: Readonly<IProps>) {
         <Button
           disabled={data.status?.title === 'Done'}
           style={{ padding: 10, marginBottom: '-10px' }}
+          onClick={() => (uploadFlag = false)}
           type="text"
           icon={<PlusOutlined />}
         />
@@ -627,7 +676,7 @@ function TaskInformation(props: Readonly<IProps>) {
   const showModal = () => {
     form.setFieldValue(
       'taskLinksMore',
-      data.taskLinks.map((x: A) => ({ label: `[` + x.taskLink.key + `] ` + x.taskLink.summary, value: x.id }))
+      data.taskLinks.map((x: A) => x.taskLinkId)
     );
     setIsModalOpen(true);
   };

@@ -58,24 +58,97 @@ function LeaderBoard() {
     );
 
   return (
-    <div className={styles.contentLibary}>
-      <div style={{ marginBottom: 20 }}>
-        <div>
-          <div className="top-1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600 }}>Top 1</span>
-            <Avatar src={data[0]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
-              {data[0]?.user?.fullName?.charAt(0)}
-            </Avatar>
+    <div className={styles.leaderboard}>
+      <div style={{ marginBottom: 75 }}>
+        <div
+          className="top-1"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative',
+            zIndex: '10'
+          }}
+        >
+          <div
+            style={{
+              width: 200,
+              height: 170,
+              background: '#b44a4aa8',
+              marginTop: 50,
+              position: 'absolute',
+              zIndex: '0',
+              borderTopRightRadius: '45%',
+              borderTopLeftRadius: '45%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column'
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>{data[0]?.user?.fullName}</div>
+            <div>
+              {data[0]?.numberStars}
+              <StarOutlined style={{ marginLeft: 10 }} />
+            </div>
           </div>
+          <span style={{ fontWeight: 600 }}>Top 1</span>
+          <Avatar src={data[0]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
+            {data[0]?.user?.fullName?.charAt(0)}
+          </Avatar>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', marginTop: '-60px' }}>
           <div className="top-2" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div
+              style={{
+                width: 200,
+                height: 129,
+                background: '#b44a4aa8',
+                marginTop: 50,
+                position: 'absolute',
+                zIndex: '0',
+                borderTopRightRadius: '45%',
+                borderTopLeftRadius: '45%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column'
+              }}
+            >
+              <div style={{ fontWeight: 600, marginTop: 30 }}>{data[1]?.user?.fullName}</div>
+              <div>
+                {data[1]?.numberStars}
+                <StarOutlined style={{ marginLeft: 10 }} />
+              </div>
+            </div>
             <span style={{ fontWeight: 600 }}>Top 2</span>
             <Avatar src={data[1]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
               {data[1]?.user?.fullName?.charAt(0)}
             </Avatar>
           </div>
           <div className="top-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div
+              style={{
+                width: 200,
+                height: 129,
+                background: '#b44a4aa8',
+                marginTop: 50,
+                position: 'absolute',
+                zIndex: '0',
+                borderTopRightRadius: '45%',
+                borderTopLeftRadius: '45%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column'
+              }}
+            >
+              <div style={{ fontWeight: 600, marginTop: 30 }}>{data[2]?.user?.fullName}</div>
+              <div>
+                {data[2]?.numberStars}
+                <StarOutlined style={{ marginLeft: 10 }} />
+              </div>
+            </div>
             <span style={{ fontWeight: 600 }}>Top 3</span>
             <Avatar src={data[2]?.user?.avatarUrl?.url} style={{ backgroundColor: util.randomColor() }} size={80}>
               {data[2]?.user?.fullName?.charAt(0)}

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { Avatar, message, Upload } from 'antd';
+import { Avatar, notification, Upload } from 'antd';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { util } from '@/common/helpers/util';
 import ImgCrop from 'antd-img-crop';
 import { service } from '@/services/apis';
 import { useLoading } from '@/common/context/useLoading';
+import { useTranslation } from 'react-i18next';
 
 const getBase64 = (img: RcFile, callback: (url: string) => void) => {
   const reader = new FileReader();
@@ -24,35 +25,43 @@ const EditAvatar = (props: IProps) => {
   const { showLoading, closeLoading } = useLoading();
   const { imageLink, name } = props;
   const [loading, setLoading] = useState(false);
+  const [fileAccept, setFileAccept] = useState<A>();
   const [imageUrl, setImageUrl] = useState<string>(imageLink);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    getFileConfig();
+  }, []);
+
+  const getFileConfig = async () => {
+    try {
+      setLoading(true);
+      const result = await service.globalSettingsService.getByType(1);
+      setFileAccept(result.detail.filter((x: A) => x.title === 'Avatar')[0]);
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const onModalOk = async (value: A) => {
+    try {
+      showLoading();
+      const formData = new FormData();
+      formData.append('file', value, value.name);
+      formData.append('outletId', 'la cai d gi');
+      formData.append('comment', 'comment làm cái đúng gì');
+      formData.append('id', props.id.toString());
+      await service.accountService.uploadAvatar(formData);
+      props.refreshList();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      closeLoading();
+    }
+  };
 
   const fileProps: UploadProps = {
-    beforeUpload: async (file: A) => {
-      try {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) {
-          message.error('You can only upload JPG/PNG file!');
-        }
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) {
-          message.error('Image must smaller than 2MB!');
-          closeLoading();
-          return;
-        }
-        showLoading();
-        const formData = new FormData();
-        formData.append('file', file, file.name);
-        formData.append('outletId', 'la cai d gi');
-        formData.append('comment', 'comment làm cái đúng gì');
-        formData.append('id', props.id.toString());
-        await service.accountService.uploadAvatar(formData);
-        props.refreshList();
-      } catch (e) {
-        console.log(e);
-      } finally {
-        closeLoading();
-      }
-    },
     showUploadList: false
   };
 
@@ -76,9 +85,36 @@ const EditAvatar = (props: IProps) => {
     </div>
   );
 
+  const beforeUpload = async (file: RcFile) => {
+    try {
+      const type = fileAccept.fileAccept.split(', ').includes(file.type.split('/')[1]);
+      if (!type) {
+        notification.open({
+          message: t(`You can only upload ${fileAccept.fileAccept} file!`),
+          type: 'error'
+        });
+        return Upload.LIST_IGNORE;
+      }
+
+      const size = file.size < fileAccept.fileSize * 1024 * 1024;
+      if (!size) {
+        notification.open({
+          message: t(`Image must be smaller than ${fileAccept.fileSize}MB!`),
+          type: 'error'
+        });
+        return Upload.LIST_IGNORE;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error during file validation:', error);
+      return Upload.LIST_IGNORE;
+    }
+  };
+
   return (
     <>
-      <ImgCrop rotationSlider>
+      <ImgCrop rotationSlider zoomSlider showGrid onModalOk={onModalOk} beforeCrop={beforeUpload}>
         <Upload
           {...fileProps}
           name="avatar"
@@ -86,6 +122,7 @@ const EditAvatar = (props: IProps) => {
           className="avatar-uploader"
           showUploadList={false}
           onChange={handleChange}
+          accept="jpg"
         >
           {imageUrl ? (
             <>

@@ -1,6 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CloseOutlined, SearchOutlined } from '@ant-design/icons';
-import { Avatar, Button, Drawer, Empty, Form, Select, Spin, Typography } from 'antd';
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Col,
+  Collapse,
+  CollapseProps,
+  Drawer,
+  Empty,
+  Form,
+  Row,
+  Select,
+  Spin,
+  Typography
+} from 'antd';
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import styles from '../Task.module.scss';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +39,7 @@ function FilterPanel(props: IProps, ref: A) {
   const [priotyList, setPriotyList] = useState<Account.IAccountModel[]>([]);
   const [searchAssigneeValue, setSearchAssigneeValue] = useState<string>('');
   const userDebouncedAssignee = useDebounce(searchAssigneeValue, 300);
+  const [items, setItems] = useState<CollapseProps['items']>([]);
 
   const { t } = useTranslation();
   const [form] = Form.useForm();
@@ -176,15 +191,85 @@ function FilterPanel(props: IProps, ref: A) {
           obj[item.key] = item.value;
           return obj;
         }, {});
-        console.log(data);
         form.setFieldsValue(data);
       }
       setOpen(true);
+      getFilterValue();
     } catch (e) {
       console.log(e);
     } finally {
       closeLoading();
     }
+  };
+
+  const getFilterValue = () => {
+    const StatusElement = (
+      <Form.Item name="statusId">
+        <Checkbox.Group>
+          <Row>
+            {statusList?.map((item: A) => (
+              <Col span={12} key={item.value} className={styles.col}>
+                <Checkbox value={item.value}>
+                  <Paragraph ellipsis={{ rows: 4, expandable: false }}>{item.label}</Paragraph>
+                </Checkbox>
+              </Col>
+            ))}
+          </Row>
+        </Checkbox.Group>
+      </Form.Item>
+    );
+    const PriotyElement = (
+      <Form.Item name="taskPriotyId">
+        <Checkbox.Group>
+          <Row>
+            {priotyList?.map((item: A) => (
+              <Col span={12} key={item.value} className={styles.col}>
+                <Checkbox value={item.value}>
+                  <Paragraph ellipsis={{ rows: 4, expandable: false }}>{item.label}</Paragraph>
+                </Checkbox>
+              </Col>
+            ))}
+          </Row>
+        </Checkbox.Group>
+      </Form.Item>
+    );
+    const MilestoneElement = (
+      <Form.Item name="milestoneId">
+        <Checkbox.Group>
+          <Row>
+            {mileStoneList?.map((item: A) => (
+              <Col span={12} key={item.value} className={styles.col}>
+                <Checkbox value={item.value}>
+                  <Paragraph ellipsis={{ rows: 4, expandable: false }}>{item.label}</Paragraph>
+                </Checkbox>
+              </Col>
+            ))}
+          </Row>
+        </Checkbox.Group>
+      </Form.Item>
+    );
+    const ProjectElement = (
+      <Form.Item name="projectId">
+        <Checkbox.Group>
+          <Row>
+            {projectList?.map((item: A) => (
+              <Col span={12} key={item.value} className={styles.col}>
+                <Checkbox value={item.value}>
+                  <Paragraph ellipsis={{ rows: 4, expandable: false }}>{item.label}</Paragraph>
+                </Checkbox>
+              </Col>
+            ))}
+          </Row>
+        </Checkbox.Group>
+      </Form.Item>
+    );
+    const item = [
+      { key: 'status', label: t('Task_Status'), children: StatusElement },
+      { key: 'prioty', label: t('Task_Priority'), children: PriotyElement },
+      { key: 'milestone', label: t('Task_Milestone'), children: MilestoneElement },
+      { key: 'project', label: t('Task_Project'), children: ProjectElement }
+    ];
+    setItems(item);
   };
 
   const closeDrawer = () => {
@@ -215,19 +300,16 @@ function FilterPanel(props: IProps, ref: A) {
         destroyOnClose={true}
       >
         <Form form={form} onFinish={onFinish} layout="vertical" className={styles.panelform}>
-          <Form.Item name="projectId" label={t('Task_Project')}>
-            <Select options={projectList} mode="multiple" />
-          </Form.Item>
-          <Form.Item name="milestoneId" label={t('Task_Milestone')}>
-            <Select options={mileStoneList} mode="multiple" />
-          </Form.Item>
-          <Form.Item name="statusId" label={t('Task_Status')}>
-            <Select options={statusList} mode="multiple" />
-          </Form.Item>
-          <Form.Item name="taskPriotyId" label={t('Task_Priority')}>
-            <Select options={priotyList} mode="multiple" />
-          </Form.Item>
-          <Form.Item name="assignee" label={t('Task_Assignee')}>
+          <Collapse
+            items={items}
+            bordered={false}
+            defaultActiveKey={['milestone', 'prioty', 'status', 'project']}
+            ghost
+            size="large"
+            expandIconPosition="end"
+            collapsible="icon"
+          />
+          <Form.Item name="assignee" label={t('Task_Assignee')} style={{ marginTop: 10 }}>
             <Select
               labelInValue
               showSearch

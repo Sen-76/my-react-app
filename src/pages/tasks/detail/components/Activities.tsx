@@ -25,10 +25,7 @@ function Activities(props: Readonly<IProps>) {
         children: <History historyList={historyList} nextHistory={nextHistory} />
       }
     ];
-    const onTabChanged = () => {
-      console.log('cc');
-    };
-    return <Tabs items={tabItems} size="large" onChange={onTabChanged} />;
+    return <Tabs items={tabItems} size="large" />;
   };
   const items = [{ key: 'Activities', label: t('Common_Activities'), children: onRenderNothing() }];
   return <Collapse items={items} bordered={false} defaultActiveKey={['Activities']} ghost size="large" />;

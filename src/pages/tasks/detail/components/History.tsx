@@ -3,7 +3,7 @@ import { util } from '@/common/helpers/util';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Avatar, Divider, List, Skeleton, Tag } from 'antd';
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import React from 'react';
 import { EActionType } from '../Task.model';
 import { useTranslation } from 'react-i18next';
 import icons from '@/assets/icons';
@@ -68,6 +68,32 @@ function History(props: Readonly<IProps>) {
                       <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
                       <div style={{ marginRight: 5 }}> {t('made changes')} </div>
                       {t('task prioty')}
+                    </div>
+                    -
+                    <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
+                      {dayjs(item.updateDate).format('DD MMM YYYY HH:mm')}
+                    </div>
+                  </div>
+                ) : item.actionBody.field === 'summary' ? (
+                  <div style={{ display: 'flex' }}>
+                    <div>{item.title}</div>
+                    <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
+                      <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
+                      <div style={{ marginRight: 5 }}> {t('made changes')} </div>
+                      {t('title')}
+                    </div>
+                    -
+                    <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
+                      {dayjs(item.updateDate).format('DD MMM YYYY HH:mm')}
+                    </div>
+                  </div>
+                ) : item.actionBody.field === 'milestone' ? (
+                  <div style={{ display: 'flex' }}>
+                    <div>{item.title}</div>
+                    <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
+                      <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
+                      <div style={{ marginRight: 5 }}> {t('made changes')} </div>
+                      {t('task milestone')}
                     </div>
                     -
                     <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
@@ -157,6 +183,18 @@ function History(props: Readonly<IProps>) {
                       <IconShow value={item.actionBody.to?.iconUrl} disabled style={{ marginRight: 10 }} />
                       {item.actionBody.to.pname}
                     </Tag>
+                  </div>
+                ) : item.actionBody.field === 'milestone' ? (
+                  <div style={{ display: 'flex', gap: 20 }}>
+                    {item.actionBody.from.title}
+                    <ArrowRightOutlined />
+                    {item.actionBody.to.title}
+                  </div>
+                ) : item.actionBody.field === 'summary' ? (
+                  <div style={{ display: 'flex', gap: 20 }}>
+                    {item.actionBody.from}
+                    <ArrowRightOutlined />
+                    {item.actionBody.to}
                   </div>
                 ) : item.actionBody.field === 'status' ? (
                   <div style={{ display: 'flex', gap: 20 }}>
