@@ -127,6 +127,11 @@ function TaskDetail() {
     }
   };
 
+  const refreshData = async () => {
+    await getDetail();
+    await getHistory();
+  };
+
   const breadcrumItem = () => {
     const project: Partial<BreadcrumbItemType & BreadcrumbSeparatorType> = {};
     const task: Partial<BreadcrumbItemType & BreadcrumbSeparatorType> = {};
@@ -219,7 +224,7 @@ function TaskDetail() {
         style={{ width: 200 }}
       />
       <Col style={{ marginTop: 10 }}>
-        <TaskInformation data={editData} refreshData={getDetail} setEditTitle={setEditTitle} />
+        <TaskInformation data={editData} refreshData={refreshData} setEditTitle={setEditTitle} />
         <Activities
           commentList={commentList}
           refreshCommentList={getComment}

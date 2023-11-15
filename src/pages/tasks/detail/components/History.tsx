@@ -16,7 +16,7 @@ interface IProps {
 function History(props: Readonly<IProps>) {
   const { historyList, nextHistory } = props;
   const { t } = useTranslation();
-
+  console.log(historyList);
   const IconShow = ({ value, ...props }: A) => {
     const iconItem = icons.find((icon) => icon.value === value);
     return iconItem ? React.cloneElement(iconItem.component, props) : null;
@@ -50,11 +50,50 @@ function History(props: Readonly<IProps>) {
                 </Avatar>
               }
               title={
-                item.actionType == EActionType.Create ? (
+                !item.actionBody?.field ? (
                   <div style={{ display: 'flex' }}>
                     <div>{item.title}</div>
                     <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20 }}>
                       {item.author?.fullName} {t('created task')}
+                    </div>
+                    -
+                    <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
+                      {dayjs(item.updateDate).format('DD MMM YYYY HH:mm')}
+                    </div>
+                  </div>
+                ) : item.actionBody.field === 'link' ? (
+                  <div style={{ display: 'flex' }}>
+                    <div>{item.title}</div>
+                    <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
+                      <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
+                      <div style={{ marginRight: 5 }}> {t('added')} </div>
+                      {t('task link')}
+                    </div>
+                    -
+                    <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
+                      {dayjs(item.updateDate).format('DD MMM YYYY HH:mm')}
+                    </div>
+                  </div>
+                ) : item.actionBody.field === 'attachment' ? (
+                  <div style={{ display: 'flex' }}>
+                    <div>{item.title}</div>
+                    <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
+                      <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
+                      <div style={{ marginRight: 5 }}> {t('added')} </div>
+                      {t('attachment')}
+                    </div>
+                    -
+                    <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
+                      {dayjs(item.updateDate).format('DD MMM YYYY HH:mm')}
+                    </div>
+                  </div>
+                ) : item.actionBody.field === 'comment' ? (
+                  <div style={{ display: 'flex' }}>
+                    <div>{item.title}</div>
+                    <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
+                      <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
+                      <div style={{ marginRight: 5 }}> {item.actionBody.from ? t('edited') : t('added')} </div>
+                      {t('comment')}
                     </div>
                     -
                     <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
@@ -126,7 +165,7 @@ function History(props: Readonly<IProps>) {
                       {dayjs(item.updateDate).format('DD MMM YYYY HH:mm')}
                     </div>
                   </div>
-                ) : item.actionBody.field === 'assignee' ? (
+                ) : item.actionBody.field === 'assignee2' ? (
                   <div style={{ display: 'flex' }}>
                     <div>{item.title}</div>
                     <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
@@ -159,7 +198,7 @@ function History(props: Readonly<IProps>) {
                       <div style={{ fontWeight: 400, marginLeft: 5, marginRight: 20, display: 'flex' }}>
                         <div style={{ marginRight: 5, color: '#3b73af' }}>{item.author?.fullName}</div>
                         <div style={{ marginRight: 5 }}> {t('made changes')} </div>
-                        {t('task relation link')}
+                        {t('reporter')}
                       </div>
                       -
                       <div style={{ fontWeight: 400, opacity: 0.8, fontSize: 14, marginLeft: 20 }}>
@@ -170,8 +209,22 @@ function History(props: Readonly<IProps>) {
                 )
               }
               description={
-                item.actionType == EActionType.Create ? (
+                !item.actionBody?.field ? (
                   <></>
+                ) : item.actionBody.field === 'link' ? (
+                  <div style={{ display: 'flex', gap: 20 }}>{item.actionBody.to.key}</div>
+                ) : item.actionBody.field === 'attachment' ? (
+                  <div style={{ display: 'flex', gap: 20 }}>{item.actionBody.to.fileName}</div>
+                ) : item.actionBody.field === 'comment' ? (
+                  <div className="ql-editor" style={{ width: '100%', display: 'flex', gap: 20 }}>
+                    {item.actionBody.from && (
+                      <>
+                        <div style={{ width: '40%' }} dangerouslySetInnerHTML={{ __html: item.actionBody.from }} />{' '}
+                        <ArrowRightOutlined />
+                      </>
+                    )}
+                    <div style={{ width: '40%' }} dangerouslySetInnerHTML={{ __html: item.actionBody.to }} />
+                  </div>
                 ) : item.actionBody.field === 'taskPrioty' ? (
                   <div style={{ display: 'flex', gap: 20 }}>
                     <Tag>
@@ -208,7 +261,7 @@ function History(props: Readonly<IProps>) {
                     <ArrowRightOutlined />
                     {dayjs(item.actionBody.to).format('DD MMM YYYY')}
                   </div>
-                ) : item.actionBody.field === 'assignee' ? (
+                ) : item.actionBody.field === 'assignee2' ? (
                   <div style={{ display: 'flex', gap: 20 }}>
                     {item.actionBody.from.fullName}
                     <ArrowRightOutlined />

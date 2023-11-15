@@ -103,7 +103,7 @@ function Comment(props: Readonly<IProps>) {
   return (
     <div className={styles.comment}>
       <Row style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 20 }}>
-        <Avatar size={44} src={avatar} style={{ marginRight: 10, backgroundColor: util.randomColor() }}>
+        <Avatar size={44} src={avatar} style={{ marginRight: 5, backgroundColor: util.randomColor() }}>
           {user.fullName?.charAt(0)}
         </Avatar>
         {!addComment ? (
@@ -156,7 +156,7 @@ function Comment(props: Readonly<IProps>) {
                     <Avatar
                       size={44}
                       src={item.author?.avatarUrl.url ?? ''}
-                      style={{ marginRight: 10, backgroundColor: util.randomColor() }}
+                      style={{ marginRight: 5, backgroundColor: util.randomColor() }}
                     >
                       {item.author?.fullName?.charAt(0)}
                     </Avatar>
@@ -197,7 +197,7 @@ function Comment(props: Readonly<IProps>) {
                 <Avatar
                   size={44}
                   src={item.user?.avatar ?? ''}
-                  style={{ marginRight: 10, backgroundColor: util.randomColor() }}
+                  style={{ marginRight: 5, backgroundColor: util.randomColor() }}
                 >
                   {user.fullName?.charAt(0)}
                 </Avatar>

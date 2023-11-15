@@ -125,7 +125,7 @@ function Kanban(props: IProps) {
                 return (
                   <div className={styles.task} key={status.id + '' + task.id}>
                     <div>
-                      <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#222' }}>
+                      <Link to={`/tasks/task-detail/${task.key}/${task.id}`} style={{ color: '#000000' }}>
                         <div style={{ fontWeight: 500, fontSize: 16, lineHeight: '32px' }}>
                           [{task?.key}] {task.summary}
                         </div>

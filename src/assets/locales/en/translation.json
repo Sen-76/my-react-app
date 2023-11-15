@@ -326,5 +326,16 @@
     "Task_Add_LinkIssues" : "Link tasks",
     "OKR_My_ORKs": "My OKRs",
     "OKR_Check_In": "Check In",
-    "Project_Task" : "Tasks"
+    "Project_Task" : "Tasks",
+    "Permission_Assign_Kick_Team_Member" : "Assign And Kick Team Member",
+    "Permission_Can_Manager_All_Team" : "Can Manager All Team",
+    "Permision_Can_Manager_Project" : "Can Manager Project",
+    "Permission_Can_Manager_All_Department" : "Can manager all department",
+    "Permission_Assign_And_Kick_Member_Department" : "Assign And Kick Member In Department",
+    "Permission_Can_Manager_All_Employees" : "Can Manager All employees",
+    "Permission_Restore_User_Employees" : "Restore User",
+    "Permission_Review_OKR_All_Departments" : "Review OKR all departments",
+    "Permission_Update_Team" : "Edit team",
+    "Edit_Project" : "Edit project",
+    "Permission_Create_Task" : "Create task"
 }

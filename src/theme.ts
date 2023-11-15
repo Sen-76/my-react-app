@@ -2,7 +2,7 @@ export default {
   token: {
     colorPrimary: '#3762ea',
     fontFamily: 'Open Sans, Segoe UI, Helvetica Neue, Arial, sans-serif',
-    colorText: '#222222',
+    colorText: '#000000',
     colorTextSecondary: '#4B5566'
   },
   components: {

@@ -22,7 +22,9 @@ export const commentService = {
   },
   async delete(param: A): Promise<A> {
     try {
-      const response = await axiosInstance.delete('/task/delete', param);
+      const response = await axiosInstance.delete('/task/delete', {
+        data: param
+      });
       return response.data;
     } catch (error) {
       console.error('An error occurred while delete comment:', error);

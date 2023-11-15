@@ -13,7 +13,7 @@ const generateOption = (props: PieChartProps) => {
       trigger: 'item',
       formatter: '{b} {c} <div>{d}%</div>',
       textStyle: {
-        color: '#222'
+        color: '#000000'
       }
     },
     legend: {

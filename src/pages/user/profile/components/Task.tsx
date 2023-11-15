@@ -10,9 +10,10 @@ interface IProps {
   task: A[];
   param: Common.IDataGrid;
   setPage: (paging: number) => void;
+  loading: boolean;
 }
 function Task(props: IProps) {
-  const { task, param, setPage } = props;
+  const { task, param, setPage, loading } = props;
   const { t } = useTranslation();
   const columns: ColumnsType<A> = [
     {
@@ -65,6 +66,7 @@ function Task(props: IProps) {
           dataSource={task}
           rowKey={(record) => record.id}
           scroll={{ x: 430 }}
+          loading={loading}
           pagination={{
             current: param.pageInfor!.pageNumber,
             pageSize: param.pageInfor!.pageSize,

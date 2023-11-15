@@ -45,9 +45,7 @@ const Overview = () => {
   }, []);
   return (
     <div className={styles.overview}>
-      <PermissionBlock module={'0ab7907a-afc1-4311-98e1-2ca3307e7f07'}>
-        <div>CC gi day</div>
-      </PermissionBlock>
+      <PermissionBlock module={'0ab7907a-afc1-4311-98e1-2ca3307e7f07'}>{/* <div>CC gi day</div> */}</PermissionBlock>
       <Row className={styles.wrapProcessManage}>
         <Col className={styles.processManage}>
           <Row className={styles.processInfo}>

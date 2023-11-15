@@ -134,7 +134,7 @@ function ChangePassword() {
             disabled
             options={validPassList}
             value={isValid}
-            style={{ display: 'flex', flexDirection: 'column', gap: 20, color: '#222222 !important' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: 20, color: '#000000 !important' }}
           />
         </Col>
       </Row>

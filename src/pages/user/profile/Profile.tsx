@@ -44,6 +44,7 @@ function Profile() {
   const [pieChartData, setPieChartData] = useState<A[]>([]);
   const [pieChartColor, setPieChartColor] = useState<string[]>([]);
   const [user, setUser] = useState<A>(true);
+  const [tableLoading, setTableLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchApi = async () => {
@@ -67,10 +68,21 @@ function Profile() {
 
   const getTaskList = async (drafParam?: Common.IDataGrid) => {
     try {
+      setTableLoading(true);
       const result = await service.taskService.get(drafParam ?? taskParam);
+      setTaskParam({
+        ...taskParam,
+        pageInfor: {
+          pageSize: result.prameter.pageSize,
+          pageNumber: result.prameter.pageNumber,
+          totalItems: result.prameter.totalItems
+        }
+      });
       setTaskList(result.data);
     } catch (e) {
       console.log(e);
+    } finally {
+      setTableLoading(false);
     }
   };
 
@@ -78,7 +90,7 @@ function Profile() {
     try {
       const task = await service.taskService.get({
         pageInfor: {
-          pageSize: 1000,
+          pageSize: 100000,
           pageNumber: 1,
           totalItems: 0
         },
@@ -157,7 +169,7 @@ function Profile() {
         <RecentlyActivities />
       </Col>
       <Col className={styles.task}>
-        <Task task={taskList} param={taskParam} setPage={setPage} />
+        <Task task={taskList} param={taskParam} setPage={setPage} loading={tableLoading} />
       </Col>
       <Col className={styles.information}>
         <Row className={styles.header}>

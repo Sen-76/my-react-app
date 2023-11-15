@@ -54,7 +54,7 @@ function Panel(props: IProps, ref: A) {
     try {
       const result = await service.rolesService.get({
         pageInfor: {
-          pageSize: 100,
+          pageSize: 100000,
           pageNumber: 1,
           totalItems: 0
         }
@@ -74,7 +74,7 @@ function Panel(props: IProps, ref: A) {
     try {
       const result = await service.departmentService.get({
         pageInfor: {
-          pageSize: 100,
+          pageSize: 100000,
           pageNumber: 1,
           totalItems: 0
         }
@@ -96,7 +96,7 @@ function Panel(props: IProps, ref: A) {
       showLoading();
       const result = await service.teamService.get({
         pageInfor: {
-          pageSize: 100,
+          pageSize: 100000,
           pageNumber: 1,
           totalItems: 0
         },

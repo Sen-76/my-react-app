@@ -22,54 +22,36 @@ const generateOption: GenerateOptionFuc = (option) => {
       containLabel: true
     },
     xAxis: {
-      // X axis label
       data: xAxisLabel,
       triggerEvent: true,
       axisLabel: {
-        // Show all x axis label, use 0
         interval: 0,
-        // X axis styles
         fontSize: 13,
         lineHeight: 18,
-        margin: 0,
+        margin: 1,
         width: 70,
-        color: '#222'
+        color: '#000000'
       },
       axisLine: {
         lineStyle: {
-          // X axis color
-          color: '#222'
+          color: '#000000'
         }
       },
       axisTick: {
-        // X axis scale height
         length: 3
       }
     },
-    // Y axis config
     yAxis: {
-      // The Y-axis interval is an integer and will not appear as 0.5
       minInterval: 1,
       axisLabel: {
-        // Y axis label color
         color: '#4B5566'
       }
     },
-    // Bar background, color string array
     color: ['#1677ff'],
     series: [
       {
         type: 'bar',
-        // Bar data
-        data: xAxisData,
-        // Bar width
-        barWidth: '60%',
-        // Number above Bar
-        label: {
-          show: true,
-          color: '#222',
-          position: 'top'
-        }
+        data: xAxisData
       }
     ]
   };
@@ -104,7 +86,8 @@ const BarChart = (props: BarChartProps) => {
       if (!ref) return;
       if (chartInstance.current) return;
       const config: A = {
-        height: '356px'
+        height: '356px',
+        width: '100%' // Set width to 100%
       };
       const boxWidth = ref?.parentElement?.clientWidth ?? 0;
       const displayNum = 5;

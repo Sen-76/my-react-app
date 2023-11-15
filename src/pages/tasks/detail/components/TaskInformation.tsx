@@ -8,6 +8,7 @@ import {
   Empty,
   Form,
   Image,
+  Input,
   List,
   Modal,
   Row,
@@ -42,7 +43,7 @@ import icons from '@/assets/icons';
 
 interface IProps {
   data: A;
-  refreshData: () => void;
+  refreshData: () => Promise<void>;
   setEditTitle: (value: boolean) => void;
 }
 function TaskInformation(props: Readonly<IProps>) {
@@ -53,7 +54,6 @@ function TaskInformation(props: Readonly<IProps>) {
   const [editedField, setEditedField] = useState<string>('');
   const [mileStoneList, setMileStoneList] = useState<A[]>([]);
   const [priotyList, setPriotyList] = useState<A[]>([]);
-  const [typeList, setTypeList] = useState<A[]>();
   const [userMemberList, setUserMemberList] = useState<A[]>([]);
   const [taskList, setTaskList] = useState<A[]>([]);
   const [selectLoading, setSelectLoading] = useState<boolean>();
@@ -61,6 +61,7 @@ function TaskInformation(props: Readonly<IProps>) {
   const userDebouncedAssignee = useDebounce(searchAssigneeValue, 300);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileAccept, setFileAccept] = useState<A>();
+  const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
   const [form] = Form.useForm();
   const { Dragger } = Upload;
 
@@ -68,11 +69,11 @@ function TaskInformation(props: Readonly<IProps>) {
     getUsers();
   }, [userDebouncedAssignee]);
 
-  useEffect(() => {
-    if (data) {
-      getTaskList();
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data) {
+  //     getTaskList();
+  //   }
+  // }, [data]);
 
   const getUsers = async () => {
     try {
@@ -129,17 +130,23 @@ function TaskInformation(props: Readonly<IProps>) {
       showLoading();
       setEditedField('');
       const cleanData = { ...data };
-      form.getFieldValue('taskLinksMore')?.length > 0 &&
-        (issueLink = [...data.taskLinks.map((x: A) => x.id), ...form.getFieldValue('taskLinksMore')]);
       await service.taskService.update({
         ...data,
         ...form.getFieldsValue(),
         assignee: form.getFieldValue('assignee')?.value ? form.getFieldValue('assignee')?.value : data.assignee,
         reportTo: form.getFieldValue('reportTo')?.value ? form.getFieldValue('reportTo')?.value : data.reportTo,
+        milestoneId:
+          typeof form.getFieldValue('milestoneId') === 'string'
+            ? form.getFieldValue('milestoneId')
+            : form.getFieldValue('milestoneId').value,
+        taskPriotyId:
+          typeof form.getFieldValue('taskPriotyId') === 'string'
+            ? form.getFieldValue('taskPriotyId')
+            : form.getFieldValue('taskPriotyId').value,
         attachments: attach && attach.length > 0 ? attach : cleanData.fileAttachments,
-        taskLinkIds: typeof issueLink === 'object' ? issueLink : cleanData.taskLinks.map((x: A) => x.taskLinkId) ?? []
+        taskLinkIds: issueLink ?? cleanData.taskLinks.map((x: A) => x.taskLinkId)
       });
-      refreshData();
+      await refreshData();
     } catch (e) {
       console.log(e);
     } finally {
@@ -147,20 +154,22 @@ function TaskInformation(props: Readonly<IProps>) {
     }
   };
 
-  useEffect(() => {
-    const fetchApi = async () => {
-      const promises = [getMilestoneList(), getTypeList(), getPriotyList()];
-      await Promise.all(promises);
-    };
-    fetchApi();
-  }, []);
+  // useEffect(() => {
+  //   const fetchApi = async () => {
+  //     const promises = [getMilestoneList(), getTypeList(), getPriotyList()];
+  //     await Promise.all(promises);
+  //   };
+  //   fetchApi();
+  // }, []);
 
-  const editField = (val: string) => {
+  const editField = async (val: string) => {
     if (data.status?.title === 'Open') {
       setEditTitle(false);
       setEditedField(val);
-      data.dueDate = dayjs(data.dueDate);
-      form.setFieldsValue(data);
+      const draft = { ...data };
+      draft.dueDate = dayjs(draft.dueDate);
+      draft.milestoneId = { label: draft.milestone.title, value: draft.milestoneId };
+      form.setFieldsValue(draft);
     }
   };
 
@@ -207,7 +216,6 @@ function TaskInformation(props: Readonly<IProps>) {
   useEffect(() => {
     getFileConfig();
   }, []);
-
   const getFileConfig = async () => {
     try {
       const result = await service.globalSettingsService.getByType(1);
@@ -216,12 +224,10 @@ function TaskInformation(props: Readonly<IProps>) {
       console.log(e);
     }
   };
-
   const IconShow = ({ value, ...props }: A) => {
     const iconItem = icons.find((icon) => icon.value === value);
     return iconItem ? React.cloneElement(iconItem.component, props) : null;
   };
-
   const handleUpload = async (fileList: A) => {
     try {
       showLoading();
@@ -242,19 +248,14 @@ function TaskInformation(props: Readonly<IProps>) {
       uploadFlag = false;
     }
   };
-
   const onRenderDetail = () => {
     return (
       <Row style={{ display: 'flex', gap: 10 }}>
         <Col style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
-          {/* <Row className={styles.detailRow}>
+          <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Key')}</Col>
             {editedField !== 'key' ? (
-              <Button
-                type="text"
-                style={{ padding: 5, width: 'calc(100% - 110px)' }}
-                // onClick={() => editField('key')}
-              >
+              <Button type="text" style={{ padding: 5, width: 'calc(100% - 110px)' }}>
                 <Col className={styles.valueCol}>{data?.key}</Col>
               </Button>
             ) : (
@@ -262,7 +263,7 @@ function TaskInformation(props: Readonly<IProps>) {
                 <Input style={{ width: '100%' }} onBlur={updateInfo} />
               </Form.Item>
             )}
-          </Row> */}
+          </Row>
           <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Milestone')}</Col>
             {editedField !== 'milestoneId' ? (
@@ -275,26 +276,33 @@ function TaskInformation(props: Readonly<IProps>) {
               </Button>
             ) : (
               <Form.Item name="milestoneId" rules={requiredRule}>
-                <Select options={mileStoneList} style={{ width: '100%' }} onBlur={updateInfo} />
+                <Select
+                  labelInValue
+                  onFocus={() => getMilestoneList()}
+                  options={mileStoneList}
+                  style={{ width: '100%' }}
+                  onBlur={updateInfo}
+                  notFoundContent={
+                    loadingFetch ? (
+                      <div
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          height: 100
+                        }}
+                      >
+                        <Spin />
+                      </div>
+                    ) : (
+                      <Empty />
+                    )
+                  }
+                />
               </Form.Item>
             )}
           </Row>
-          {/* <Row className={styles.detailRow}>
-            <Col className={styles.keyCol}>{t('Task_Type')}</Col>
-            {editedField !== 'taskType' ? (
-              <Button
-                type="text"
-                style={{ padding: 5, width: 'calc(100% - 110px)' }}
-                onClick={() => editField('taskType')}
-              >
-                <Col className={styles.valueCol}>{data?.taskType2?.title}</Col>
-              </Button>
-            ) : (
-              <Form.Item name="taskType" rules={requiredRule}>
-                <Select options={typeList} style={{ width: '100%' }} onBlur={updateInfo} />
-              </Form.Item>
-            )}
-          </Row> */}
           <Row className={styles.detailRow}>
             <Col className={styles.keyCol}>{t('Task_Priority')}</Col>
             {editedField !== 'taskPriotyId' ? (
@@ -310,7 +318,29 @@ function TaskInformation(props: Readonly<IProps>) {
               </Button>
             ) : (
               <Form.Item name="taskPriotyId" rules={requiredRule}>
-                <Select options={priotyList} style={{ width: '100%' }} onBlur={updateInfo} />
+                <Select
+                  onFocus={() => getPriotyList()}
+                  options={priotyList}
+                  style={{ width: '100%' }}
+                  onBlur={updateInfo}
+                  notFoundContent={
+                    loadingFetch ? (
+                      <div
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          height: 100
+                        }}
+                      >
+                        <Spin />
+                      </div>
+                    ) : (
+                      <Empty />
+                    )
+                  }
+                />
               </Form.Item>
             )}
           </Row>
@@ -356,7 +386,9 @@ function TaskInformation(props: Readonly<IProps>) {
           style={{ padding: 5, display: 'flex', width: '100%', alignItems: 'center', height: 'auto' }}
           onClick={() => editField('description')}
         >
-          <Empty />
+          <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Empty />
+          </div>
         </Button>
       )
     ) : (
@@ -681,7 +713,6 @@ function TaskInformation(props: Readonly<IProps>) {
     setIsModalOpen(true);
   };
   const handleOk = () => {
-    console.log(form.getFieldValue('taskLinksMore'));
     updateInfo(undefined, form.getFieldValue('taskLinksMore'));
     form.setFieldValue('taskLinksMore', []);
     setIsModalOpen(false);
@@ -703,45 +734,34 @@ function TaskInformation(props: Readonly<IProps>) {
 
   const getMilestoneList = async () => {
     try {
+      setLoadingFetch(true);
       const result = await service.milestoneService.get({
         pageInfor: {
-          pageSize: 100,
+          pageSize: 100000,
           pageNumber: 1,
           totalItems: 0
         }
       });
-      setMileStoneList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
+      setMileStoneList(result.data?.map((x: A) => ({ label: x?.title, value: x.id })));
     } catch (e) {
       console.log(e);
-    }
-  };
-
-  const getTypeList = async () => {
-    try {
-      const result = await service.taskTypeService.get({
-        pageInfor: {
-          pageSize: 100,
-          pageNumber: 1,
-          totalItems: 0
-        }
-      });
-      setTypeList(result.data.map((x: A) => ({ label: x?.title, value: x.id })));
-    } catch (e) {
-      console.log(e);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
   const getPriotyList = async () => {
     try {
+      setLoadingFetch(true);
       const result = await service.taskPriotyService.get({
         pageInfor: {
-          pageSize: 100,
+          pageSize: 100000,
           pageNumber: 1,
           totalItems: 0
         }
       });
       setPriotyList(
-        result.data.map((x: A) => ({
+        result.data?.map((x: A) => ({
           label: (
             <>
               <IconShow value={x?.iconUrl} disabled style={{ marginRight: 10 }} />
@@ -753,11 +773,14 @@ function TaskInformation(props: Readonly<IProps>) {
       );
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
   const getTaskList = async () => {
     try {
+      setLoadingFetch(true);
       const result = await service.taskService.get({
         pageInfor: {
           pageSize: 100,
@@ -773,9 +796,11 @@ function TaskInformation(props: Readonly<IProps>) {
           }
         ]
       });
-      setTaskList(result.data.map((x: A) => ({ label: `[` + x.key + `] ` + x.summary, value: x.id })));
+      setTaskList(result.data?.map((x: A) => ({ label: `[` + x.key + `] ` + x.summary, value: x.id })));
     } catch (e) {
       console.log(e);
+    } finally {
+      setLoadingFetch(false);
     }
   };
 
